@@ -1,0 +1,127 @@
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// We allow the app to run without env vars in local dev — it falls back to
+// localStorage so you can demo the UI even before wiring Supabase.
+const hasSupabase = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+export const supabase = hasSupabase ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+// =============================================================================
+// LOCAL FALLBACK — used when Supabase env vars are missing
+// =============================================================================
+const LS_PREFIX = 'hyperlink:';
+const lsGet = (k) => {
+  try {
+    const v = localStorage.getItem(LS_PREFIX + k);
+    return v ? JSON.parse(v) : null;
+  } catch { return null; }
+};
+const lsSet = (k, v) => {
+  try { localStorage.setItem(LS_PREFIX + k, JSON.stringify(v)); } catch {}
+};
+
+// =============================================================================
+// PROFILES API
+// =============================================================================
+
+/**
+ * Load a single profile by handle (lowercased automatically).
+ * Returns null if not found.
+ */
+export async function loadProfile(handle) {
+  const h = handle.toLowerCase().trim();
+  if (!h) return null;
+
+  if (!hasSupabase) {
+    return lsGet(`profile:${h}`);
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('handle', h)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return rowToProfile(data);
+}
+
+/**
+ * Check whether a handle is already taken. Used during the create flow.
+ */
+export async function isHandleTaken(handle) {
+  const profile = await loadProfile(handle);
+  return !!profile;
+}
+
+/**
+ * Save a profile. Inserts on first publish, fails on conflict so we never
+ * silently overwrite someone else's handle. Returns { ok: bool, error?: string }.
+ */
+export async function saveProfile(profile) {
+  const h = profile.handle.toLowerCase().trim();
+  const record = {
+    handle: h,
+    display_name: profile.displayName?.trim() || h,
+    bio: profile.bio?.trim() || '',
+    category: profile.category,
+    pinned: profile.pinned || null,
+    links: profile.links || [],
+  };
+
+  if (!hasSupabase) {
+    if (lsGet(`profile:${h}`)) {
+      return { ok: false, error: 'Handle already taken' };
+    }
+    lsSet(`profile:${h}`, { ...record, displayName: record.display_name, createdAt: Date.now() });
+    const idx = lsGet('index') || [];
+    if (!idx.includes(h)) lsSet('index', [h, ...idx].slice(0, 100));
+    return { ok: true };
+  }
+
+  const { error } = await supabase.from('profiles').insert(record);
+  if (error) {
+    // 23505 = unique_violation in postgres
+    if (error.code === '23505') return { ok: false, error: 'Handle already taken' };
+    return { ok: false, error: error.message || 'Failed to publish' };
+  }
+  return { ok: true };
+}
+
+/**
+ * Load the most recent N profiles for the directory page.
+ */
+export async function loadRecentProfiles(limit = 24) {
+  if (!hasSupabase) {
+    const idx = lsGet('index') || [];
+    return idx.slice(0, limit).map((h) => lsGet(`profile:${h}`)).filter(Boolean);
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error || !data) return [];
+  return data.map(rowToProfile);
+}
+
+// =============================================================================
+// Helpers
+// =============================================================================
+function rowToProfile(row) {
+  return {
+    handle: row.handle,
+    displayName: row.display_name,
+    bio: row.bio,
+    category: row.category,
+    pinned: row.pinned,
+    links: row.links || [],
+    createdAt: row.created_at,
+  };
+}
+
+export const usingSupabase = hasSupabase;
