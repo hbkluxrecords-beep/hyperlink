@@ -7,6 +7,8 @@ import MusicLinkButton from '../components/MusicLinkButton.jsx';
 import { STUDIO, STUDIO_FONTS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
 import { LUXURY_EASE, staggerContainer } from '../lib/animations.js';
 import { loadArtist, trackEvent } from '../lib/studioStorage.js';
+import { isOwnerOf, checkHandle, getSession, logout } from '../../lib/auth.js';
+import ClaimModal from '../../components/ClaimModal.jsx';
 
 // Truncate "City, Full Country" to "City, USA"
 function compactLocation(loc) {
@@ -97,13 +99,22 @@ export default function StudioProfile() {
   const [artist, setArtist] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [claimable, setClaimable] = useState(false);
+  const [showClaim, setShowClaim] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    loadArtist(handle).then((a) => {
+    loadArtist(handle).then(async (a) => {
       setArtist(a);
       setLoading(false);
-      if (a) trackEvent(handle, 'view');
+      if (a) {
+        trackEvent(handle, 'view');
+        // Check if profile is unclaimed (no password yet) → show Claim button
+        const status = await checkHandle(handle);
+        setClaimable(status.exists && !status.claimed);
+        setIsOwner(isOwnerOf(handle));
+      }
     });
   }, [handle]);
 
@@ -241,7 +252,7 @@ export default function StudioProfile() {
               )}
 
               {/* Inline share/analytics */}
-              <div className="flex items-center gap-2 mt-5">
+              <div className="flex items-center gap-2 mt-5 flex-wrap">
                 <button
                   onClick={share}
                   className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
@@ -256,6 +267,26 @@ export default function StudioProfile() {
                 >
                   Analytics
                 </Link>
+                {claimable && !isOwner && (
+                  <button
+                    onClick={() => setShowClaim(true)}
+                    className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
+                    style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+                  >
+                    🔒 Claim profile
+                  </button>
+                )}
+                {isOwner && (
+                  <>
+                    <button
+                      onClick={() => { logout(); setIsOwner(false); }}
+                      className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                      style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+                    >
+                      Log out
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
 
@@ -325,7 +356,7 @@ export default function StudioProfile() {
               </div>
             )}
 
-            <div className="flex items-center gap-2 mt-6">
+            <div className="flex items-center gap-2 mt-6 flex-wrap">
               <button
                 onClick={share}
                 className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
@@ -340,6 +371,24 @@ export default function StudioProfile() {
               >
                 Analytics
               </Link>
+              {claimable && !isOwner && (
+                <button
+                  onClick={() => setShowClaim(true)}
+                  className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
+                  style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+                >
+                  🔒 Claim profile
+                </button>
+              )}
+              {isOwner && (
+                <button
+                  onClick={() => { logout(); setIsOwner(false); }}
+                  className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                  style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+                >
+                  Log out
+                </button>
+              )}
             </div>
           </motion.div>
         )}
@@ -462,6 +511,20 @@ export default function StudioProfile() {
           <Link to="/studio/new" className="hover:opacity-100 hover:underline">Claim yours →</Link>
         </div>
       </div>
+
+      {showClaim && (
+        <ClaimModal
+          handle={handle}
+          type="artist"
+          theme="dark"
+          onClose={() => setShowClaim(false)}
+          onClaimed={() => {
+            setShowClaim(false);
+            setClaimable(false);
+            setIsOwner(true);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import Create from './pages/Create.jsx';
 import Profile from './pages/Profile.jsx';
 import Explore from './pages/Explore.jsx';
 import Lookup from './pages/Lookup.jsx';
+import Login from './pages/Login.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 // Studio (isolated — won't affect main site if broken)
@@ -31,6 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* Existing main site routes — untouched */}
         <Route path="/" element={<Landing />} />
         <Route path="/new" element={<Create />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/find" element={<Lookup />} />
         <Route path="/:handle" element={<Profile />} />

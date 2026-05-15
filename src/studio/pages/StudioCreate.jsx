@@ -11,6 +11,7 @@ import {
   uploadFile,
 } from '../lib/studioStorage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
+import { setPasswordForHandle, validatePassword } from '../../lib/auth.js';
 
 const RESERVED = ['new', 'explore', 'analytics', 'studio', 'admin', 'api', 'edit', 'login', 'signup'];
 
@@ -44,6 +45,10 @@ export default function StudioCreate() {
   // Step 3: Links
   const [musicLinks, setMusicLinks] = useState([]);
   const [socials, setSocials] = useState({});
+
+  // Step 4: Password
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
 
   const toggleGenre = (g) => {
     setGenres((prev) =>
@@ -130,6 +135,11 @@ export default function StudioCreate() {
     } else if (step === 2) {
       setStep(3);
     } else if (step === 3) {
+      setStep(4);
+    } else if (step === 4) {
+      const pwErr = validatePassword(password);
+      if (pwErr) { setErrorMsg(pwErr); return; }
+      if (password !== passwordConfirm) { setErrorMsg('Passwords don\'t match'); return; }
       await publish();
     }
   };
@@ -196,6 +206,12 @@ export default function StudioCreate() {
         });
       }
 
+      // Set password
+      const pwResult = await setPasswordForHandle(h, password, 'artist');
+      if (!pwResult.ok) {
+        console.warn('Password not set:', pwResult.error);
+      }
+
       navigate(`/studio/${h}`);
     } catch (e) {
       setErrorMsg(e.message || 'Something went wrong');
@@ -242,7 +258,7 @@ export default function StudioCreate() {
       <div className="max-w-2xl mx-auto px-6 md:px-12 pt-32 pb-24">
         {/* Step indicator */}
         <div className="flex items-center gap-2 mb-12">
-          {[1, 2, 3].map((n) => (
+          {[1, 2, 3, 4].map((n) => (
             <motion.div
               key={n}
               className="flex-1 h-[2px]"
@@ -252,7 +268,7 @@ export default function StudioCreate() {
           ))}
         </div>
         <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-8" style={labelStyle}>
-          NEW STUDIO · {step} / 3
+          NEW STUDIO · {step} / 4
         </div>
 
         <AnimatePresence mode="wait">
@@ -536,6 +552,59 @@ export default function StudioCreate() {
               </div>
             </motion.div>
           )}
+
+          {step === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4, ease: LUXURY_EASE }}
+              className="space-y-10"
+            >
+              <h2 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tight" style={{ fontFamily: STUDIO_FONTS.display }}>
+                Lock it<br />
+                <span style={{ color: STUDIO.accent, fontStyle: 'italic', fontWeight: 300 }}>down.</span>
+              </h2>
+              <p className="text-base opacity-70 max-w-md" style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.muted }}>
+                Set a password so only you can edit your studio. Save it — there's no recovery yet.
+              </p>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={labelStyle}>
+                    Password · 6+ characters
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••"
+                    className="w-full text-2xl pb-2 outline-none"
+                    style={inputStyle}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={labelStyle}>
+                    Confirm
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    placeholder="••••••"
+                    className="w-full text-2xl pb-2 outline-none"
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+
+              <div className="pl-4 py-2 text-xs opacity-80" style={{ borderLeft: `2px solid ${STUDIO.accent}`, fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}>
+                Your handle is <strong>/{handle}</strong>. You'll use it to log in.
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* Nav */}
@@ -562,7 +631,7 @@ export default function StudioCreate() {
               className="px-6 py-3 text-xs tracking-[0.25em] uppercase font-bold transition-all disabled:opacity-40"
               style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
             >
-              {saving ? 'Publishing…' : step === 3 ? 'Publish Studio' : 'Continue'} →
+              {saving ? 'Publishing…' : step === 4 ? 'Publish Studio' : 'Continue'} →
             </motion.button>
           </div>
         </div>

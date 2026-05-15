@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Grain, Halftone, Stamp } from '../components/Primitives.jsx';
 import { ACCENT, INK, PAPER, CATEGORIES } from '../lib/design.js';
 import { loadProfile } from '../lib/storage.js';
+import { isOwnerOf, checkHandle, logout } from '../lib/auth.js';
+import ClaimModal from '../components/ClaimModal.jsx';
 
 export default function Profile() {
   const { handle } = useParams();
@@ -10,10 +12,21 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [claimable, setClaimable] = useState(false);
+  const [showClaim, setShowClaim] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    loadProfile(handle).then((p) => { setProfile(p); setLoading(false); });
+    loadProfile(handle).then(async (p) => {
+      setProfile(p);
+      setLoading(false);
+      if (p) {
+        const status = await checkHandle(handle);
+        setClaimable(status.exists && !status.claimed);
+        setIsOwner(isOwnerOf(handle));
+      }
+    });
   }, [handle]);
 
   const share = async () => {
@@ -65,9 +78,29 @@ export default function Profile() {
         <Link to="/" className="text-xs tracking-[0.2em] uppercase font-bold hover:underline flex items-center gap-2" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
           ← HYPERLINK
         </Link>
-        <button onClick={share} className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5" style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}>
-          {copied ? '✓ Copied' : 'Share ↗'}
-        </button>
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          {claimable && !isOwner && (
+            <button
+              onClick={() => setShowClaim(true)}
+              className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5 hover:scale-[1.02] transition-transform"
+              style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+            >
+              🔒 Claim
+            </button>
+          )}
+          {isOwner && (
+            <button
+              onClick={() => { logout(); setIsOwner(false); }}
+              className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5"
+              style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}
+            >
+              Log out
+            </button>
+          )}
+          <button onClick={share} className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5" style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}>
+            {copied ? '✓ Copied' : 'Share ↗'}
+          </button>
+        </div>
       </header>
 
       <div className="max-w-xl mx-auto px-6 pt-12 md:pt-16">
@@ -139,6 +172,20 @@ export default function Profile() {
           <Link to="/new" className="hover:opacity-100 hover:underline">Make your own →</Link>
         </div>
       </div>
+
+      {showClaim && (
+        <ClaimModal
+          handle={handle}
+          type="creator"
+          theme="light"
+          onClose={() => setShowClaim(false)}
+          onClaimed={() => {
+            setShowClaim(false);
+            setClaimable(false);
+            setIsOwner(true);
+          }}
+        />
+      )}
     </div>
   );
 }

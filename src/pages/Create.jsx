@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Grain, Stamp } from '../components/Primitives.jsx';
 import { ACCENT, INK, PAPER, PAPER_DEEP, CATEGORIES, LINK_PRESETS } from '../lib/design.js';
 import { isHandleTaken, saveProfile } from '../lib/storage.js';
+import { setPasswordForHandle, validatePassword } from '../lib/auth.js';
 
 export default function Create() {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ export default function Create() {
   const [handleError, setHandleError] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [saving, setSaving] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
 
   useEffect(() => {
     if (step === 2 && links.every((l) => !l.label && !l.url)) {
@@ -51,6 +54,13 @@ export default function Create() {
     } else if (step === 2) {
       setStep(3);
     } else if (step === 3) {
+      setStep(4);
+    } else if (step === 4) {
+      // Validate password
+      const pwErr = validatePassword(password);
+      if (pwErr) { setErrorMsg(pwErr); return; }
+      if (password !== passwordConfirm) { setErrorMsg('Passwords don\'t match'); return; }
+
       setSaving(true);
       try {
         const cleanLinks = links.filter((l) => l.label.trim() && l.url.trim());
@@ -66,6 +76,12 @@ export default function Create() {
         if (!result.ok) {
           setErrorMsg(result.error || 'Failed to publish');
           return;
+        }
+        // Set password right after profile created
+        const pwResult = await setPasswordForHandle(profile.handle, password, 'creator');
+        if (!pwResult.ok) {
+          // Profile saved but password failed — non-fatal, just warn
+          console.warn('Password not set:', pwResult.error);
         }
         navigate(`/${profile.handle}`);
       } catch (e) {
@@ -88,13 +104,13 @@ export default function Create() {
           ← Back to index
         </Link>
         <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-          NEW SUBMISSION · {step} / 3
+          NEW SUBMISSION · {step} / 4
         </div>
       </header>
 
       <div className="max-w-2xl mx-auto px-6 md:px-12 py-16 md:py-24">
         <div className="flex items-center gap-2 mb-12">
-          {[1, 2, 3].map((n) => (
+          {[1, 2, 3, 4].map((n) => (
             <div key={n} className="flex-1 h-1" style={{ background: n <= step ? ACCENT : 'rgba(0,0,0,0.15)' }} />
           ))}
         </div>
@@ -202,6 +218,54 @@ export default function Create() {
           </div>
         )}
 
+        {step === 4 && (
+          <div className="space-y-10">
+            <div>
+              <Stamp rotate={-2}>STEP 04 / SECURE IT</Stamp>
+              <h2 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tight mt-4" style={{ fontFamily: '"Fraunces", serif' }}>
+                Set a <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>password</span>.
+              </h2>
+              <p className="mt-4 text-base opacity-70 max-w-md" style={{ fontFamily: '"Fraunces", serif' }}>
+                So you can come back and edit your profile anytime. Save it somewhere safe — there's no recovery yet.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                  Password · 6+ characters
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••"
+                  className="w-full text-2xl bg-transparent border-b-2 pb-2 outline-none"
+                  style={{ borderColor: INK, fontFamily: '"Fraunces", serif' }}
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                  Confirm password
+                </label>
+                <input
+                  type="password"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  placeholder="••••••"
+                  className="w-full text-2xl bg-transparent border-b-2 pb-2 outline-none"
+                  style={{ borderColor: INK, fontFamily: '"Fraunces", serif' }}
+                />
+              </div>
+            </div>
+
+            <div className="border-l-4 pl-4 py-2 text-xs opacity-80" style={{ borderColor: ACCENT, fontFamily: '"Fraunces", serif' }}>
+              Your handle is <strong>/{handle}</strong>. Remember it — you'll use it to log in.
+            </div>
+          </div>
+        )}
+
         <div className="mt-16 pt-8 border-t-2" style={{ borderColor: INK }}>
           {errorMsg && (
             <div className="mb-4 px-4 py-3 border-2 text-xs font-bold flex items-center gap-2" style={{ borderColor: ACCENT, color: ACCENT, background: 'rgba(255,77,31,0.06)', fontFamily: '"JetBrains Mono", monospace' }}>
@@ -220,7 +284,7 @@ export default function Create() {
               className="px-6 py-3 text-xs tracking-[0.25em] uppercase font-bold border-2 flex items-center gap-2 disabled:opacity-40 hover:scale-[1.02] transition-transform"
               style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
             >
-              {saving ? 'Publishing…' : step === 3 ? 'Publish profile' : 'Continue'} →
+              {saving ? 'Publishing…' : step === 4 ? 'Publish profile' : 'Continue'} →
             </button>
           </div>
         </div>
