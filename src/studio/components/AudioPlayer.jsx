@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Waveform from './Waveform.jsx';
-import CoverArt from './CoverArt.jsx';
+import ReleaseCover from './ReleaseCover.jsx';
 import { STUDIO, STUDIO_FONTS } from '../lib/studioDesign.js';
 import { formatTime } from '../lib/audioUtils.js';
 
@@ -111,11 +111,11 @@ export default function AudioPlayer({
       <audio ref={audioRef} src={src} preload="metadata" />
 
       <div className={`flex ${isHero ? 'flex-col md:flex-row gap-6 md:gap-8' : 'flex-row gap-4'} items-center`}>
-        <CoverArt
+        <ReleaseCover
           src={coverArtUrl}
-          alt={title}
+          trackTitle={title || 'Untitled'}
           playing={playing}
-          size={isHero ? 160 : 80}
+          size={isHero ? 240 : 80}
         />
 
         <div className="flex-1 min-w-0 w-full">

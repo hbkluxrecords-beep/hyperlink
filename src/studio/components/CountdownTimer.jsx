@@ -6,26 +6,27 @@ function timeLeft(target) {
   const now = Date.now();
   const t = new Date(target).getTime();
   const diff = Math.max(0, t - now);
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff / 3600000) % 24);
-  const mins = Math.floor((diff / 60000) % 60);
-  const secs = Math.floor((diff / 1000) % 60);
-  return { days, hours, mins, secs, expired: diff === 0 };
+  return {
+    days: Math.floor(diff / 86400000),
+    hours: Math.floor((diff / 3600000) % 24),
+    mins: Math.floor((diff / 60000) % 60),
+    secs: Math.floor((diff / 1000) % 60),
+    expired: diff === 0,
+  };
 }
 
-function FlipDigit({ value, label }) {
+function Unit({ value, label, primary = false }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex items-baseline gap-1.5">
       <div
         className="relative overflow-hidden tabular-nums"
         style={{
           fontFamily: STUDIO_FONTS.display,
-          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+          fontSize: primary ? 'clamp(1.75rem, 5vw, 2.5rem)' : 'clamp(1.25rem, 3.5vw, 1.75rem)',
           fontWeight: 900,
           color: STUDIO.ink,
           lineHeight: 1,
-          minWidth: '1.5em',
-          textAlign: 'center',
+          minWidth: primary ? '1.2em' : '1em',
         }}
       >
         <AnimatePresence mode="popLayout">
@@ -34,7 +35,7 @@ function FlipDigit({ value, label }) {
             initial={{ y: '-100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="block"
           >
             {String(value).padStart(2, '0')}
@@ -42,7 +43,7 @@ function FlipDigit({ value, label }) {
         </AnimatePresence>
       </div>
       <span
-        className="text-[10px] tracking-[0.3em] uppercase mt-2"
+        className="text-[9px] tracking-[0.3em] uppercase"
         style={{ color: STUDIO.muted, fontFamily: STUDIO_FONTS.mono }}
       >
         {label}
@@ -67,14 +68,14 @@ export default function CountdownTimer({ target, onExpire }) {
   if (t.expired) return null;
 
   return (
-    <div className="flex items-center gap-4 md:gap-8 justify-center">
-      <FlipDigit value={t.days} label="Days" />
-      <span style={{ color: STUDIO.accent, fontSize: '3rem', fontFamily: STUDIO_FONTS.display, lineHeight: 1 }}>:</span>
-      <FlipDigit value={t.hours} label="Hrs" />
-      <span style={{ color: STUDIO.accent, fontSize: '3rem', fontFamily: STUDIO_FONTS.display, lineHeight: 1 }}>:</span>
-      <FlipDigit value={t.mins} label="Min" />
-      <span style={{ color: STUDIO.accent, fontSize: '3rem', fontFamily: STUDIO_FONTS.display, lineHeight: 1 }}>:</span>
-      <FlipDigit value={t.secs} label="Sec" />
+    <div className="flex items-center gap-3 md:gap-5 flex-wrap">
+      <Unit value={t.days} label="Days" primary />
+      <span style={{ color: STUDIO.border, fontSize: '1rem' }}>·</span>
+      <Unit value={t.hours} label="Hrs" />
+      <span style={{ color: STUDIO.border, fontSize: '1rem' }}>·</span>
+      <Unit value={t.mins} label="Min" />
+      <span style={{ color: STUDIO.border, fontSize: '1rem' }}>·</span>
+      <Unit value={t.secs} label="Sec" />
     </div>
   );
 }
