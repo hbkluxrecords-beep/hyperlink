@@ -1,22 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion } from 'motion/react';
 import StudioNav from '../components/StudioNav.jsx';
 import PresaveBlock from '../components/PresaveBlock.jsx';
 import MusicLinkButton from '../components/MusicLinkButton.jsx';
 import { STUDIO, STUDIO_FONTS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
-import { LUXURY_EASE, staggerContainer, staggerItem } from '../lib/animations.js';
+import { LUXURY_EASE, staggerContainer } from '../lib/animations.js';
 import { loadArtist, trackEvent } from '../lib/studioStorage.js';
 
-// Truncate "City, Full Country" to "City, ST"
+// Truncate "City, Full Country" to "City, USA"
 function compactLocation(loc) {
   if (!loc) return '';
-  // Take everything before first comma (city), then short region after
   const parts = loc.split(',').map((s) => s.trim()).filter(Boolean);
   if (parts.length <= 1) return parts[0]?.toUpperCase() || '';
   const city = parts[0];
   let region = parts[1];
-  // Map common full names to abbreviations
   const stateMap = {
     'united states of america': 'USA',
     'united states': 'USA',
@@ -24,7 +22,6 @@ function compactLocation(loc) {
   };
   const lower = region.toLowerCase();
   if (stateMap[lower]) region = stateMap[lower];
-  // If region is a 2-letter code, keep it. Otherwise truncate to first word
   if (region.length > 3) region = region.split(' ')[0];
   return `${city.toUpperCase()}, ${region.toUpperCase()}`;
 }
@@ -33,18 +30,63 @@ function SectionLabel({ number, label }) {
   return (
     <div className="flex items-center gap-3 mb-6">
       <span
-        className="text-[10px] tracking-[0.3em] uppercase font-bold"
+        className="text-[10px] tracking-[0.3em] uppercase font-bold shrink-0"
         style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}
       >
         § {number}
       </span>
       <span
-        className="text-[10px] tracking-[0.3em] uppercase font-bold"
+        className="text-[10px] tracking-[0.3em] uppercase font-bold shrink-0"
         style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
       >
         {label}
       </span>
       <div className="flex-1 h-px" style={{ background: STUDIO.border }} />
+    </div>
+  );
+}
+
+function ArtistCard({ artist, year, locDisplay, compact = false }) {
+  return (
+    <div className="flex gap-5 items-start">
+      {artist.photoUrl && (
+        <div
+          className={`shrink-0 overflow-hidden rounded-full ${compact ? 'w-16 h-16' : 'w-20 h-20 md:w-24 md:h-24'}`}
+          style={{ border: `1px solid ${STUDIO.borderStrong}` }}
+        >
+          <img src={artist.photoUrl} alt={artist.artistName} className="w-full h-full object-cover" />
+        </div>
+      )}
+
+      <div className="flex-1 min-w-0">
+        <div
+          className="font-black leading-[1] tracking-tighter break-words"
+          style={{
+            fontFamily: STUDIO_FONTS.display,
+            fontSize: compact ? 'clamp(1.5rem, 5vw, 2rem)' : 'clamp(1.75rem, 5.5vw, 2.25rem)',
+          }}
+        >
+          {artist.artistName}
+        </div>
+
+        {artist.genres && artist.genres.length > 0 && (
+          <div
+            className="mt-2 text-[10px] tracking-[0.3em] uppercase font-bold"
+            style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}
+          >
+            {artist.genres.join(' · ')}
+          </div>
+        )}
+
+        {locDisplay && (
+          <div
+            className="mt-1.5 text-[10px] tracking-[0.3em] uppercase truncate"
+            style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+          >
+            ◉ {locDisplay} · EST {year}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -55,9 +97,6 @@ export default function StudioProfile() {
   const [artist, setArtist] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-
-  const { scrollY } = useScroll();
-  const photoParallax = useTransform(scrollY, [0, 600], [0, -60]);
 
   useEffect(() => {
     setLoading(true);
@@ -128,7 +167,7 @@ export default function StudioProfile() {
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20">
       <StudioNav minimal />
 
-      {/* Vol/Issue stamp - top of page like main site */}
+      {/* Vol/Issue stamp */}
       <div className="max-w-2xl mx-auto px-6 pt-28 pb-2">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
@@ -151,7 +190,6 @@ export default function StudioProfile() {
 
       <div className="max-w-2xl mx-auto px-6 pb-12">
 
-        {/* HERO: Release if exists, otherwise artist */}
         {releaseIsHero ? (
           <>
             {/* Release headline */}
@@ -159,7 +197,7 @@ export default function StudioProfile() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: LUXURY_EASE, delay: 0.1 }}
-              className="mb-6 mt-4"
+              className="mb-8 mt-4"
             >
               <span
                 className="text-[10px] tracking-[0.35em] uppercase font-bold block mb-2"
@@ -178,8 +216,51 @@ export default function StudioProfile() {
               </h1>
             </motion.div>
 
+            {/* ARTIST CARD — now right under the headline */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: LUXURY_EASE, delay: 0.25 }}
+              className="mb-6 pb-6"
+              style={{ borderBottom: `1px solid ${STUDIO.border}` }}
+            >
+              <ArtistCard artist={artist} year={year} locDisplay={locDisplay} compact />
+
+              {artist.bio && (
+                <div
+                  className="mt-5 pl-5 py-1"
+                  style={{ borderLeft: `2px solid ${STUDIO.accent}` }}
+                >
+                  <p
+                    className="text-base md:text-lg leading-snug"
+                    style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}
+                  >
+                    {artist.bio}
+                  </p>
+                </div>
+              )}
+
+              {/* Inline share/analytics */}
+              <div className="flex items-center gap-2 mt-5">
+                <button
+                  onClick={share}
+                  className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                  style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.ink }}
+                >
+                  {copied ? '✓ Copied' : 'Share ↗'}
+                </button>
+                <Link
+                  to={`/studio/${handle}/analytics`}
+                  className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                  style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+                >
+                  Analytics
+                </Link>
+              </div>
+            </motion.div>
+
             {/* Presave/Player block */}
-            <div className="mb-16">
+            <div className="mb-12">
               <PresaveBlock
                 release={featuredRelease}
                 artistName={artist.artistName}
@@ -187,82 +268,6 @@ export default function StudioProfile() {
                 onPresaveClick={() => trackEvent(handle, 'presave_click', { trackTitle: featuredRelease.trackTitle })}
               />
             </div>
-
-            {/* Artist credit (below the music) */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-            >
-              <SectionLabel number="02" label="The Artist" />
-
-              <div className="flex gap-5 items-start">
-                {artist.photoUrl && (
-                  <motion.div
-                    style={{ y: photoParallax }}
-                    className="shrink-0 overflow-hidden"
-                  >
-                    <div
-                      className="w-24 h-24 md:w-32 md:h-32 overflow-hidden rounded-full"
-                      style={{ border: `1px solid ${STUDIO.borderStrong}` }}
-                    >
-                      <img src={artist.photoUrl} alt={artist.artistName} className="w-full h-full object-cover" />
-                    </div>
-                  </motion.div>
-                )}
-
-                <div className="flex-1 min-w-0">
-                  <h2
-                    className="font-black leading-[0.95] tracking-tighter break-words"
-                    style={{
-                      fontFamily: STUDIO_FONTS.display,
-                      fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
-                    }}
-                  >
-                    {artist.artistName}
-                  </h2>
-
-                  {/* Genre line - liner notes style */}
-                  {artist.genres && artist.genres.length > 0 && (
-                    <div
-                      className="mt-2 text-[10px] tracking-[0.3em] uppercase font-bold"
-                      style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}
-                    >
-                      {artist.genres.join(' · ')}
-                    </div>
-                  )}
-
-                  {locDisplay && (
-                    <div
-                      className="mt-1.5 text-[10px] tracking-[0.3em] uppercase truncate"
-                      style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-                    >
-                      ◉ {locDisplay} · EST {year}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Bio as magazine pull-quote, no italic quote marks */}
-              {artist.bio && (
-                <div
-                  className="mt-6 pl-5 py-1"
-                  style={{ borderLeft: `2px solid ${STUDIO.accent}` }}
-                >
-                  <p
-                    className="text-lg md:text-xl leading-snug"
-                    style={{
-                      fontFamily: STUDIO_FONTS.display,
-                      color: STUDIO.ink,
-                      fontWeight: 400,
-                    }}
-                  >
-                    {artist.bio}
-                  </p>
-                </div>
-              )}
-            </motion.div>
           </>
         ) : (
           // No release — artist info IS the hero
@@ -319,28 +324,27 @@ export default function StudioProfile() {
                 </p>
               </div>
             )}
+
+            <div className="flex items-center gap-2 mt-6">
+              <button
+                onClick={share}
+                className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.ink }}
+              >
+                {copied ? '✓ Copied' : 'Share ↗'}
+              </button>
+              <Link
+                to={`/studio/${handle}/analytics`}
+                className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+              >
+                Analytics
+              </Link>
+            </div>
           </motion.div>
         )}
 
-        {/* Share/Analytics buttons */}
-        <div className="flex items-center gap-2 mt-8 mb-8">
-          <button
-            onClick={share}
-            className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
-            style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.ink }}
-          >
-            {copied ? '✓ Copied' : 'Share ↗'}
-          </button>
-          <Link
-            to={`/studio/${handle}/analytics`}
-            className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
-            style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-          >
-            Analytics
-          </Link>
-        </div>
-
-        {/* Tracklist - other releases as vinyl back cover style */}
+        {/* Discography */}
         {otherReleases.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -348,7 +352,7 @@ export default function StudioProfile() {
             viewport={{ once: true }}
             className="mt-12"
           >
-            <SectionLabel number="03" label="Discography" />
+            <SectionLabel number="02" label="Discography" />
             <div className="space-y-2">
               {otherReleases.map((r, i) => (
                 <div
@@ -392,9 +396,9 @@ export default function StudioProfile() {
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            className="mt-16"
+            className="mt-12"
           >
-            <SectionLabel number={otherReleases.length > 0 ? '04' : '03'} label="Listen Everywhere" />
+            <SectionLabel number={otherReleases.length > 0 ? '03' : '02'} label="Listen Everywhere" />
             <div className="space-y-3">
               {artist.links.map((l, i) => (
                 <MusicLinkButton
@@ -416,10 +420,16 @@ export default function StudioProfile() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="mt-16"
+            className="mt-12"
           >
             <SectionLabel
-              number={otherReleases.length > 0 ? '05' : '04'}
+              number={
+                (otherReleases.length > 0 ? 1 : 0) +
+                (artist.links?.length > 0 ? 1 : 0) +
+                2 < 10
+                  ? String((otherReleases.length > 0 ? 1 : 0) + (artist.links?.length > 0 ? 1 : 0) + 2).padStart(2, '0')
+                  : '0X'
+              }
               label="Off the record"
             />
             <div className="flex flex-wrap gap-2">
@@ -443,7 +453,7 @@ export default function StudioProfile() {
           </motion.div>
         )}
 
-        {/* Footer credit - record label imprint style */}
+        {/* Footer credit */}
         <div
           className="mt-24 pt-8 border-t flex items-center justify-between text-[9px] tracking-[0.35em] uppercase"
           style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
