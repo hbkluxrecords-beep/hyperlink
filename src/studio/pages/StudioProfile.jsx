@@ -7,9 +7,7 @@ import MusicLinkButton from '../components/MusicLinkButton.jsx';
 import { STUDIO, STUDIO_FONTS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
 import { LUXURY_EASE, staggerContainer } from '../lib/animations.js';
 import { loadArtist, trackEvent } from '../lib/studioStorage.js';
-import { isOwnerOf, checkHandle, getSession, logout } from '../../lib/auth.js';
-import ClaimModal from '../../components/ClaimModal.jsx';
-import ClaimBanner from '../../components/ClaimBanner.jsx';
+import { isOwnerOf, logout } from '../../lib/auth.js';
 
 // Truncate "City, Full Country" to "City, USA"
 function compactLocation(loc) {
@@ -100,8 +98,6 @@ export default function StudioProfile() {
   const [artist, setArtist] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [claimable, setClaimable] = useState(false);
-  const [showClaim, setShowClaim] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
@@ -111,9 +107,6 @@ export default function StudioProfile() {
       setLoading(false);
       if (a) {
         trackEvent(handle, 'view');
-        // Check if profile is unclaimed (no password yet) → show Claim button
-        const status = await checkHandle(handle);
-        setClaimable(status.exists && !status.claimed);
         setIsOwner(isOwnerOf(handle));
       }
     });
@@ -178,14 +171,6 @@ export default function StudioProfile() {
   return (
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20">
       <StudioNav minimal />
-
-      {claimable && !isOwner && (
-        <ClaimBanner
-          handle={handle}
-          theme="dark"
-          onClaim={() => setShowClaim(true)}
-        />
-      )}
 
       {/* Vol/Issue stamp */}
       <div className="max-w-2xl mx-auto px-6 pt-28 pb-2">
@@ -269,15 +254,15 @@ export default function StudioProfile() {
                 >
                   {copied ? '✓ Copied' : 'Share ↗'}
                 </button>
-                <Link
-                  to={`/studio/${handle}/analytics`}
-                  className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
-                  style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-                >
-                  Analytics
-                </Link>
                 {isOwner && (
                   <>
+                    <Link
+                      to={`/studio/${handle}/analytics`}
+                      className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                      style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+                    >
+                      Analytics
+                    </Link>
                     <Link
                       to={`/studio/${handle}/edit`}
                       className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
@@ -293,15 +278,6 @@ export default function StudioProfile() {
                       Log out
                     </button>
                   </>
-                )}
-                {!isOwner && !claimable && (
-                  <Link
-                    to="/login"
-                    className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
-                    style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-                  >
-                    Log in →
-                  </Link>
                 )}
               </div>
             </motion.div>
@@ -380,15 +356,15 @@ export default function StudioProfile() {
               >
                 {copied ? '✓ Copied' : 'Share ↗'}
               </button>
-              <Link
-                to={`/studio/${handle}/analytics`}
-                className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
-                style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-              >
-                Analytics
-              </Link>
               {isOwner && (
                 <>
+                  <Link
+                    to={`/studio/${handle}/analytics`}
+                    className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                    style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+                  >
+                    Analytics
+                  </Link>
                   <Link
                     to={`/studio/${handle}/edit`}
                     className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
@@ -404,15 +380,6 @@ export default function StudioProfile() {
                     Log out
                   </button>
                 </>
-              )}
-              {!isOwner && !claimable && (
-                <Link
-                  to="/login"
-                  className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
-                  style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-                >
-                  Log in →
-                </Link>
               )}
             </div>
           </motion.div>
@@ -532,24 +499,12 @@ export default function StudioProfile() {
           className="mt-24 pt-8 border-t flex items-center justify-between text-[9px] tracking-[0.35em] uppercase"
           style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
         >
-          <span>Pressed at Plinks Studio</span>
-          <Link to="/studio/new" className="hover:opacity-100 hover:underline">Claim yours →</Link>
+          <span>/{handle}</span>
+          {isOwner && (
+            <Link to={`/studio/${handle}/edit`} className="hover:opacity-100 hover:underline">Edit profile →</Link>
+          )}
         </div>
       </div>
-
-      {showClaim && (
-        <ClaimModal
-          handle={handle}
-          type="artist"
-          theme="dark"
-          onClose={() => setShowClaim(false)}
-          onClaimed={() => {
-            setShowClaim(false);
-            setClaimable(false);
-            setIsOwner(true);
-          }}
-        />
-      )}
     </div>
   );
 }
