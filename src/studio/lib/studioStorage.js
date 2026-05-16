@@ -68,17 +68,21 @@ export async function saveArtist(profile) {
   };
 
   if (!hasSupabase) {
-    if (lsGet(`artist:${h}`)) return { ok: false, error: 'Handle already taken' };
-    lsSet(`artist:${h}`, { ...record, artistName: record.artist_name, createdAt: Date.now() });
+    const existing = lsGet(`artist:${h}`);
+    lsSet(`artist:${h}`, {
+      ...(existing || {}),
+      ...record,
+      artistName: record.artist_name,
+      createdAt: existing?.createdAt || Date.now(),
+    });
     const idx = lsGet('artist-index') || [];
     if (!idx.includes(h)) lsSet('artist-index', [h, ...idx].slice(0, 100));
     return { ok: true };
   }
 
-  const { error } = await supabase.from('artist_profiles').insert(record);
+  const { error } = await supabase.from('artist_profiles').upsert(record, { onConflict: 'handle' });
   if (error) {
-    if (error.code === '23505') return { ok: false, error: 'Handle already taken' };
-    return { ok: false, error: error.message || 'Failed to publish' };
+    return { ok: false, error: error.message || 'Failed to save' };
   }
   return { ok: true };
 }

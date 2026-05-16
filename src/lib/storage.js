@@ -110,20 +110,21 @@ export async function saveProfile(profile) {
   };
 
   if (!hasSupabase) {
-    if (lsGet(`profile:${h}`)) {
-      return { ok: false, error: 'Handle already taken' };
-    }
-    lsSet(`profile:${h}`, { ...record, displayName: record.display_name, createdAt: Date.now() });
+    const existing = lsGet(`profile:${h}`);
+    lsSet(`profile:${h}`, {
+      ...(existing || {}),
+      ...record,
+      displayName: record.display_name,
+      createdAt: existing?.createdAt || Date.now(),
+    });
     const idx = lsGet('index') || [];
     if (!idx.includes(h)) lsSet('index', [h, ...idx].slice(0, 100));
     return { ok: true };
   }
 
-  const { error } = await supabase.from('profiles').insert(record);
+  const { error } = await supabase.from('profiles').upsert(record, { onConflict: 'handle' });
   if (error) {
-    // 23505 = unique_violation in postgres
-    if (error.code === '23505') return { ok: false, error: 'Handle already taken' };
-    return { ok: false, error: error.message || 'Failed to publish' };
+    return { ok: false, error: error.message || 'Failed to save' };
   }
   return { ok: true };
 }
