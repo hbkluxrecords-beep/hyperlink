@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Grain, Stamp } from '../components/Primitives.jsx';
 import { ACCENT, INK, PAPER, PAPER_DEEP, CATEGORIES, LINK_PRESETS } from '../lib/design.js';
-import { isHandleTaken, saveProfile } from '../lib/storage.js';
+import { isHandleTaken, isHandleTakenAnywhere, saveProfile } from '../lib/storage.js';
 import { setPasswordForHandle, validatePassword } from '../lib/auth.js';
 
 export default function Create() {
@@ -32,12 +32,12 @@ export default function Create() {
       setHandleError('3–24 chars · a-z, 0-9, _ or -');
       return false;
     }
-    if (['new', 'explore', 'find', 'admin', 'api'].includes(clean)) {
+    if (['new', 'explore', 'find', 'admin', 'api', 'studio', 'login', 'edit'].includes(clean)) {
       setHandleError('Reserved handle');
       return false;
     }
-    const taken = await isHandleTaken(clean);
-    if (taken) {
+    const collision = await isHandleTakenAnywhere(clean);
+    if (collision.taken) {
       setHandleError('Taken — try another');
       return false;
     }

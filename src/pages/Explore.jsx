@@ -1,19 +1,51 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Grain, Stamp } from '../components/Primitives.jsx';
-import { ACCENT, INK, PAPER, PAPER_DEEP, CATEGORIES } from '../lib/design.js';
+import { ACCENT, INK, PAPER, CATEGORIES } from '../lib/design.js';
 import { loadRecentProfiles } from '../lib/storage.js';
+import { loadRecentArtists } from '../studio/lib/studioStorage.js';
 
 export default function Explore() {
-  const [profiles, setProfiles] = useState([]);
+  const [entries, setEntries] = useState([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadRecentProfiles(48).then((p) => { setProfiles(p); setLoading(false); });
+    Promise.all([
+      loadRecentProfiles(48).then((profiles) =>
+        profiles.map((p) => ({ ...p, _type: 'creator' }))
+      ),
+      loadRecentArtists(48).then((artists) =>
+        artists.map((a) => ({
+          handle: a.handle,
+          displayName: a.artistName || a.handle,
+          bio: a.bio || '',
+          category: 'musician',
+          links: a.links || [],
+          pinned: null,
+          genres: a.genres || [],
+          createdAt: a.createdAt,
+          _type: 'artist',
+        }))
+      ),
+    ]).then(([creators, artists]) => {
+      // Merge + sort by createdAt desc
+      const merged = [...creators, ...artists].sort((a, b) => {
+        const aTime = new Date(a.createdAt || 0).getTime();
+        const bTime = new Date(b.createdAt || 0).getTime();
+        return bTime - aTime;
+      });
+      setEntries(merged);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
-  const filtered = filter === 'all' ? profiles : profiles.filter((p) => p.category === filter);
+  // 'musician' filter shows artists; other filters show creators with matching category
+  const filtered = filter === 'all'
+    ? entries
+    : filter === 'musician'
+      ? entries.filter((e) => e._type === 'artist')
+      : entries.filter((e) => e._type === 'creator' && e.category === filter);
 
   return (
     <div className="min-h-screen relative" style={{ background: PAPER, color: INK }}>
@@ -35,7 +67,7 @@ export default function Explore() {
               The <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>directory</span>.
             </h1>
             <p className="mt-3 max-w-md opacity-70" style={{ fontFamily: '"Fraunces", serif' }}>
-              Everyone who's published. Browse by craft. Click to visit.
+              Everyone who's published. Creators and artists. Click to visit.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -70,16 +102,21 @@ export default function Explore() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: INK }}>
             {filtered.map((p) => {
-              const cat = CATEGORIES.find((c) => c.id === p.category) || CATEGORIES[2];
+              const isArtist = p._type === 'artist';
+              const cat = isArtist
+                ? { label: 'ARTIST' }
+                : (CATEGORIES.find((c) => c.id === p.category) || CATEGORIES[2]);
               return (
                 <Link
-                  key={p.handle}
+                  key={`${p._type}-${p.handle}`}
                   to={`/${p.handle}`}
                   className="text-left p-6 hover:bg-[#E6E2D5] transition-colors relative overflow-hidden group"
                   style={{ background: PAPER }}
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <Stamp rotate={-2}>{cat.label}</Stamp>
+                    <Stamp rotate={-2} bg={isArtist ? ACCENT : undefined} color={isArtist ? PAPER : undefined}>
+                      {cat.label}
+                    </Stamp>
                   </div>
                   <div className="text-3xl font-black leading-tight tracking-tight mb-1 break-words" style={{ fontFamily: '"Fraunces", serif' }}>
                     {p.displayName}
@@ -87,9 +124,14 @@ export default function Explore() {
                   <div className="text-xs opacity-60 mb-4" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
                     /{p.handle}
                   </div>
+                  {isArtist && p.genres && p.genres.length > 0 && (
+                    <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-2" style={{ fontFamily: '"JetBrains Mono", monospace', color: ACCENT }}>
+                      {p.genres.join(' · ')}
+                    </div>
+                  )}
                   {p.bio && <p className="text-sm opacity-80 line-clamp-2" style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic' }}>"{p.bio}"</p>}
                   <div className="mt-6 flex items-center justify-between text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-                    <span>{p.links.length + (p.pinned ? 1 : 0)} LINKS</span>
+                    <span>{isArtist ? 'STUDIO' : `${p.links.length + (p.pinned ? 1 : 0)} LINKS`}</span>
                     <span className="group-hover:translate-x-1 transition-transform">VISIT →</span>
                   </div>
                 </Link>

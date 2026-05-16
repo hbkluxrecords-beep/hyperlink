@@ -57,6 +57,44 @@ export async function isHandleTaken(handle) {
 }
 
 /**
+ * Check whether a handle is taken in EITHER table (creator or artist).
+ * Used for cross-namespace collision prevention.
+ * Returns { taken: bool, type: 'creator' | 'artist' | null }
+ */
+export async function isHandleTakenAnywhere(handle) {
+  const h = handle.toLowerCase().trim();
+
+  if (!hasSupabase) {
+    // localStorage fallback
+    const creatorKey = `hyperlink:profile:${h}`;
+    const artistKey = `plinks-studio:artist:${h}`;
+    try {
+      if (localStorage.getItem(creatorKey)) return { taken: true, type: 'creator' };
+      if (localStorage.getItem(artistKey)) return { taken: true, type: 'artist' };
+    } catch {}
+    return { taken: false, type: null };
+  }
+
+  // Check artist first
+  const { data: artist } = await supabase
+    .from('artist_profiles')
+    .select('handle')
+    .eq('handle', h)
+    .maybeSingle();
+  if (artist) return { taken: true, type: 'artist' };
+
+  // Then creator
+  const { data: creator } = await supabase
+    .from('profiles')
+    .select('handle')
+    .eq('handle', h)
+    .maybeSingle();
+  if (creator) return { taken: true, type: 'creator' };
+
+  return { taken: false, type: null };
+}
+
+/**
  * Save a profile. Inserts on first publish, fails on conflict so we never
  * silently overwrite someone else's handle. Returns { ok: bool, error?: string }.
  */

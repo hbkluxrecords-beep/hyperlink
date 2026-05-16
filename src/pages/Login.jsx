@@ -50,7 +50,7 @@ export default function Login() {
           return;
         }
         const clean = handle.toLowerCase().trim();
-        navigate(result.type === 'artist' ? `/studio/${clean}` : `/${clean}`);
+        navigate(`/${clean}`);
       } else {
         // Claim mode: set password
         const pwErr = validatePassword(password);
@@ -64,7 +64,7 @@ export default function Login() {
           return;
         }
         const clean = handle.toLowerCase().trim();
-        navigate(profileType === 'artist' ? `/studio/${clean}` : `/${clean}`);
+        navigate(`/${clean}`);
       }
     } catch (e) {
       setError(e.message || 'Something went wrong');

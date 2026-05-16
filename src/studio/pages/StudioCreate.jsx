@@ -10,6 +10,7 @@ import {
   savePresaveRelease,
   uploadFile,
 } from '../lib/studioStorage.js';
+import { isHandleTakenAnywhere } from '../../lib/storage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { setPasswordForHandle, validatePassword } from '../../lib/auth.js';
 
@@ -112,8 +113,8 @@ export default function StudioCreate() {
       setHandleError('Reserved handle');
       return false;
     }
-    const taken = await isArtistHandleTaken(clean);
-    if (taken) {
+    const collision = await isHandleTakenAnywhere(clean);
+    if (collision.taken) {
       setHandleError('Taken — try another');
       return false;
     }

@@ -9,6 +9,7 @@ import Explore from './pages/Explore.jsx';
 import Lookup from './pages/Lookup.jsx';
 import Login from './pages/Login.jsx';
 import NotFound from './pages/NotFound.jsx';
+import SmartProfileResolver from './components/SmartProfileResolver.jsx';
 
 // Studio (isolated — won't affect main site if broken)
 import StudioLanding from './studio/pages/StudioLanding.jsx';
@@ -39,7 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/explore" element={<Explore />} />
         <Route path="/find" element={<Lookup />} />
         <Route path="/:handle/edit" element={<Edit />} />
-        <Route path="/:handle" element={<Profile />} />
+        <Route path="/:handle" element={<SmartProfileResolver />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
