@@ -5,6 +5,7 @@ import { ACCENT, INK, PAPER, CATEGORIES } from '../lib/design.js';
 import { loadProfile } from '../lib/storage.js';
 import { isOwnerOf, checkHandle, logout } from '../lib/auth.js';
 import ClaimModal from '../components/ClaimModal.jsx';
+import ClaimBanner from '../components/ClaimBanner.jsx';
 
 export default function Profile() {
   const { handle } = useParams();
@@ -79,29 +80,42 @@ export default function Profile() {
           ← HYPERLINK
         </Link>
         <div className="flex items-center gap-2 flex-wrap justify-end">
-          {claimable && !isOwner && (
-            <button
-              onClick={() => setShowClaim(true)}
-              className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5 hover:scale-[1.02] transition-transform"
-              style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
-            >
-              🔒 Claim
-            </button>
-          )}
           {isOwner && (
-            <button
-              onClick={() => { logout(); setIsOwner(false); }}
+            <>
+              <Link
+                to={`/${handle}/edit`}
+                className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5 hover:scale-[1.02] transition-transform"
+                style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                ✎ Edit
+              </Link>
+              <button
+                onClick={() => { logout(); setIsOwner(false); }}
+                className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5"
+                style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                Log out
+              </button>
+            </>
+          )}
+          {!isOwner && !claimable && (
+            <Link
+              to="/login"
               className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5"
               style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}
             >
-              Log out
-            </button>
+              Log in →
+            </Link>
           )}
           <button onClick={share} className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5" style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}>
             {copied ? '✓ Copied' : 'Share ↗'}
           </button>
         </div>
       </header>
+
+      {claimable && !isOwner && (
+        <ClaimBanner handle={handle} theme="light" onClaim={() => setShowClaim(true)} />
+      )}
 
       <div className="max-w-xl mx-auto px-6 pt-12 md:pt-16">
         <div className="mb-12">

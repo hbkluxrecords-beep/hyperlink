@@ -9,6 +9,7 @@ import { LUXURY_EASE, staggerContainer } from '../lib/animations.js';
 import { loadArtist, trackEvent } from '../lib/studioStorage.js';
 import { isOwnerOf, checkHandle, getSession, logout } from '../../lib/auth.js';
 import ClaimModal from '../../components/ClaimModal.jsx';
+import ClaimBanner from '../../components/ClaimBanner.jsx';
 
 // Truncate "City, Full Country" to "City, USA"
 function compactLocation(loc) {
@@ -178,6 +179,14 @@ export default function StudioProfile() {
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20">
       <StudioNav minimal />
 
+      {claimable && !isOwner && (
+        <ClaimBanner
+          handle={handle}
+          theme="dark"
+          onClaim={() => setShowClaim(true)}
+        />
+      )}
+
       {/* Vol/Issue stamp */}
       <div className="max-w-2xl mx-auto px-6 pt-28 pb-2">
         <motion.div
@@ -251,7 +260,7 @@ export default function StudioProfile() {
                 </div>
               )}
 
-              {/* Inline share/analytics */}
+              {/* Inline share/analytics/edit */}
               <div className="flex items-center gap-2 mt-5 flex-wrap">
                 <button
                   onClick={share}
@@ -267,17 +276,15 @@ export default function StudioProfile() {
                 >
                   Analytics
                 </Link>
-                {claimable && !isOwner && (
-                  <button
-                    onClick={() => setShowClaim(true)}
-                    className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
-                    style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
-                  >
-                    🔒 Claim profile
-                  </button>
-                )}
                 {isOwner && (
                   <>
+                    <Link
+                      to={`/studio/${handle}/edit`}
+                      className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
+                      style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+                    >
+                      ✎ Edit
+                    </Link>
                     <button
                       onClick={() => { logout(); setIsOwner(false); }}
                       className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
@@ -286,6 +293,15 @@ export default function StudioProfile() {
                       Log out
                     </button>
                   </>
+                )}
+                {!isOwner && !claimable && (
+                  <Link
+                    to="/login"
+                    className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                    style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+                  >
+                    Log in →
+                  </Link>
                 )}
               </div>
             </motion.div>
@@ -371,23 +387,32 @@ export default function StudioProfile() {
               >
                 Analytics
               </Link>
-              {claimable && !isOwner && (
-                <button
-                  onClick={() => setShowClaim(true)}
-                  className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
-                  style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
-                >
-                  🔒 Claim profile
-                </button>
-              )}
               {isOwner && (
-                <button
-                  onClick={() => { logout(); setIsOwner(false); }}
+                <>
+                  <Link
+                    to={`/studio/${handle}/edit`}
+                    className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
+                    style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+                  >
+                    ✎ Edit
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setIsOwner(false); }}
+                    className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                    style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+                  >
+                    Log out
+                  </button>
+                </>
+              )}
+              {!isOwner && !claimable && (
+                <Link
+                  to="/login"
                   className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
                   style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
                 >
-                  Log out
-                </button>
+                  Log in →
+                </Link>
               )}
             </div>
           </motion.div>
