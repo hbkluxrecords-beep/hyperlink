@@ -4,7 +4,8 @@ import { motion } from 'motion/react';
 import StudioNav from '../components/StudioNav.jsx';
 import { STUDIO, STUDIO_FONTS, GENRES, MUSIC_PLATFORMS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
 import { LUXURY_EASE } from '../lib/animations.js';
-import { loadArtist, saveArtist, uploadFile } from '../lib/studioStorage.js';
+import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRelease } from '../lib/studioStorage.js';
+import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { isOwnerOf, getSession } from '../../lib/auth.js';
 
 export default function StudioEdit() {
@@ -25,6 +26,19 @@ export default function StudioEdit() {
   const [musicLinks, setMusicLinks] = useState([]);
   const [socials, setSocials] = useState({});
 
+  // Release editing
+  const [releaseId, setReleaseId] = useState(null);
+  const [trackTitle, setTrackTitle] = useState('');
+  const [releaseDate, setReleaseDate] = useState('');
+  const [presaveUrl, setPresaveUrl] = useState('');
+  const [coverArtUrl, setCoverArtUrl] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(null);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
+  const [audioFile, setAudioFile] = useState(null);
+  const [audioError, setAudioError] = useState('');
+  const [platforms, setPlatforms] = useState([]);
+
   useEffect(() => {
     // Gate: must be logged in as this handle's owner
     if (!isOwnerOf(handle)) {
@@ -44,6 +58,18 @@ export default function StudioEdit() {
       setPhotoUrl(a.photoUrl || null);
       setMusicLinks(a.links || []);
       setSocials(a.socials || {});
+
+      if (a.releases && a.releases.length > 0) {
+        const r = a.releases[0];
+        setReleaseId(r.id);
+        setTrackTitle(r.trackTitle || '');
+        setReleaseDate(r.releaseDate ? String(r.releaseDate).split('T')[0] : '');
+        setPresaveUrl(r.presaveUrl || '');
+        setCoverArtUrl(r.coverArtUrl || null);
+        setAudioPreviewUrl(r.audioPreviewUrl || null);
+        setPlatforms(r.platforms || []);
+      }
+
       setLoading(false);
     });
   }, [handle, navigate]);
@@ -84,6 +110,35 @@ export default function StudioEdit() {
     setSocials((prev) => ({ ...prev, [id]: url }));
   };
 
+  const onCoverChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setErrorMsg('Cover art must be under 5MB'); return; }
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  };
+
+  const onAudioChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAudioError('');
+    if (file.size > 10 * 1024 * 1024) { setAudioError('Audio must be under 10MB'); return; }
+    try {
+      const duration = await getAudioDuration(file);
+      if (duration > 35) {
+        setAudioError(`Preview must be under 30s (got ${Math.round(duration)}s)`);
+        return;
+      }
+      setAudioFile(file);
+    } catch {
+      setAudioError('Could not read audio file');
+    }
+  };
+
+  const togglePlatform = (p) => {
+    setPlatforms((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+  };
+
   const save = async () => {
     setErrorMsg('');
     setSavedMsg('');
@@ -109,10 +164,48 @@ export default function StudioEdit() {
 
       const result = await saveArtist(profile);
       if (!result.ok) {
-        setErrorMsg(result.error || 'Failed to save');
+        setErrorMsg(result.error || 'Failed to save profile');
         setSaving(false);
         return;
       }
+
+      // Handle release update/create
+      if (trackTitle.trim()) {
+        let finalCoverUrl = coverArtUrl;
+        let finalAudioUrl = audioPreviewUrl;
+        let waveformData = null;
+
+        if (coverFile) {
+          const r = await uploadFile('cover-art', coverFile, handle);
+          if (r.ok) finalCoverUrl = r.url;
+        }
+        if (audioFile) {
+          const r = await uploadFile('audio-previews', audioFile, handle);
+          if (r.ok) {
+            finalAudioUrl = r.url;
+            try { waveformData = await generateWaveformData(audioFile); } catch {}
+          }
+        }
+
+        const releaseFields = {
+          trackTitle: trackTitle.trim(),
+          releaseDate: releaseDate || null,
+          coverArtUrl: finalCoverUrl,
+          audioPreviewUrl: finalAudioUrl,
+          presaveUrl: presaveUrl.trim(),
+          platforms,
+        };
+        if (waveformData) releaseFields.waveformData = waveformData;
+
+        if (releaseId) {
+          const rr = await updatePresaveRelease(handle, releaseId, releaseFields);
+          if (!rr.ok) { setErrorMsg(rr.error || 'Release update failed'); setSaving(false); return; }
+        } else {
+          const rr = await savePresaveRelease(handle, releaseFields);
+          if (!rr.ok) { setErrorMsg(rr.error || 'Release create failed'); setSaving(false); return; }
+        }
+      }
+
       setSavedMsg('Saved ✓');
       setTimeout(() => setSavedMsg(''), 2000);
     } catch (e) {
@@ -306,6 +399,106 @@ export default function StudioEdit() {
                   />
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* RELEASE SECTION */}
+          <div className="pt-8 border-t" style={{ borderColor: STUDIO.borderStrong }}>
+            <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-2" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
+              § Featured Release
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-6" style={{ fontFamily: STUDIO_FONTS.display }}>
+              {releaseId ? 'Update release' : 'Add a release'}
+            </h2>
+
+            <div className="space-y-8">
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={labelStyle}>Track Title</label>
+                <input
+                  value={trackTitle}
+                  onChange={(e) => setTrackTitle(e.target.value)}
+                  placeholder="Snake Eyes"
+                  className="w-full text-2xl md:text-3xl font-black pb-2 outline-none"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={labelStyle}>Release Date</label>
+                <input
+                  type="date"
+                  value={releaseDate}
+                  onChange={(e) => setReleaseDate(e.target.value)}
+                  className="w-full text-lg pb-2 outline-none"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-3" style={labelStyle}>Cover Art</label>
+                <div className="flex items-center gap-4">
+                  {(coverPreview || coverArtUrl) && (
+                    <img src={coverPreview || coverArtUrl} alt="" className="w-20 h-20 object-cover" style={{ border: `1px solid ${STUDIO.borderStrong}` }} />
+                  )}
+                  <label className="text-[10px] tracking-[0.25em] uppercase font-bold border px-4 py-2 cursor-pointer hover:scale-[1.02] transition-transform inline-block"
+                    style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.ink }}>
+                    {(coverPreview || coverArtUrl) ? 'Replace' : 'Upload'}
+                    <input type="file" accept="image/*" onChange={onCoverChange} className="hidden" />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-3" style={labelStyle}>Audio Preview · 30s max</label>
+                <div className="flex items-center gap-4 flex-wrap">
+                  {(audioFile || audioPreviewUrl) && (
+                    <span className="text-xs" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
+                      ♪ {audioFile ? audioFile.name : 'current preview'}
+                    </span>
+                  )}
+                  <label className="text-[10px] tracking-[0.25em] uppercase font-bold border px-4 py-2 cursor-pointer hover:scale-[1.02] transition-transform inline-block"
+                    style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.ink }}>
+                    {(audioFile || audioPreviewUrl) ? 'Replace' : 'Upload'}
+                    <input type="file" accept="audio/*" onChange={onAudioChange} className="hidden" />
+                  </label>
+                </div>
+                {audioError && <div className="mt-2 text-xs" style={{ color: STUDIO.accent, fontFamily: STUDIO_FONTS.mono }}>{audioError}</div>}
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={labelStyle}>Presave URL</label>
+                <input
+                  value={presaveUrl}
+                  onChange={(e) => setPresaveUrl(e.target.value)}
+                  placeholder="https://distrokid.com/hyperfollow/yourtrack"
+                  className="w-full text-sm pb-2 outline-none"
+                  style={{ ...inputStyle, fontFamily: STUDIO_FONTS.mono }}
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-3" style={labelStyle}>Available On</label>
+                <div className="flex flex-wrap gap-2">
+                  {['Spotify','Apple','SoundCloud','YouTube','Tidal','Bandcamp'].map((p) => {
+                    const active = platforms.includes(p);
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => togglePlatform(p)}
+                        className="text-[10px] tracking-[0.25em] uppercase font-bold px-3 py-1.5 border transition-all"
+                        style={{
+                          borderColor: active ? STUDIO.accent : STUDIO.border,
+                          background: active ? STUDIO.accent : 'transparent',
+                          color: active ? STUDIO.ink : STUDIO.muted,
+                          fontFamily: STUDIO_FONTS.mono,
+                        }}
+                      >
+                        {p}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>

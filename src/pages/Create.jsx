@@ -32,7 +32,7 @@ export default function Create() {
       setHandleError('3–24 chars · a-z, 0-9, _ or -');
       return false;
     }
-    if (['new', 'explore', 'find', 'admin', 'api', 'studio', 'login', 'edit'].includes(clean)) {
+    if (['new', 'explore', 'find', 'admin', 'api', 'studio', 'login', 'edit', 'upgrade'].includes(clean)) {
       setHandleError('Reserved handle');
       return false;
     }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Grain, Stamp } from '../components/Primitives.jsx';
+import AuthButton from '../components/AuthButton.jsx';
 import { ACCENT, INK, PAPER, PAPER_DEEP, CATEGORIES } from '../lib/design.js';
 import { loadRecentProfiles } from '../lib/storage.js';
 
@@ -33,13 +34,16 @@ export default function Landing() {
           <Link to="/explore" className="hover:underline">Directory</Link>
           <Link to="/find" className="hover:underline">Find</Link>
         </div>
-        <Link
-          to="/new"
-          className="px-4 py-2 text-xs tracking-[0.2em] uppercase font-bold border-2 hover:scale-[1.02] active:scale-95 transition-transform"
-          style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
-        >
-          Claim Page →
-        </Link>
+        <div className="flex items-center gap-2">
+          <AuthButton theme="light" variant="badge" />
+          <Link
+            to="/new"
+            className="px-4 py-2 text-xs tracking-[0.2em] uppercase font-bold border-2 hover:scale-[1.02] active:scale-95 transition-transform"
+            style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+          >
+            Claim Page →
+          </Link>
+        </div>
       </nav>
 
       {/* Hero */}

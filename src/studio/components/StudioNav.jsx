@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
+import AuthButton from '../../components/AuthButton.jsx';
 import { STUDIO, STUDIO_FONTS } from '../lib/studioDesign.js';
 
 export default function StudioNav({ minimal = false }) {
@@ -64,6 +65,7 @@ export default function StudioNav({ minimal = false }) {
             >
               ← main
             </Link>
+            <AuthButton theme="dark" variant="minimal" />
             <Link
               to="/studio/new"
               className="px-4 py-2 text-xs tracking-[0.25em] uppercase font-bold border transition-all hover:scale-[1.02] active:scale-95"

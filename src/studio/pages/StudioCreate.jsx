@@ -14,7 +14,7 @@ import { isHandleTakenAnywhere } from '../../lib/storage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { setPasswordForHandle, validatePassword } from '../../lib/auth.js';
 
-const RESERVED = ['new', 'explore', 'analytics', 'studio', 'admin', 'api', 'edit', 'login', 'signup'];
+const RESERVED = ['new', 'explore', 'analytics', 'studio', 'admin', 'api', 'edit', 'login', 'signup', 'upgrade'];
 
 export default function StudioCreate() {
   const navigate = useNavigate();

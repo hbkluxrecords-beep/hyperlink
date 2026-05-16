@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Grain, Stamp } from '../components/Primitives.jsx';
+import AuthButton from '../components/AuthButton.jsx';
 import { ACCENT, INK, PAPER, CATEGORIES } from '../lib/design.js';
 import { loadRecentProfiles } from '../lib/storage.js';
 import { loadRecentArtists } from '../studio/lib/studioStorage.js';
@@ -54,9 +55,12 @@ export default function Explore() {
         <Link to="/" className="text-xs tracking-[0.2em] uppercase font-bold hover:underline" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
           ← HYPERLINK
         </Link>
-        <Link to="/new" className="px-3 py-1.5 text-xs tracking-[0.2em] uppercase font-bold border-2" style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}>
-          Claim a page →
-        </Link>
+        <div className="flex items-center gap-2">
+          <AuthButton theme="light" variant="badge" />
+          <Link to="/new" className="px-3 py-1.5 text-xs tracking-[0.2em] uppercase font-bold border-2" style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}>
+            Claim a page →
+          </Link>
+        </div>
       </header>
 
       <div className="px-6 md:px-12 py-16">

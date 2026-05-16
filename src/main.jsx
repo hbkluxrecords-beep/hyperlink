@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import Landing from './pages/Landing.jsx';
 import Create from './pages/Create.jsx';
 import Profile from './pages/Profile.jsx';
@@ -8,10 +8,11 @@ import Edit from './pages/Edit.jsx';
 import Explore from './pages/Explore.jsx';
 import Lookup from './pages/Lookup.jsx';
 import Login from './pages/Login.jsx';
+import Upgrade from './pages/Upgrade.jsx';
 import NotFound from './pages/NotFound.jsx';
 import SmartProfileResolver from './components/SmartProfileResolver.jsx';
+import RouteTransitions from './components/RouteTransitions.jsx';
 
-// Studio (isolated — won't affect main site if broken)
 import StudioLanding from './studio/pages/StudioLanding.jsx';
 import StudioCreate from './studio/pages/StudioCreate.jsx';
 import StudioProfile from './studio/pages/StudioProfile.jsx';
@@ -24,8 +25,7 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <Routes>
-        {/* Studio routes — checked first so /studio/* never collides with /:handle */}
+      <RouteTransitions>
         <Route path="/studio" element={<StudioLanding />} />
         <Route path="/studio/new" element={<StudioCreate />} />
         <Route path="/studio/explore" element={<StudioExplore />} />
@@ -33,16 +33,16 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/studio/:handle" element={<StudioProfile />} />
         <Route path="/studio/:handle/analytics" element={<StudioAnalytics />} />
 
-        {/* Existing main site routes — untouched */}
         <Route path="/" element={<Landing />} />
         <Route path="/new" element={<Create />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/upgrade" element={<Upgrade />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/find" element={<Lookup />} />
         <Route path="/:handle/edit" element={<Edit />} />
         <Route path="/:handle" element={<SmartProfileResolver />} />
         <Route path="*" element={<NotFound />} />
-      </Routes>
+      </RouteTransitions>
     </BrowserRouter>
   </React.StrictMode>
 );

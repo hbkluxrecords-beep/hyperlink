@@ -109,6 +109,31 @@ export async function savePresaveRelease(handle, release) {
   return { ok: true };
 }
 
+export async function updatePresaveRelease(handle, releaseId, fields) {
+  const h = handle.toLowerCase().trim();
+  const update = {};
+  if (fields.trackTitle !== undefined) update.track_title = fields.trackTitle;
+  if (fields.releaseDate !== undefined) update.release_date = fields.releaseDate || null;
+  if (fields.coverArtUrl !== undefined) update.cover_art_url = fields.coverArtUrl;
+  if (fields.audioPreviewUrl !== undefined) update.audio_preview_url = fields.audioPreviewUrl;
+  if (fields.waveformData !== undefined) update.waveform_data = fields.waveformData;
+  if (fields.presaveUrl !== undefined) update.presave_url = fields.presaveUrl;
+  if (fields.platforms !== undefined) update.platforms = fields.platforms;
+
+  if (!hasSupabase) {
+    const list = lsGet(`releases:${h}`) || [];
+    const idx = list.findIndex((r) => String(r.id) === String(releaseId));
+    if (idx === -1) return { ok: false, error: 'Release not found' };
+    list[idx] = { ...list[idx], ...update };
+    lsSet(`releases:${h}`, list);
+    return { ok: true };
+  }
+
+  const { error } = await supabase.from('presave_releases').update(update).eq('id', releaseId).eq('artist_handle', h);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 export async function loadRecentArtists(limit = 24) {
   if (!hasSupabase) {
     const idx = lsGet('artist-index') || [];

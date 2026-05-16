@@ -1,13 +1,43 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Grain, Halftone, Stamp } from '../components/Primitives.jsx';
-import { ACCENT, INK, PAPER, CATEGORIES } from '../lib/design.js';
+import { Link, useParams } from 'react-router-dom';
+import { motion } from 'motion/react';
+import PlatformLinkCard from '../components/PlatformLinkCard.jsx';
+import SocialPill from '../components/SocialPill.jsx';
 import { loadProfile } from '../lib/storage.js';
 import { isOwnerOf, logout } from '../lib/auth.js';
 
+const BG = '#0A0A0A';
+const INK = '#F2EFE6';
+const MUTED = '#8A8680';
+const ACCENT = '#FF4D1F';
+const BORDER = 'rgba(255,255,255,0.08)';
+const BORDER_STRONG = 'rgba(255,255,255,0.18)';
+const DISPLAY = '"Fraunces", serif';
+const MONO = '"JetBrains Mono", monospace';
+
+const CAT_LABELS = {
+  streamer: 'STREAMER',
+  musician: 'MUSICIAN',
+  creator: 'CREATOR',
+  developer: 'DEVELOPER',
+};
+
+function SectionLabel({ number, label }) {
+  return (
+    <div className="flex items-center gap-3 mb-4 mt-12">
+      <span className="text-[10px] tracking-[0.3em] uppercase font-bold shrink-0" style={{ fontFamily: MONO, color: ACCENT }}>
+        § {number}
+      </span>
+      <span className="text-[10px] tracking-[0.3em] uppercase font-bold shrink-0" style={{ fontFamily: MONO, color: MUTED }}>
+        {label}
+      </span>
+      <div className="flex-1 h-px" style={{ background: BORDER }} />
+    </div>
+  );
+}
+
 export default function Profile() {
   const { handle } = useParams();
-  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -15,12 +45,10 @@ export default function Profile() {
 
   useEffect(() => {
     setLoading(true);
-    loadProfile(handle).then(async (p) => {
+    loadProfile(handle).then((p) => {
       setProfile(p);
       setLoading(false);
-      if (p) {
-        setIsOwner(isOwnerOf(handle));
-      }
+      if (p) setIsOwner(isOwnerOf(handle));
     });
   }, [handle]);
 
@@ -39,133 +67,182 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: PAPER, color: INK }}>
-        <div className="text-xs tracking-[0.3em] uppercase font-bold animate-pulse" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+      <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="flex items-center justify-center">
+        <motion.div
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="text-xs tracking-[0.3em] uppercase font-bold"
+          style={{ fontFamily: MONO, color: MUTED }}
+        >
           Loading /{handle}…
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6 relative" style={{ background: PAPER, color: INK }}>
-        <Grain />
-        <div className="text-center max-w-md relative z-10">
-          <div className="text-8xl font-black mb-4" style={{ fontFamily: '"Fraunces", serif', color: ACCENT }}>404</div>
-          <h2 className="text-3xl font-black mb-3" style={{ fontFamily: '"Fraunces", serif' }}>No one lives at /{handle}</h2>
-          <p className="opacity-70 mb-8" style={{ fontFamily: '"Fraunces", serif' }}>This handle hasn't been claimed yet. Want it?</p>
-          <button onClick={() => navigate('/new')} className="px-6 py-3 text-xs tracking-[0.25em] uppercase font-bold border-2" style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}>
+      <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <div className="text-8xl font-black mb-4" style={{ fontFamily: DISPLAY, color: ACCENT }}>404</div>
+          <h2 className="text-3xl font-black mb-3" style={{ fontFamily: DISPLAY }}>No profile at /{handle}</h2>
+          <p className="opacity-70 mb-8" style={{ fontFamily: DISPLAY, color: MUTED }}>This handle hasn't been claimed yet.</p>
+          <Link
+            to="/new"
+            className="px-6 py-3 text-xs tracking-[0.25em] uppercase font-bold transition-all hover:scale-[1.02] inline-block"
+            style={{ background: ACCENT, color: BG, fontFamily: MONO }}
+          >
             Claim it →
-          </button>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const cat = CATEGORIES.find((c) => c.id === profile.category) || CATEGORIES[2];
+  const year = new Date(profile.createdAt || Date.now()).getFullYear();
+  const categoryLabel = CAT_LABELS[profile.category] || 'CREATOR';
 
   return (
-    <div className="min-h-screen relative pb-20" style={{ background: PAPER, color: INK }}>
-      <Grain />
-
-      <header className="flex items-center justify-between px-6 md:px-12 py-6 border-b-2" style={{ borderColor: INK }}>
-        <Link to="/" className="text-xs tracking-[0.2em] uppercase font-bold hover:underline flex items-center gap-2" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-          ← HYPERLINK
+    <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-20">
+      {/* Minimal nav */}
+      <nav className="px-6 py-5 flex items-center justify-between">
+        <Link to="/" className="text-[10px] tracking-[0.3em] uppercase font-bold hover:opacity-70" style={{ fontFamily: MONO, color: MUTED }}>
+          HYPERLINK
         </Link>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
+      </nav>
+
+      <div className="max-w-xl mx-auto px-6 pt-8 pb-12">
+        {/* Subtle vol/issue */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-[9px] tracking-[0.35em] uppercase font-bold mb-6"
+          style={{ fontFamily: MONO, color: MUTED }}
+        >
+          VOL 01 · ISSUE 04 · {year}
+        </motion.div>
+
+        {/* Display name + category */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+        >
+          <h1
+            className="font-black leading-[0.9] tracking-tight break-words"
+            style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.5rem, 9vw, 4.5rem)' }}
+          >
+            {profile.displayName}
+          </h1>
+          <div
+            className="text-[10px] tracking-[0.3em] uppercase font-bold mt-3"
+            style={{ fontFamily: MONO, color: ACCENT }}
+          >
+            {categoryLabel}
+          </div>
+          <div className="text-[10px] tracking-[0.3em] uppercase mt-2" style={{ fontFamily: MONO, color: MUTED }}>
+            /{profile.handle}
+          </div>
+        </motion.div>
+
+        {/* Bio */}
+        {profile.bio && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+            className="mt-6 pl-4"
+            style={{ borderLeft: `2px solid ${ACCENT}` }}
+          >
+            <p
+              className="text-base md:text-lg leading-snug"
+              style={{ fontFamily: DISPLAY, color: INK }}
+            >
+              {profile.bio}
+            </p>
+          </motion.div>
+        )}
+
+        {/* Buttons */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex items-center gap-2 mt-6 flex-wrap"
+        >
+          <button
+            onClick={share}
+            className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+            style={{ borderColor: BORDER_STRONG, fontFamily: MONO, color: INK }}
+          >
+            {copied ? '✓ Copied' : 'Share ↗'}
+          </button>
           {isOwner && (
             <>
               <Link
                 to={`/${handle}/edit`}
-                className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5 hover:scale-[1.02] transition-transform"
-                style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+                className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
+                style={{ background: ACCENT, color: BG, fontFamily: MONO }}
               >
                 ✎ Edit
               </Link>
               <button
                 onClick={() => { logout(); setIsOwner(false); }}
-                className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5"
-                style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}
+                className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                style={{ borderColor: BORDER_STRONG, fontFamily: MONO, color: MUTED }}
               >
                 Log out
               </button>
             </>
           )}
-          <button onClick={share} className="text-xs tracking-[0.2em] uppercase font-bold border-2 px-3 py-1.5" style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}>
-            {copied ? '✓ Copied' : 'Share ↗'}
-          </button>
-        </div>
-      </header>
+        </motion.div>
 
-      <div className="max-w-xl mx-auto px-6 pt-12 md:pt-16">
-        <div className="mb-12">
-          <div className="flex items-center gap-2 mb-6">
-            <Stamp rotate={-2} bg={ACCENT} color={PAPER}>{cat.label}</Stamp>
-            <Stamp rotate={1}>/{profile.handle}</Stamp>
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter break-words" style={{ fontFamily: '"Fraunces", serif' }}>
-            {profile.displayName}
-          </h1>
-
-          {profile.bio && (
-            <p className="mt-6 text-lg md:text-xl leading-snug opacity-80 max-w-md" style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic' }}>
-              "{profile.bio}"
-            </p>
-          )}
-
-          <div className="mt-8 flex items-center gap-3 text-[10px] tracking-[0.3em] uppercase opacity-60" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-            <span>{cat.icon}</span>
-            <div className="flex-1 h-px" style={{ background: INK }} />
-            <span>{profile.links.length + (profile.pinned ? 1 : 0)} LINKS</span>
-          </div>
-        </div>
-
-        {profile.pinned && profile.pinned.url && (
-          <a
-            href={profile.pinned.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block relative border-2 p-6 mb-8 overflow-hidden group hover:translate-x-1 hover:-translate-y-1 transition-transform"
-            style={{ borderColor: INK, background: INK, color: PAPER, boxShadow: `6px 6px 0 ${ACCENT}` }}
+        {/* Pinned link */}
+        {profile.pinned && profile.pinned.label && profile.pinned.url && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="mt-8"
           >
-            <Halftone className="absolute -right-10 -top-10 w-40 h-40 opacity-30" />
-            <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-3" style={{ fontFamily: '"JetBrains Mono", monospace', color: ACCENT }}>★ PINNED · LATEST</div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-2xl md:text-3xl font-black leading-tight" style={{ fontFamily: '"Fraunces", serif' }}>{profile.pinned.label}</span>
-              <span className="text-3xl">→</span>
+            <div className="text-[9px] tracking-[0.35em] uppercase font-bold mb-2" style={{ fontFamily: MONO, color: ACCENT }}>
+              ★ PINNED
             </div>
-          </a>
+            <PlatformLinkCard
+              label={profile.pinned.label}
+              url={profile.pinned.url}
+              theme="dark"
+            />
+          </motion.div>
         )}
 
-        <div className="space-y-3">
-          {profile.links.map((l, i) => (
-            <a
-              key={i}
-              href={l.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative border-2 px-5 py-4 flex items-center justify-between gap-4 group hover:bg-black hover:text-white transition-colors"
-              style={{ borderColor: INK, background: PAPER }}
-            >
-              <div className="flex items-center gap-4 min-w-0">
-                <span className="text-[10px] tracking-[0.2em] font-bold opacity-50 tabular-nums" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="text-lg md:text-xl font-bold truncate" style={{ fontFamily: '"Fraunces", serif' }}>
-                  {l.label}
-                </span>
-              </div>
-              <span className="text-xl shrink-0 group-hover:translate-x-1 transition-transform">→</span>
-            </a>
-          ))}
-        </div>
+        {/* Links */}
+        {profile.links && profile.links.length > 0 && (
+          <div>
+            <SectionLabel number="02" label="The Links" />
+            <div className="space-y-2.5">
+              {profile.links.map((l, i) => (
+                <PlatformLinkCard
+                  key={i}
+                  label={l.label}
+                  url={l.url}
+                  index={i}
+                  theme="dark"
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className="mt-20 pt-8 border-t flex items-center justify-between text-[10px] tracking-[0.3em] uppercase opacity-60" style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}>
+        {/* Footer */}
+        <div
+          className="mt-20 pt-6 border-t flex items-center justify-between text-[9px] tracking-[0.35em] uppercase"
+          style={{ borderColor: BORDER, fontFamily: MONO, color: MUTED }}
+        >
           <span>/{profile.handle}</span>
           {isOwner && (
-            <Link to={`/${handle}/edit`} className="hover:opacity-100 hover:underline">Edit profile →</Link>
+            <Link to={`/${handle}/edit`} className="hover:opacity-100 hover:underline">Edit →</Link>
           )}
         </div>
       </div>
