@@ -1,174 +1,324 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Grain, Stamp } from '../components/Primitives.jsx';
+import { motion } from 'motion/react';
 import AuthButton from '../components/AuthButton.jsx';
-import { ACCENT, INK, PAPER, PAPER_DEEP, CATEGORIES } from '../lib/design.js';
 import { loadRecentProfiles } from '../lib/storage.js';
+import { loadRecentArtists } from '../studio/lib/studioStorage.js';
+
+const BG = '#0A0A0A';
+const SURFACE = '#141414';
+const INK = '#F2EFE6';
+const MUTED = '#8A8680';
+const ACCENT = '#FF4D1F';
+const BORDER = 'rgba(255,255,255,0.08)';
+const BORDER_STRONG = 'rgba(255,255,255,0.18)';
+const DISPLAY = '"Fraunces", serif';
+const MONO = '"JetBrains Mono", monospace';
+
+const EASE = [0.22, 1, 0.36, 1];
+
+function ChooserCard({ to, eyebrow, headline, subline, accent, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay, ease: EASE }}
+    >
+      <Link to={to} className="block group relative overflow-hidden" style={{ background: SURFACE, border: `1px solid ${BORDER_STRONG}` }}>
+        {/* Hover accent fill */}
+        <motion.div
+          className="absolute inset-0 origin-bottom"
+          style={{ background: accent, opacity: 0 }}
+          whileHover={{ opacity: 0.06 }}
+          transition={{ duration: 0.4 }}
+        />
+
+        <div className="relative p-8 md:p-10 min-h-[280px] md:min-h-[400px] flex flex-col justify-between">
+          <div>
+            <div
+              className="text-[10px] tracking-[0.35em] uppercase font-bold mb-4"
+              style={{ fontFamily: MONO, color: accent }}
+            >
+              {eyebrow}
+            </div>
+            <h2
+              className="font-black leading-[0.9] tracking-tight"
+              style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', color: INK }}
+            >
+              {headline}
+            </h2>
+            <p
+              className="mt-4 text-base md:text-lg max-w-sm"
+              style={{ fontFamily: DISPLAY, color: MUTED }}
+            >
+              {subline}
+            </p>
+          </div>
+
+          <div
+            className="flex items-center justify-between text-[10px] tracking-[0.3em] uppercase font-bold mt-8"
+            style={{ fontFamily: MONO, color: INK }}
+          >
+            <span>Start here</span>
+            <motion.span
+              className="text-2xl"
+              style={{ color: accent }}
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              →
+            </motion.span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
 
 export default function Landing() {
   const [recent, setRecent] = useState([]);
+  const [recentArtists, setRecentArtists] = useState([]);
 
   useEffect(() => {
-    loadRecentProfiles(12).then(setRecent);
+    loadRecentProfiles(6).then(setRecent);
+    loadRecentArtists(6).then(setRecentArtists);
   }, []);
 
   return (
-    <div className="min-h-screen relative" style={{ background: PAPER, color: INK }}>
-      <Grain />
-
+    <div style={{ background: BG, color: INK, minHeight: '100vh' }}>
       {/* Nav */}
-      <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-6 border-b-2" style={{ borderColor: INK }}>
-        <Link to="/" className="flex items-center gap-3">
+      <motion.nav
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="flex items-center justify-between px-6 md:px-12 py-5"
+      >
+        <Link to="/" className="flex items-center gap-3 group">
           <div
-            className="w-8 h-8 flex items-center justify-center font-black text-lg"
-            style={{ background: INK, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+            className="w-8 h-8 flex items-center justify-center font-black"
+            style={{ background: INK, color: BG, fontFamily: MONO, fontSize: 14 }}
           >
-            H
+            P
           </div>
-          <span className="font-black text-xl tracking-tighter" style={{ fontFamily: '"Fraunces", serif' }}>
-            HYPERLINK
+          <span className="font-black text-xl tracking-tight" style={{ fontFamily: DISPLAY, color: INK }}>
+            plinks<span style={{ color: ACCENT, fontStyle: 'italic', fontWeight: 300 }}>.dev</span>
           </span>
         </Link>
-        <div className="hidden md:flex items-center gap-8 text-xs tracking-[0.2em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-          <Link to="/" className="hover:underline">Index</Link>
-          <Link to="/explore" className="hover:underline">Directory</Link>
-          <Link to="/find" className="hover:underline">Find</Link>
-        </div>
-        <div className="flex items-center gap-2">
-          <AuthButton theme="light" variant="badge" />
+        <div className="flex items-center gap-3">
           <Link
-            to="/new"
-            className="px-4 py-2 text-xs tracking-[0.2em] uppercase font-bold border-2 hover:scale-[1.02] active:scale-95 transition-transform"
-            style={{ borderColor: INK, background: ACCENT, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+            to="/upgrade"
+            className="hidden md:inline-block text-[10px] tracking-[0.3em] uppercase font-bold hover:opacity-70 transition-opacity"
+            style={{ fontFamily: MONO, color: MUTED }}
           >
-            Claim Page →
+            Pricing
           </Link>
+          <Link
+            to="/explore"
+            className="hidden md:inline-block text-[10px] tracking-[0.3em] uppercase font-bold hover:opacity-70 transition-opacity"
+            style={{ fontFamily: MONO, color: MUTED }}
+          >
+            Directory
+          </Link>
+          <AuthButton theme="dark" variant="badge" />
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* Hero */}
-      <section className="relative px-6 md:px-12 pt-12 md:pt-20 pb-24 overflow-hidden">
-        <div className="hidden lg:block absolute right-12 top-12 bottom-12 w-px" style={{ background: INK, opacity: 0.2 }} />
-        <div className="hidden lg:flex absolute right-4 top-24 flex-col gap-2 text-[10px] tracking-[0.3em] uppercase font-bold rotate-90 origin-top-right" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-          <span>VOL. 01 — ISSUE 04 / 2026</span>
-        </div>
-
-        <div className="max-w-6xl">
-          <div className="flex flex-wrap items-center gap-3 mb-8">
-            <Stamp rotate={-3} bg={ACCENT} color={PAPER}>ISSUE №01</Stamp>
-            <Stamp rotate={1.5}>FOR THE PEOPLE WHO MAKE THINGS</Stamp>
-            <Stamp rotate={-1} bg={INK} color={PAPER}>EST. 2026</Stamp>
+      {/* HERO: chooser */}
+      <section className="px-6 md:px-12 pt-10 md:pt-16 pb-20">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
+          className="max-w-5xl mx-auto"
+        >
+          <div className="text-center mb-12 md:mb-16">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-[10px] tracking-[0.35em] uppercase font-bold mb-4"
+              style={{ fontFamily: MONO, color: ACCENT }}
+            >
+              ONE LINK · ALL YOUR WORK
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8, ease: EASE }}
+              className="font-black leading-[0.88] tracking-tighter"
+              style={{ fontFamily: DISPLAY, fontSize: 'clamp(3rem, 12vw, 7rem)', color: INK }}
+            >
+              Who are <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>you?</span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55, duration: 0.6 }}
+              className="mt-5 text-base md:text-lg opacity-75 max-w-md mx-auto"
+              style={{ fontFamily: DISPLAY }}
+            >
+              Two flavors of plinks — one built for music, one for everything else. Pick yours.
+            </motion.p>
           </div>
 
-          <h1
-            className="font-black leading-[0.85] tracking-[-0.04em] mb-8"
-            style={{ fontFamily: '"Fraunces", serif', fontSize: 'clamp(3.5rem, 11vw, 11rem)' }}
-          >
-            One link.<br />
-            <span style={{ fontStyle: 'italic', fontWeight: 300 }}>Every</span>{' '}
-            <span style={{ color: ACCENT }}>thing.</span>
-          </h1>
+          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+            <ChooserCard
+              to="/studio"
+              eyebrow="ARTISTS · MUSICIANS"
+              headline={<>Plinks <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>Studio.</span></>}
+              subline="Audio previews, presave countdowns, real analytics. Built for rappers, producers, indie artists."
+              accent={ACCENT}
+              delay={0.65}
+            />
+            <ChooserCard
+              to="/new"
+              eyebrow="STREAMERS · CREATORS · DEVS"
+              headline={<>Plinks <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>Bio.</span></>}
+              subline="One clean link-in-bio for everything you do. Streamers, social media, developers."
+              accent={ACCENT}
+              delay={0.8}
+            />
+          </div>
+        </motion.div>
+      </section>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl">
-            <p className="md:col-span-2 text-lg md:text-2xl leading-snug font-light" style={{ fontFamily: '"Fraunces", serif' }}>
-              A homepage for streamers, musicians, creators, and developers who refuse to
-              choose between platforms. Print-shop aesthetics. Built for clicks.
-            </p>
-            <div className="flex flex-col gap-3">
-              <Link
-                to="/new"
-                className="px-5 py-4 text-sm tracking-[0.25em] uppercase font-bold border-2 text-left flex items-center justify-between hover:translate-x-1 transition-transform"
-                style={{ borderColor: INK, background: INK, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+      {/* WHY PLINKS */}
+      <section className="px-6 md:px-12 py-16 md:py-24" style={{ background: SURFACE }}>
+        <div className="max-w-5xl mx-auto">
+          <div
+            className="text-[10px] tracking-[0.35em] uppercase font-bold mb-4"
+            style={{ fontFamily: MONO, color: ACCENT }}
+          >
+            § 02 · WHY PLINKS
+          </div>
+          <h2
+            className="font-black leading-[0.9] tracking-tight mb-12"
+            style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 6vw, 3.5rem)', color: INK }}
+          >
+            Linktree charges $35/mo.<br />
+            <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>We don't.</span>
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { label: 'FREE FOREVER', detail: 'Every feature on the free tier. No trial. No watermark. No catch.' },
+              { label: 'ZERO FEES', detail: 'Linktree takes 9–12% per sale. We take 0%, ever.' },
+              { label: 'YOUR NAME', detail: 'plinks.dev/yourname — no branding, no ads, no algorithm.' },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6, ease: EASE }}
+                className="p-6"
+                style={{ background: BG, border: `1px solid ${BORDER}` }}
               >
-                <span>Make yours</span><span>→</span>
-              </Link>
-              <Link
-                to="/explore"
-                className="px-5 py-4 text-sm tracking-[0.25em] uppercase font-bold border-2 text-left flex items-center justify-between hover:translate-x-1 transition-transform"
-                style={{ borderColor: INK, background: 'transparent', color: INK, fontFamily: '"JetBrains Mono", monospace' }}
-              >
-                <span>Browse the directory</span><span>→</span>
-              </Link>
-            </div>
+                <div
+                  className="text-[10px] tracking-[0.3em] uppercase font-bold mb-3"
+                  style={{ fontFamily: MONO, color: ACCENT }}
+                >
+                  {item.label}
+                </div>
+                <p style={{ fontFamily: DISPLAY, color: INK }} className="text-base leading-snug">
+                  {item.detail}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <Link
+              to="/upgrade"
+              className="inline-block text-[10px] tracking-[0.3em] uppercase font-bold hover:opacity-70 transition-opacity"
+              style={{ fontFamily: MONO, color: MUTED }}
+            >
+              See premium tier →
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Categories ribbon */}
-      <section className="relative border-t-2 border-b-2 overflow-hidden" style={{ borderColor: INK, background: INK, color: PAPER }}>
-        <div className="flex animate-marquee whitespace-nowrap py-5 text-2xl md:text-3xl font-black tracking-tight" style={{ fontFamily: '"Fraunces", serif' }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-8 px-4">
-              {CATEGORIES.map((c) => (
-                <span key={c.id + i} className="flex items-center gap-4">
-                  <span style={{ color: ACCENT }}>{c.icon}</span>
-                  <span style={{ fontStyle: 'italic', fontWeight: 300 }}>{c.label}</span>
-                  <span style={{ color: ACCENT }}>✦</span>
-                </span>
+      {/* RECENT */}
+      {(recent.length > 0 || recentArtists.length > 0) && (
+        <section className="px-6 md:px-12 py-16 md:py-24">
+          <div className="max-w-5xl mx-auto">
+            <div
+              className="text-[10px] tracking-[0.35em] uppercase font-bold mb-4"
+              style={{ fontFamily: MONO, color: ACCENT }}
+            >
+              § 03 · RECENTLY ADDED
+            </div>
+            <h2
+              className="font-black tracking-tight mb-8"
+              style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 5vw, 3rem)', color: INK }}
+            >
+              The <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>roster.</span>
+            </h2>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                ...recentArtists.map((a) => ({ ...a, type: 'artist', displayName: a.artistName || a.handle })),
+                ...recent.map((p) => ({ ...p, type: 'creator' })),
+              ].slice(0, 6).map((p, i) => (
+                <motion.div
+                  key={`${p.type}-${p.handle}`}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, duration: 0.5, ease: EASE }}
+                >
+                  <Link
+                    to={`/${p.handle}`}
+                    className="block p-5 group transition-colors"
+                    style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+                  >
+                    <div
+                      className="text-[9px] tracking-[0.3em] uppercase font-bold mb-2"
+                      style={{ fontFamily: MONO, color: ACCENT }}
+                    >
+                      {p.type === 'artist' ? 'ARTIST' : 'CREATOR'}
+                    </div>
+                    <div
+                      className="text-xl font-black tracking-tight"
+                      style={{ fontFamily: DISPLAY, color: INK }}
+                    >
+                      {p.displayName}
+                    </div>
+                    <div
+                      className="text-[10px] tracking-[0.25em] uppercase mt-1"
+                      style={{ fontFamily: MONO, color: MUTED }}
+                    >
+                      /{p.handle}
+                    </div>
+                  </Link>
+                </motion.div>
               ))}
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Triptych */}
-      <section className="px-6 md:px-12 py-20 md:py-28 relative">
-        <div className="flex items-center gap-3 mb-12">
-          <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>§ 01</span>
-          <div className="flex-1 h-px" style={{ background: INK }} />
-          <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>WHY HYPERLINK</span>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-px" style={{ background: INK }}>
-          {[
-            { n: '01', t: 'Designed,\nnot defaulted', b: 'Editorial typography. Riso textures. Layouts with a point of view — not the same template everyone else uses.' },
-            { n: '02', t: 'For makers\nspecifically', b: 'Streamer schedules. Musician releases. Dev repos. Creator socials. Category-aware blocks, not just rounded rectangles.' },
-            { n: '03', t: 'Yours in\nninety seconds', b: 'Pick a handle, pick a category, paste your links. Share the URL. No accounts, no upsells, no purple gradient.' },
-          ].map((f) => (
-            <div key={f.n} className="p-8 md:p-10" style={{ background: PAPER }}>
-              <div className="text-5xl font-black mb-6" style={{ fontFamily: '"Fraunces", serif', color: ACCENT }}>{f.n}</div>
-              <h3 className="text-2xl md:text-3xl font-black leading-tight mb-4 whitespace-pre-line" style={{ fontFamily: '"Fraunces", serif' }}>{f.t}</h3>
-              <p className="text-sm leading-relaxed opacity-80">{f.b}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Recent */}
-      {recent.length > 0 && (
-        <section className="px-6 md:px-12 py-16 border-t-2" style={{ borderColor: INK, background: PAPER_DEEP }}>
-          <div className="flex items-center gap-3 mb-8">
-            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>§ 02</span>
-            <div className="flex-1 h-px" style={{ background: INK }} />
-            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>RECENTLY PUBLISHED</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {recent.map((p) => (
+            <div className="mt-8">
               <Link
-                key={p.handle}
-                to={`/${p.handle}`}
-                className="px-4 py-2 border-2 text-sm font-bold hover:bg-black hover:text-white transition-colors"
-                style={{ borderColor: INK, fontFamily: '"JetBrains Mono", monospace' }}
+                to="/explore"
+                className="text-[10px] tracking-[0.3em] uppercase font-bold hover:opacity-70 transition-opacity"
+                style={{ fontFamily: MONO, color: MUTED }}
               >
-                /{p.handle}
+                View full directory →
               </Link>
-            ))}
+            </div>
           </div>
         </section>
       )}
 
       {/* Footer */}
-      <footer className="px-6 md:px-12 py-10 border-t-2 flex flex-wrap items-end justify-between gap-6" style={{ borderColor: INK }}>
-        <div>
-          <div className="text-4xl md:text-5xl font-black leading-none tracking-tighter" style={{ fontFamily: '"Fraunces", serif' }}>
-            HYPER<span style={{ color: ACCENT, fontStyle: 'italic', fontWeight: 300 }}>link</span>
-          </div>
-          <div className="text-[10px] tracking-[0.3em] uppercase mt-2" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-            Printed in the browser · {new Date().getFullYear()}
-          </div>
-        </div>
-        <div className="text-[10px] tracking-[0.3em] uppercase opacity-60 max-w-xs text-right" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-          A home for everyone who has more than one URL worth sharing.
+      <footer
+        className="px-6 md:px-12 py-8 border-t flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.3em] uppercase"
+        style={{ borderColor: BORDER, fontFamily: MONO, color: MUTED }}
+      >
+        <span>© 2026 plinks.dev</span>
+        <div className="flex items-center gap-5">
+          <Link to="/upgrade" className="hover:opacity-100 hover:underline">Pricing</Link>
+          <Link to="/explore" className="hover:opacity-100 hover:underline">Directory</Link>
+          <Link to="/login" className="hover:opacity-100 hover:underline">Log in</Link>
         </div>
       </footer>
     </div>

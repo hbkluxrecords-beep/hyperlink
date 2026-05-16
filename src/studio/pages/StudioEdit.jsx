@@ -260,6 +260,34 @@ export default function StudioEdit() {
           </Link>
         </div>
 
+        {/* Premium upsell */}
+        <Link
+          to="/upgrade"
+          className="block mb-8 p-4 hover:scale-[1.005] transition-transform"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,77,31,0.12), rgba(255,77,31,0.04))',
+            border: `1px solid ${STUDIO.accent}`,
+          }}
+        >
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-2xl">★</span>
+            <div className="flex-1 min-w-[200px]">
+              <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
+                Unlock Premium
+              </div>
+              <div className="text-sm mt-0.5" style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}>
+                Custom themes, hover-audio links, drop alerts, fan DMs.
+              </div>
+            </div>
+            <span
+              className="text-[10px] tracking-[0.3em] uppercase font-bold"
+              style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}
+            >
+              From $3/mo →
+            </span>
+          </div>
+        </Link>
+
         <div className="space-y-10">
           {/* Artist name */}
           <div>
