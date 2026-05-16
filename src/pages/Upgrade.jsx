@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import AuthButton from '../components/AuthButton.jsx';
+import { startCheckout } from '../lib/premium.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -91,7 +92,7 @@ function Tier({ name, price, period, sub, features, cta, highlighted, savings })
         ))}
       </ul>
       <button
-        onClick={() => alert('Stripe checkout coming soon.')}
+        onClick={() => !cta.disabled && cta.tier && startCheckout(cta.tier)}
         disabled={cta.disabled}
         className="w-full px-5 py-3.5 text-xs tracking-[0.25em] uppercase font-bold hover:scale-[1.02] active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed"
         style={{
@@ -145,7 +146,7 @@ export default function Upgrade() {
             period="first month"
             sub="$7/mo after"
             features={PREMIUM}
-            cta={{ label: 'Start for $3 →', disabled: false }}
+            cta={{ label: 'Start for $3 →', disabled: false, tier: '3' }}
           />
           <Tier
             name="Premium Yearly"
@@ -153,7 +154,7 @@ export default function Upgrade() {
             period="per year"
             sub="$5/mo · best value"
             features={PREMIUM}
-            cta={{ label: 'Lock in $60 →', disabled: false }}
+            cta={{ label: 'Lock in $60 →', disabled: false, tier: '60' }}
             highlighted
             savings="Save $24"
           />

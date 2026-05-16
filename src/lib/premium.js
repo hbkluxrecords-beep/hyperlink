@@ -1,6 +1,9 @@
 import { supabase } from './storage.js';
+import { getSession } from './auth.js';
 
 const hasSupabase = !!supabase;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export async function isPremium(handle) {
   if (!handle) return false;
@@ -15,7 +18,45 @@ export async function isPremium(handle) {
 }
 
 export const PRICING = {
-  monthlyIntro: { price: 3, label: '$3', period: 'first month', stripePriceId: null },
-  monthly: { price: 7, label: '$7', period: 'per month', stripePriceId: null },
-  yearly: { price: 60, label: '$60', period: 'per year', savings: 'Save $24', stripePriceId: null },
+  intro:   { price: 3,  label: '$3',  period: 'first month', tier: '3' },
+  monthly: { price: 7,  label: '$7',  period: 'per month',   tier: '7' },
+  yearly:  { price: 60, label: '$60', period: 'per year',    tier: '60', savings: 'Save $24' },
 };
+
+/**
+ * Kick off Stripe Checkout for the logged-in user.
+ * Requires an active session (from auth.js).
+ * Redirects to the Stripe-hosted page on success.
+ */
+export async function startCheckout(tier) {
+  const session = getSession();
+  if (!session?.handle) {
+    window.location.href = '/login';
+    return;
+  }
+
+  if (!SUPABASE_URL) {
+    alert('Checkout unavailable — Supabase URL missing.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+      },
+      body: JSON.stringify({ handle: session.handle, tier }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.error || 'Could not start checkout');
+    }
+  } catch (err) {
+    console.error('checkout error', err);
+    alert('Could not start checkout. Try again.');
+  }
+}
