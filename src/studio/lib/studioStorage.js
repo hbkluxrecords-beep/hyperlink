@@ -82,7 +82,8 @@ export async function saveArtist(profile) {
 
   const { error } = await supabase.from('artist_profiles').upsert(record, { onConflict: 'handle' });
   if (error) {
-    return { ok: false, error: error.message || 'Failed to save' };
+    console.error('saveArtist error:', error);
+    return { ok: false, error: error.message || error.details || 'Failed to save' };
   }
   return { ok: true };
 }

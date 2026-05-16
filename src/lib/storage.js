@@ -124,7 +124,8 @@ export async function saveProfile(profile) {
 
   const { error } = await supabase.from('profiles').upsert(record, { onConflict: 'handle' });
   if (error) {
-    return { ok: false, error: error.message || 'Failed to save' };
+    console.error('saveProfile error:', error);
+    return { ok: false, error: error.message || error.details || 'Failed to save' };
   }
   return { ok: true };
 }
