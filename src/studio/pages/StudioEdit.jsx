@@ -6,6 +6,7 @@ import CollapsibleSection from '../../components/CollapsibleSection.jsx';
 import { STUDIO, STUDIO_FONTS, GENRES, MUSIC_PLATFORMS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
 import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRelease } from '../lib/studioStorage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
+import AudioTrimmer from '../components/AudioTrimmer.jsx';
 import { isOwnerOf } from '../../lib/auth.js';
 import { isPremium } from '../../lib/premium.js';
 import { saveAccentColor, saveReleaseLayout, PREMIUM_PALETTE } from '../../lib/premiumFeatures.js';
@@ -40,6 +41,7 @@ export default function StudioEdit() {
   const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
   const [audioError, setAudioError] = useState('');
+  const [trimmerFile, setTrimmerFile] = useState(null);
   const [platforms, setPlatforms] = useState([]);
   const [premium, setPremium] = useState(false);
   const [accentColor, setAccentColor] = useState(null);
@@ -99,12 +101,24 @@ export default function StudioEdit() {
     const file = e.target.files?.[0];
     if (!file) return;
     setAudioError('');
-    if (file.size > 10 * 1024 * 1024) { setAudioError('Audio must be under 10MB'); return; }
+    // Accept up to 25MB raw (will trim to <1MB clip)
+    if (file.size > 25 * 1024 * 1024) { setAudioError('File must be under 25MB'); return; }
     try {
       const dur = await getAudioDuration(file);
-      if (dur > 35) { setAudioError(`Under 30s (got ${Math.round(dur)}s)`); return; }
-      setAudioFile(file);
-    } catch { setAudioError('Could not read audio'); }
+      if (dur < 1) { setAudioError('Audio too short'); return; }
+      // Open the trimmer modal
+      setTrimmerFile(file);
+    } catch {
+      setAudioError('Could not read audio');
+    }
+  };
+
+  const onTrimComplete = (blob, durationSec) => {
+    // Convert Blob back to File so existing upload flow works
+    const ext = 'wav';
+    const trimmedFile = new File([blob], `preview-${Date.now()}.${ext}`, { type: 'audio/wav' });
+    setAudioFile(trimmedFile);
+    setTrimmerFile(null);
   };
 
   const togglePlatform = (p) =>
@@ -582,7 +596,7 @@ export default function StudioEdit() {
           {/* AUDIO PREVIEW */}
           <CollapsibleSection
             label="Audio Preview"
-            summary={(audioFile || audioPreviewUrl) ? '✓ Uploaded · 30s max' : 'No preview'}
+            summary={(audioFile || audioPreviewUrl) ? '✓ Uploaded · trimmed clip' : 'Upload + trim to 30s'}
             theme="dark"
           >
             <div className="flex items-center gap-3 flex-wrap">
@@ -687,6 +701,15 @@ export default function StudioEdit() {
           )}
         </div>
       </div>
+
+      {/* Audio trimmer modal */}
+      {trimmerFile && (
+        <AudioTrimmer
+          file={trimmerFile}
+          onClose={() => setTrimmerFile(null)}
+          onTrim={onTrimComplete}
+        />
+      )}
 
       {/* Sticky save bar */}
       <div
