@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import StudioNav from '../components/StudioNav.jsx';
 import CompactPlayer from '../components/CompactPlayer.jsx';
+import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
 import SocialPill from '../../components/SocialPill.jsx';
 import FanDMWidget from '../../components/FanDMWidget.jsx';
@@ -281,8 +282,27 @@ export default function StudioProfile() {
           )}
         </motion.div>
 
-        {/* COMPACT RELEASE PLAYER */}
-        {featuredRelease && (
+        {/* RELEASE - layout switches between compact and showcase */}
+        {featuredRelease && artist.releaseLayout === 'showcase' ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35, ease: LUXURY_EASE }}
+            className="mt-8"
+          >
+            <ShowcaseRelease
+              release={featuredRelease}
+              artistName={artist.artistName}
+              handle={handle}
+              musicLinks={artist.links || []}
+              isPremium={artist.isPremium}
+              accent={accentColor}
+              onPlay={() => trackEvent(handle, 'audio_play', { trackTitle: featuredRelease.trackTitle })}
+              onPresaveClick={() => trackEvent(handle, 'presave_click', { trackTitle: featuredRelease.trackTitle })}
+              onLinkClick={(l) => trackEvent(handle, 'link_click', { platform: l.label, url: l.url })}
+            />
+          </motion.div>
+        ) : featuredRelease ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -299,10 +319,10 @@ export default function StudioProfile() {
               onPresaveClick={() => trackEvent(handle, 'presave_click', { trackTitle: featuredRelease.trackTitle })}
             />
           </motion.div>
-        )}
+        ) : null}
 
-        {/* Music links */}
-        {artist.links && artist.links.length > 0 && (
+        {/* Music links — only in compact layout (showcase has them built-in) */}
+        {artist.releaseLayout !== 'showcase' && artist.links && artist.links.length > 0 && (
           <div>
             <SectionLabel number="02" label="Listen Everywhere" />
             <div className="space-y-2.5">

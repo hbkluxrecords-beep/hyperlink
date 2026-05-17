@@ -107,6 +107,14 @@ export async function saveAccentColor(handle, color, type) {
   return { ok: !error };
 }
 
+export async function saveReleaseLayout(handle, layout, type) {
+  if (!hasSupabase) return { ok: false };
+  const h = handle.toLowerCase().trim();
+  const table = type === 'artist' ? 'artist_profiles' : 'profiles';
+  const { error } = await supabase.from(table).update({ release_layout: layout }).eq('handle', h);
+  return { ok: !error };
+}
+
 export const PREMIUM_PALETTE = [
   { name: 'Plinks Orange', value: '#FF4D1F' },
   { name: 'Hot Pink', value: '#FF3D7F' },

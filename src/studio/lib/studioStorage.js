@@ -252,6 +252,7 @@ function rowToArtist(row, releases) {
     })),
     isPremium: !!row.is_premium,
     accentColor: row.accent_color || null,
+    releaseLayout: row.release_layout || 'compact',
     createdAt: row.created_at,
   };
 }

@@ -8,7 +8,7 @@ import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRe
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { isOwnerOf } from '../../lib/auth.js';
 import { isPremium } from '../../lib/premium.js';
-import { saveAccentColor, PREMIUM_PALETTE } from '../../lib/premiumFeatures.js';
+import { saveAccentColor, saveReleaseLayout, PREMIUM_PALETTE } from '../../lib/premiumFeatures.js';
 
 export default function StudioEdit() {
   const { handle } = useParams();
@@ -43,6 +43,7 @@ export default function StudioEdit() {
   const [platforms, setPlatforms] = useState([]);
   const [premium, setPremium] = useState(false);
   const [accentColor, setAccentColor] = useState(null);
+  const [releaseLayout, setReleaseLayout] = useState('compact');
 
   useEffect(() => {
     if (!isOwnerOf(handle)) {
@@ -59,6 +60,7 @@ export default function StudioEdit() {
       setMusicLinks(a.links || []);
       setSocials(a.socials || {});
       setAccentColor(a.accentColor || null);
+      setReleaseLayout(a.releaseLayout || 'compact');
       if (a.releases && a.releases.length > 0) {
         const r = a.releases[0];
         setReleaseId(r.id);
@@ -182,6 +184,9 @@ export default function StudioEdit() {
       if (premium && accentColor) {
         await saveAccentColor(handle, accentColor, 'artist');
       }
+
+      // Save layout (free for all)
+      await saveReleaseLayout(handle, releaseLayout, 'artist');
 
       setSavedMsg('Saved ✓');
       setTimeout(() => setSavedMsg(''), 2000);
@@ -450,6 +455,74 @@ export default function StudioEdit() {
               § Release
             </div>
           </div>
+
+          {/* LAYOUT PICKER */}
+          <CollapsibleSection
+            label="Layout"
+            summary={releaseLayout === 'showcase' ? 'Showcase (big cover)' : 'Compact (mini player)'}
+            theme="dark"
+          >
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setReleaseLayout('compact')}
+                className="p-3 transition-all text-left"
+                style={{
+                  background: releaseLayout === 'compact' ? STUDIO.surfaceHigh : 'transparent',
+                  border: `2px solid ${releaseLayout === 'compact' ? STUDIO.accent : STUDIO.border}`,
+                }}
+              >
+                {/* Mini preview */}
+                <div className="flex items-center gap-1 mb-3" style={{ background: '#0A0A0A', padding: 4 }}>
+                  <div className="w-6 h-6" style={{ background: STUDIO.muted }} />
+                  <div className="flex-1 space-y-1">
+                    <div className="h-1.5 w-3/4" style={{ background: STUDIO.muted }} />
+                    <div className="h-1 w-1/2" style={{ background: STUDIO.border }} />
+                  </div>
+                  <div className="w-4 h-4 rounded-full" style={{ background: STUDIO.accent }} />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
+                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
+                </div>
+                <div className="text-[10px] tracking-[0.25em] uppercase font-bold mt-3" style={{ fontFamily: STUDIO_FONTS.mono, color: releaseLayout === 'compact' ? STUDIO.accent : STUDIO.muted }}>
+                  Compact
+                </div>
+                <div className="text-[9px] mt-1 opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
+                  Mini player + link cards
+                </div>
+              </button>
+
+              <button
+                onClick={() => setReleaseLayout('showcase')}
+                className="p-3 transition-all text-left"
+                style={{
+                  background: releaseLayout === 'showcase' ? STUDIO.surfaceHigh : 'transparent',
+                  border: `2px solid ${releaseLayout === 'showcase' ? STUDIO.accent : STUDIO.border}`,
+                }}
+              >
+                {/* Big cover preview */}
+                <div className="aspect-square mb-2 flex items-center justify-center" style={{ background: STUDIO.muted }}>
+                  <div className="w-6 h-6 rounded-full" style={{ background: STUDIO.accent }} />
+                </div>
+                <div className="space-y-1 mb-2">
+                  <div className="h-1.5 w-2/3 mx-auto" style={{ background: STUDIO.ink }} />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
+                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
+                </div>
+                <div className="text-[10px] tracking-[0.25em] uppercase font-bold mt-3" style={{ fontFamily: STUDIO_FONTS.mono, color: releaseLayout === 'showcase' ? STUDIO.accent : STUDIO.muted }}>
+                  Showcase
+                </div>
+                <div className="text-[9px] mt-1 opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
+                  Big cover, link rows below
+                </div>
+              </button>
+            </div>
+            <div className="mt-3 text-[10px] tracking-[0.25em] uppercase opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
+              Compact for everyday · Showcase for new drops
+            </div>
+          </CollapsibleSection>
 
           {/* TRACK TITLE */}
           <CollapsibleSection
