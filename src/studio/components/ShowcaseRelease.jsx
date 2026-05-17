@@ -74,11 +74,11 @@ export default function ShowcaseRelease({
         className="relative mx-auto"
         style={{
           width: '100%',
-          maxWidth: 320,
+          maxWidth: 240,
           aspectRatio: '1 / 1',
           background: '#0A0A0A',
           border: `1px solid ${BORDER}`,
-          boxShadow: playing ? `0 0 60px ${accent}40` : `0 8px 40px rgba(0,0,0,0.4)`,
+          boxShadow: playing ? `0 0 40px ${accent}30` : `0 6px 24px rgba(0,0,0,0.4)`,
           transition: 'box-shadow 0.5s',
         }}
       >
@@ -90,7 +90,7 @@ export default function ShowcaseRelease({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-6xl font-black opacity-20" style={{ fontFamily: DISPLAY, color: INK }}>
+            <span className="text-5xl font-black opacity-20" style={{ fontFamily: DISPLAY, color: INK }}>
               {(release.trackTitle || '?')[0].toUpperCase()}
             </span>
           </div>
@@ -103,25 +103,25 @@ export default function ShowcaseRelease({
             whileTap={{ scale: 0.92 }}
             whileHover={{ scale: 1.05 }}
             className="absolute inset-0 flex items-center justify-center group"
-            style={{ background: playing ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.35)' }}
+            style={{ background: playing ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.3)' }}
           >
             <motion.div
               animate={{ scale: playing ? 0.85 : 1 }}
               transition={{ duration: 0.3 }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform"
+              className="w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform"
               style={{
                 background: accent,
                 color: '#0A0A0A',
-                boxShadow: `0 0 20px ${accent}80`,
+                boxShadow: `0 0 16px ${accent}80`,
               }}
             >
               {playing ? (
-                <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
                   <rect x="3" y="2" width="4" height="12" />
                   <rect x="9" y="2" width="4" height="12" />
                 </svg>
               ) : (
-                <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M3 2 L13 8 L3 14 Z" />
                 </svg>
               )}
@@ -135,16 +135,16 @@ export default function ShowcaseRelease({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-center mt-6"
+        className="text-center mt-4"
       >
         <h2
-          className="text-3xl md:text-4xl font-black tracking-tight leading-tight"
+          className="text-2xl md:text-3xl font-black tracking-tight leading-tight"
           style={{ fontFamily: DISPLAY, color: INK }}
         >
           {release.trackTitle}
         </h2>
         <div
-          className="text-[10px] tracking-[0.35em] uppercase font-bold mt-2"
+          className="text-[10px] tracking-[0.35em] uppercase font-bold mt-1"
           style={{ fontFamily: MONO, color: MUTED }}
         >
           {artistName}
@@ -153,9 +153,9 @@ export default function ShowcaseRelease({
 
       {/* Drop date label */}
       {drop && (
-        <div className="text-center mt-3">
+        <div className="text-center mt-2">
           <span
-            className="inline-flex items-center gap-2 text-[10px] tracking-[0.35em] uppercase font-bold px-3 py-1.5"
+            className="inline-flex items-center gap-2 text-[9px] tracking-[0.35em] uppercase font-bold px-2.5 py-1"
             style={{
               fontFamily: MONO,
               color: drop.isOut ? '#1DB954' : accent,
@@ -180,12 +180,12 @@ export default function ShowcaseRelease({
           onClick={onPresaveClick}
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="block w-full text-center py-4 mt-6"
+          className="block w-full text-center py-3 mt-4"
           style={{
             background: accent,
             color: '#0A0A0A',
             fontFamily: MONO,
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
@@ -203,7 +203,7 @@ export default function ShowcaseRelease({
       {/* "Choose music service" label */}
       {musicLinks.length > 0 && (
         <div
-          className="text-center text-[10px] tracking-[0.35em] uppercase font-bold mt-8 mb-4"
+          className="text-center text-[9px] tracking-[0.35em] uppercase font-bold mt-6 mb-3"
           style={{ fontFamily: MONO, color: MUTED }}
         >
           ◆ Choose music service
@@ -226,7 +226,7 @@ export default function ShowcaseRelease({
               transition={{ duration: 0.4, delay: 0.4 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-3 px-4 py-4 group"
+              className="flex items-center gap-3 px-4 py-3 group"
               style={{
                 background: SURFACE,
                 border: `1px solid ${BORDER}`,
@@ -240,13 +240,13 @@ export default function ShowcaseRelease({
                 }}
               />
               <span
-                className="flex-1 text-base font-bold truncate"
+                className="flex-1 text-sm font-bold truncate"
                 style={{ fontFamily: DISPLAY, color: INK }}
               >
                 {l.label}
               </span>
               <span
-                className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 shrink-0 group-hover:scale-[1.04] transition-transform"
+                className="text-[9px] tracking-[0.3em] uppercase font-bold px-2.5 py-1 shrink-0 group-hover:scale-[1.04] transition-transform"
                 style={{
                   background: accent,
                   color: '#0A0A0A',
