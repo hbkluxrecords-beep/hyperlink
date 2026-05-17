@@ -162,6 +162,7 @@ function rowToProfile(row) {
     links: row.links || [],
     isPremium: !!row.is_premium,
     accentColor: row.accent_color || null,
+    isFeatured: !!row.is_featured,
     createdAt: row.created_at,
   };
 }

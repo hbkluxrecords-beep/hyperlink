@@ -9,6 +9,7 @@ import Explore from './pages/Explore.jsx';
 import Lookup from './pages/Lookup.jsx';
 import Login from './pages/Login.jsx';
 import Upgrade from './pages/Upgrade.jsx';
+import Admin from './pages/Admin.jsx';
 import NotFound from './pages/NotFound.jsx';
 import SmartProfileResolver from './components/SmartProfileResolver.jsx';
 import RouteTransitions from './components/RouteTransitions.jsx';
@@ -41,6 +42,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/new" element={<Create />} />
         <Route path="/login" element={<Login />} />
         <Route path="/upgrade" element={<Upgrade />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/find" element={<Lookup />} />
         <Route path="/:handle/edit" element={<Edit />} />

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import AuthButton from '../components/AuthButton.jsx';
+import TopNav from '../components/TopNav.jsx';
 import { startCheckout } from '../lib/premium.js';
 
 const BG = '#0A0A0A';
@@ -111,14 +112,9 @@ function Tier({ name, price, period, sub, features, cta, highlighted, savings })
 export default function Upgrade() {
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }}>
-      <nav className="px-6 py-5 flex items-center justify-between">
-        <Link to="/" className="text-[10px] tracking-[0.3em] uppercase font-bold hover:opacity-70" style={{ fontFamily: MONO, color: MUTED }}>
-          ← HYPERLINK
-        </Link>
-        <AuthButton theme="dark" variant="badge" />
-      </nav>
+      <TopNav />
 
-      <div className="max-w-5xl mx-auto px-6 md:px-12 py-12 md:py-20">
+      <div className="max-w-5xl mx-auto px-6 md:px-12 pt-24 md:pt-32 pb-20">
         <div className="text-center mb-16">
           <div className="text-[10px] tracking-[0.35em] uppercase font-bold mb-4" style={{ fontFamily: MONO, color: ACCENT }}>
             PRICING · 2026
