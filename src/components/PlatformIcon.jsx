@@ -3,12 +3,12 @@
 
 const SVGS = {
   spotify: (
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.5-1.5-5.6-1.9-9.3-1-.4.1-.7-.1-.8-.5-.1-.4.1-.7.5-.8 4-.9 7.5-.5 10.3 1.2.3.2.4.6.2.9zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7.1-2.2-10.4-1.2-.4.1-.9-.1-1-.5-.1-.4.1-.9.5-1 3.8-1.1 8.5-.6 11.7 1.4.4.2.5.7.3 1zm.1-2.8C14.5 9 8.8 8.8 5.6 9.8c-.5.1-1-.1-1.2-.6-.1-.5.1-1 .6-1.2 3.7-1.1 10-.9 13.9 1.4.4.3.6.9.3 1.3-.3.5-.9.7-1.3.4z"/>
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12C24 5.4 18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.56.3z"/>
     </svg>
   ),
   apple: (
-    <svg viewBox="0 0 24 24" fill="currentColor">
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
     </svg>
   ),
@@ -95,19 +95,20 @@ const SVGS = {
 };
 
 function matchKey(labelOrUrl) {
-  const s = (labelOrUrl || '').toLowerCase();
-  if (s.includes('spotify')) return 'spotify';
-  if (s.includes('apple') || s.includes('itunes')) return 'apple';
-  if (s.includes('soundcloud')) return 'soundcloud';
-  if (s.includes('youtube') || s.includes('youtu.be')) return 'youtube';
+  const s = (labelOrUrl || '').toLowerCase().trim();
+  if (!s) return null;
+  if (s.includes('spotify') || s.includes('spoti.fi')) return 'spotify';
+  if (s.includes('apple') || s.includes('itunes') || s.includes('music.apple')) return 'apple';
+  if (s.includes('soundcloud') || s.includes('snd.sc')) return 'soundcloud';
+  if (s.includes('youtube') || s.includes('youtu.be') || s.includes('music.youtube')) return 'youtube';
   if (s.includes('tidal')) return 'tidal';
   if (s.includes('bandcamp')) return 'bandcamp';
-  if (s.includes('amazon')) return 'amazon';
+  if (s.includes('amazon') || s.includes('amzn')) return 'amazon';
   if (s.includes('deezer')) return 'deezer';
-  if (s.includes('instagram')) return 'instagram';
+  if (s.includes('instagram') || s.includes('instagr.am')) return 'instagram';
   if (s.includes('tiktok')) return 'tiktok';
-  if (s.includes('twitter') || s.includes('x.com')) return 'x';
-  if (s.includes('facebook')) return 'facebook';
+  if (s.includes('twitter') || s.includes('x.com') || s.includes('t.co')) return 'x';
+  if (s.includes('facebook') || s.includes('fb.com')) return 'facebook';
   if (s.includes('twitch')) return 'twitch';
   if (s.includes('discord')) return 'discord';
   if (s.includes('mailto') || s.includes('email')) return 'email';
@@ -115,17 +116,19 @@ function matchKey(labelOrUrl) {
 }
 
 /**
- * Renders a platform-matched glyph if recognized, otherwise a generic link icon
- * or null (caller can show a fallback).
+ * Renders a platform-matched glyph if recognized, otherwise a generic link icon.
+ * NEVER returns null when fallback is 'link' — that way every link card always has SOMETHING visible.
  */
 export default function PlatformIcon({ label, url, size = 18, className = '', fallback = 'link' }) {
+  // Try label first, fall back to URL. If neither matches, use the generic link glyph.
   const key = matchKey(label) || matchKey(url);
-  const svg = key ? SVGS[key] : (fallback === 'link' ? SVGS.link : null);
+  let svg = key ? SVGS[key] : null;
+  if (!svg && fallback === 'link') svg = SVGS.link;
   if (!svg) return null;
   return (
     <span
       className={className}
-      style={{ display: 'inline-flex', width: size, height: size, alignItems: 'center', justifyContent: 'center' }}
+      style={{ display: 'inline-flex', width: size, height: size, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
     >
       {svg}
     </span>
