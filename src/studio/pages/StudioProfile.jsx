@@ -127,7 +127,7 @@ export default function StudioProfile() {
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 
-      <div className={`max-w-xl mx-auto px-6 relative ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-20 pb-8' : 'pt-24 pb-12'}`} style={{ zIndex: 1 }}>
+      <div className={`max-w-xl mx-auto px-6 relative ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-16 pb-6' : 'pt-24 pb-12'}`} style={{ zIndex: 1 }}>
 
         {/* HIDE everything above the release in SHOWCASE mode - lnk.to direct page style */}
         {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && (

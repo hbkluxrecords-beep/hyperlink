@@ -75,7 +75,7 @@ export default function ShowcaseRelease({
         className="relative mx-auto"
         style={{
           width: '100%',
-          maxWidth: 240,
+          maxWidth: 200,
           aspectRatio: '1 / 1',
           background: '#0A0A0A',
           border: `1px solid ${BORDER}`,
@@ -136,7 +136,7 @@ export default function ShowcaseRelease({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-center mt-4"
+        className="text-center mt-3"
       >
         <h2
           className="text-2xl md:text-3xl font-black tracking-tight leading-tight"
@@ -181,7 +181,7 @@ export default function ShowcaseRelease({
           onClick={onPresaveClick}
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="block w-full text-center py-3 mt-4"
+          className="block w-full text-center py-2.5 mt-3"
           style={{
             background: accent,
             color: '#0A0A0A',
@@ -199,7 +199,7 @@ export default function ShowcaseRelease({
       {/* "Choose music service" label */}
       {musicLinks.length > 0 && (
         <div
-          className="text-center text-[9px] tracking-[0.35em] uppercase font-bold mt-6 mb-3"
+          className="text-center text-[9px] tracking-[0.35em] uppercase font-bold mt-4 mb-2"
           style={{ fontFamily: MONO, color: MUTED }}
         >
           ◆ Choose music service
@@ -207,7 +207,7 @@ export default function ShowcaseRelease({
       )}
 
       {/* Music service rows */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {musicLinks.map((l, i) => {
           const dotColor = l.color || platformColor(l.label || l.url);
           return (
@@ -222,7 +222,7 @@ export default function ShowcaseRelease({
               transition={{ duration: 0.4, delay: 0.4 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-3 px-4 py-3 group"
+              className="flex items-center gap-3 px-4 py-2.5 group"
               style={{
                 background: SURFACE,
                 border: `1px solid ${BORDER}`,
@@ -252,7 +252,7 @@ export default function ShowcaseRelease({
 
       {/* Premium: drop alerts - secondary, after music services */}
       {isPremium && drop && !drop.isOut && handle && (
-        <div className="mt-6">
+        <div className="mt-4">
           <div
             className="text-center text-[9px] tracking-[0.35em] uppercase font-bold mb-2"
             style={{ fontFamily: MONO, color: MUTED }}
