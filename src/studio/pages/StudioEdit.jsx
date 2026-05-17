@@ -610,7 +610,7 @@ export default function StudioEdit() {
                 style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.ink }}
               >
                 {(audioFile || audioPreviewUrl) ? 'Replace' : 'Upload'}
-                <input type="file" accept="audio/*" onChange={onAudioChange} className="hidden" />
+                <input type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac" onChange={onAudioChange} className="hidden" />
               </label>
             </div>
             {audioError && <div className="mt-2 text-xs" style={{ color: STUDIO.accent, fontFamily: STUDIO_FONTS.mono }}>{audioError}</div>}
