@@ -175,6 +175,11 @@ export default function StudioEdit() {
           if (r.ok) {
             finalAudioUrl = r.url;
             try { waveformData = await generateWaveformData(audioFile); } catch {}
+          } else {
+            console.error('Audio upload failed:', r.error);
+            setErrorMsg('Audio upload failed: ' + (r.error || 'unknown'));
+            setSaving(false);
+            return;
           }
         }
 
