@@ -34,12 +34,7 @@ export default function PlatformLinkCard({ label, url, color, index = 0, onClick
       }}
     >
       <div className="flex items-center gap-4">
-        <span
-          className="shrink-0 flex items-center justify-center w-8 h-8"
-          style={{ color: dotColor }}
-        >
-          <PlatformIcon label={label} url={url} size={20} />
-        </span>
+        <PlatformIcon label={label} url={url} size={24} />
         <span
           className="flex-1 text-lg font-bold truncate"
           style={{ fontFamily: '"Fraunces", serif' }}

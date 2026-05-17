@@ -175,12 +175,7 @@ export default function MinimalRelease({
                 className="flex items-center gap-3 px-4 py-3.5 group"
                 style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
               >
-                <span
-                  className="shrink-0 flex items-center justify-center w-7 h-7"
-                  style={{ color: dot }}
-                >
-                  <PlatformIcon label={l.label} url={l.url} size={18} />
-                </span>
+                <PlatformIcon label={l.label} url={l.url} size={22} />
                 <span className="flex-1 text-sm font-bold truncate" style={{ fontFamily: DISPLAY, color: INK }}>
                   {l.label}
                 </span>

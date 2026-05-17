@@ -228,12 +228,7 @@ export default function ShowcaseRelease({
                 border: `1px solid ${BORDER}`,
               }}
             >
-              <span
-                className="shrink-0 flex items-center justify-center w-8 h-8"
-                style={{ color: dotColor }}
-              >
-                <PlatformIcon label={l.label} url={l.url} size={20} />
-              </span>
+              <PlatformIcon label={l.label} url={l.url} size={24} />
               <span
                 className="flex-1 text-sm font-bold truncate"
                 style={{ fontFamily: DISPLAY, color: INK }}
