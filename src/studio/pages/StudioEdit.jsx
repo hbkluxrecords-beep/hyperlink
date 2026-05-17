@@ -102,7 +102,7 @@ export default function StudioEdit() {
     if (!file) return;
     setAudioError('');
     // Accept up to 25MB raw (will trim to <1MB clip)
-    if (file.size > 25 * 1024 * 1024) { setAudioError('File must be under 25MB'); return; }
+    if (file.size > 50 * 1024 * 1024) { setAudioError('File must be under 50MB'); return; }
     try {
       const dur = await getAudioDuration(file);
       if (dur < 1) { setAudioError('Audio too short'); return; }
