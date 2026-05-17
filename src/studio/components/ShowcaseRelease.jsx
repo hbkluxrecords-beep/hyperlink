@@ -195,11 +195,6 @@ export default function ShowcaseRelease({
         </motion.a>
       )}
 
-      {/* Premium: drop alerts */}
-      {isPremium && drop && !drop.isOut && handle && (
-        <DropAlertCapture handle={handle} releaseId={release.id} accent={accent} />
-      )}
-
       {/* "Choose music service" label */}
       {musicLinks.length > 0 && (
         <div
@@ -259,6 +254,19 @@ export default function ShowcaseRelease({
           );
         })}
       </div>
+
+      {/* Premium: drop alerts - secondary, after music services */}
+      {isPremium && drop && !drop.isOut && handle && (
+        <div className="mt-6">
+          <div
+            className="text-center text-[9px] tracking-[0.35em] uppercase font-bold mb-2"
+            style={{ fontFamily: MONO, color: MUTED }}
+          >
+            ◆ Get notified
+          </div>
+          <DropAlertCapture handle={handle} releaseId={release.id} accent={accent} />
+        </div>
+      )}
     </div>
   );
 }
