@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { platformColor } from '../../lib/platformColors.js';
+import PlatformIcon from '../../components/PlatformIcon.jsx';
 import DropAlertCapture from '../../components/DropAlertCapture.jsx';
 
 const ACCENT = '#FF4D1F';
@@ -175,9 +176,11 @@ export default function MinimalRelease({
                 style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
               >
                 <span
-                  className="inline-block w-2 h-2 rounded-full shrink-0"
-                  style={{ background: dot, boxShadow: `0 0 6px ${dot}80` }}
-                />
+                  className="shrink-0 flex items-center justify-center w-7 h-7"
+                  style={{ color: dot }}
+                >
+                  <PlatformIcon label={l.label} url={l.url} size={18} />
+                </span>
                 <span className="flex-1 text-sm font-bold truncate" style={{ fontFamily: DISPLAY, color: INK }}>
                   {l.label}
                 </span>

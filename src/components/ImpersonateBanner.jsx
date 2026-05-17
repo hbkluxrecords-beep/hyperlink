@@ -18,27 +18,27 @@ export default function ImpersonateBanner() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between gap-3 px-4 py-2"
+      className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between gap-2 px-3 py-1.5"
       style={{
         background: '#FF4D1F',
         color: '#0A0A0A',
         fontFamily: '"JetBrains Mono", monospace',
-        fontSize: 10,
-        letterSpacing: '0.25em',
+        fontSize: 9,
+        letterSpacing: '0.2em',
         textTransform: 'uppercase',
         fontWeight: 800,
       }}
     >
-      <span>◆ ADMIN MODE · Editing as @{targetHandle}</span>
+      <span className="truncate">◆ ADMIN · @{targetHandle}</span>
       <button
         onClick={() => {
           stopImpersonating();
           window.location.href = '/admin';
         }}
-        className="border px-2 py-1 hover:bg-black hover:text-white transition-colors"
-        style={{ borderColor: '#0A0A0A' }}
+        className="border px-2 py-1 hover:bg-black hover:text-white transition-colors whitespace-nowrap shrink-0"
+        style={{ borderColor: '#0A0A0A', fontSize: 9 }}
       >
-        ← Return to admin
+        ← Exit
       </button>
     </div>
   );

@@ -24,3 +24,18 @@ input, textarea, select { font-family: inherit; }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Prevent horizontal cutoff on mobile */
+html, body, #root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Hide scrollbar utility for horizontal scrolls */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

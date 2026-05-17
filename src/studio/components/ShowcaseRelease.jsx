@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { platformColor } from '../../lib/platformColors.js';
+import PlatformIcon from '../../components/PlatformIcon.jsx';
 import DropAlertCapture from '../../components/DropAlertCapture.jsx';
 
 const ACCENT = '#FF4D1F';
@@ -228,12 +229,11 @@ export default function ShowcaseRelease({
               }}
             >
               <span
-                className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
-                style={{
-                  background: dotColor,
-                  boxShadow: `0 0 8px ${dotColor}40`,
-                }}
-              />
+                className="shrink-0 flex items-center justify-center w-8 h-8"
+                style={{ color: dotColor }}
+              >
+                <PlatformIcon label={l.label} url={l.url} size={20} />
+              </span>
               <span
                 className="flex-1 text-sm font-bold truncate"
                 style={{ fontFamily: DISPLAY, color: INK }}

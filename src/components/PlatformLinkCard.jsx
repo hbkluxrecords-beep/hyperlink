@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { platformColor } from '../lib/platformColors.js';
+import PlatformIcon from './PlatformIcon.jsx';
 
 /**
  * Dark card link with platform-color dot on left, name center, arrow right.
@@ -34,12 +35,11 @@ export default function PlatformLinkCard({ label, url, color, index = 0, onClick
     >
       <div className="flex items-center gap-4">
         <span
-          className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
-          style={{
-            background: dotColor,
-            boxShadow: `0 0 8px ${dotColor}40`,
-          }}
-        />
+          className="shrink-0 flex items-center justify-center w-8 h-8"
+          style={{ color: dotColor }}
+        >
+          <PlatformIcon label={label} url={url} size={20} />
+        </span>
         <span
           className="flex-1 text-lg font-bold truncate"
           style={{ fontFamily: '"Fraunces", serif' }}
