@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import AuthButton from '../components/AuthButton.jsx';
 import TopNav from '../components/TopNav.jsx';
+import MiniPreviewPlayer from '../components/MiniPreviewPlayer.jsx';
 import { loadRecentProfiles } from '../lib/storage.js';
 import { loadRecentArtists } from '../studio/lib/studioStorage.js';
 import { listFeatured } from '../lib/admin.js';
@@ -92,8 +93,72 @@ export default function Landing() {
     <div style={{ background: BG, color: INK, minHeight: '100vh' }}>
       <TopNav />
 
+      {/* FEATURED ARTISTS - moved to TOP */}
+      {featured.length > 0 && (
+        <section className="px-6 md:px-12 pt-24 md:pt-28 pb-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-[10px] tracking-[0.35em] uppercase font-bold mb-3" style={{ fontFamily: MONO, color: ACCENT }}>
+              ◆ FEATURED THIS WEEK
+            </div>
+            <h2 className="font-black tracking-tight mb-6" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', color: INK }}>
+              On <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>rotation.</span>
+            </h2>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-6 md:-mx-12 px-6 md:px-12">
+              {featured.map((f, i) => (
+                <motion.div
+                  key={`${f.type}-${f.handle}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, duration: 0.4 }}
+                  className="shrink-0"
+                  style={{ width: 220 }}
+                >
+                  <Link
+                    to={`/${f.handle}`}
+                    className="block group hover:scale-[1.02] transition-transform"
+                    style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+                  >
+                    <div className="aspect-square overflow-hidden" style={{ background: '#0A0A0A' }}>
+                      {f.photoUrl ? (
+                        <img src={f.photoUrl} alt={f.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-4xl font-black opacity-30" style={{ fontFamily: DISPLAY, color: INK }}>
+                            {(f.name || '?')[0].toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <div className="text-[9px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>
+                        {f.type === 'artist' ? '◆ ARTIST' : 'CREATOR'}
+                      </div>
+                      <div className="font-black tracking-tight mt-1 truncate" style={{ fontFamily: DISPLAY, color: INK }}>
+                        {f.name}
+                      </div>
+                      <div className="text-[10px] tracking-[0.25em] uppercase opacity-60 mt-0.5 mb-2" style={{ fontFamily: MONO, color: MUTED }}>
+                        /{f.handle}
+                      </div>
+                      {f.type === 'artist' && (
+                        <MiniPreviewPlayer
+                          id={`featured-${f.handle}`}
+                          coverUrl={f.coverArtUrl || f.photoUrl}
+                          audioUrl={f.audioPreviewUrl}
+                          trackTitle={f.trackTitle}
+                        />
+                      )}
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* HERO: chooser */}
-      <section className="px-6 md:px-12 pt-24 md:pt-32 pb-20">
+      <section className={`px-6 md:px-12 ${featured.length > 0 ? 'pt-6' : 'pt-24 md:pt-32'} pb-20`}>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -150,62 +215,6 @@ export default function Landing() {
           </div>
         </motion.div>
       </section>
-
-      {/* FEATURED ARTISTS */}
-      {featured.length > 0 && (
-        <section className="px-6 md:px-12 py-12 md:py-16">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-[10px] tracking-[0.35em] uppercase font-bold mb-4" style={{ fontFamily: MONO, color: ACCENT }}>
-              ◆ FEATURED THIS WEEK
-            </div>
-            <h2 className="font-black tracking-tight mb-6" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', color: INK }}>
-              On <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>rotation.</span>
-            </h2>
-            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-6 md:-mx-12 px-6 md:px-12">
-              {featured.map((f, i) => (
-                <motion.div
-                  key={`${f.type}-${f.handle}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05, duration: 0.4 }}
-                  className="shrink-0"
-                  style={{ width: 180 }}
-                >
-                  <Link
-                    to={`/${f.handle}`}
-                    className="block group hover:scale-[1.02] transition-transform"
-                    style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
-                  >
-                    <div className="aspect-square overflow-hidden" style={{ background: '#0A0A0A' }}>
-                      {f.photoUrl ? (
-                        <img src={f.photoUrl} alt={f.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-4xl font-black opacity-30" style={{ fontFamily: DISPLAY, color: INK }}>
-                            {(f.name || '?')[0].toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3">
-                      <div className="text-[9px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>
-                        {f.type === 'artist' ? '◆ ARTIST' : 'CREATOR'}
-                      </div>
-                      <div className="font-black tracking-tight mt-1 truncate" style={{ fontFamily: DISPLAY, color: INK }}>
-                        {f.name}
-                      </div>
-                      <div className="text-[10px] tracking-[0.25em] uppercase opacity-60 mt-0.5" style={{ fontFamily: MONO, color: MUTED }}>
-                        /{f.handle}
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* WHY PLINKS */}
       <section className="px-6 md:px-12 py-16 md:py-24" style={{ background: SURFACE }}>

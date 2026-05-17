@@ -1,13 +1,62 @@
 import { supabase } from './storage.js';
-import { getSession } from './auth.js';
+import { getSession, setSession } from './auth.js';
 
 const hasSupabase = !!supabase;
+const IMPERSONATE_KEY = 'plinks-admin-original';
 
 export const ADMIN_HANDLE = 'hbk';
 
 export function isAdmin() {
-  const s = getSession();
-  return s?.handle?.toLowerCase() === ADMIN_HANDLE;
+  // True if current session OR the original (pre-impersonate) session is hbk
+  const cur = getSession();
+  if (cur?.handle?.toLowerCase() === ADMIN_HANDLE) return true;
+  try {
+    const orig = JSON.parse(localStorage.getItem(IMPERSONATE_KEY) || 'null');
+    return orig?.handle?.toLowerCase() === ADMIN_HANDLE;
+  } catch {
+    return false;
+  }
+}
+
+export function isImpersonating() {
+  try {
+    return !!localStorage.getItem(IMPERSONATE_KEY);
+  } catch {
+    return false;
+  }
+}
+
+export function getOriginalAdmin() {
+  try {
+    return JSON.parse(localStorage.getItem(IMPERSONATE_KEY) || 'null');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Swap session to another user. Only runs if current user is admin.
+ * Stores the original admin session so we can swap back.
+ */
+export function impersonate(handle, type) {
+  const cur = getSession();
+  if (cur?.handle?.toLowerCase() !== ADMIN_HANDLE && !isImpersonating()) return false;
+  // Save original admin session (only if not already impersonating)
+  if (!isImpersonating() && cur) {
+    try { localStorage.setItem(IMPERSONATE_KEY, JSON.stringify(cur)); } catch {}
+  }
+  setSession({ handle: handle.toLowerCase(), type });
+  return true;
+}
+
+export function stopImpersonating() {
+  try {
+    const raw = localStorage.getItem(IMPERSONATE_KEY);
+    if (!raw) return;
+    const orig = JSON.parse(raw);
+    setSession(orig);
+    localStorage.removeItem(IMPERSONATE_KEY);
+  } catch {}
 }
 
 export async function getAdminStats() {
@@ -55,13 +104,36 @@ export async function listFeatured() {
     supabase.from('artist_profiles').select('*').eq('is_featured', true).limit(8),
     supabase.from('profiles').select('*').eq('is_featured', true).limit(4),
   ]);
-  const artistRows = (a.data || []).map((r) => ({
-    handle: r.handle,
-    name: r.artist_name,
-    type: 'artist',
-    photoUrl: r.photo_url,
-    genres: r.genre_tags || [],
-  }));
+
+  // Pull latest release per artist for preview audio
+  const artistHandles = (a.data || []).map((r) => r.handle);
+  let releasesByHandle = {};
+  if (artistHandles.length > 0) {
+    const { data: releases } = await supabase
+      .from('presave_releases')
+      .select('artist_handle, track_title, cover_art_url, audio_preview_url, created_at')
+      .in('artist_handle', artistHandles)
+      .order('created_at', { ascending: false });
+    for (const r of releases || []) {
+      if (!releasesByHandle[r.artist_handle]) {
+        releasesByHandle[r.artist_handle] = r;
+      }
+    }
+  }
+
+  const artistRows = (a.data || []).map((r) => {
+    const rel = releasesByHandle[r.handle];
+    return {
+      handle: r.handle,
+      name: r.artist_name,
+      type: 'artist',
+      photoUrl: r.photo_url,
+      genres: r.genre_tags || [],
+      trackTitle: rel?.track_title || null,
+      coverArtUrl: rel?.cover_art_url || null,
+      audioPreviewUrl: rel?.audio_preview_url || null,
+    };
+  });
   const creatorRows = (c.data || []).map((r) => ({
     handle: r.handle,
     name: r.display_name,

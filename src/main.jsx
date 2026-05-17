@@ -13,6 +13,7 @@ import Admin from './pages/Admin.jsx';
 import NotFound from './pages/NotFound.jsx';
 import SmartProfileResolver from './components/SmartProfileResolver.jsx';
 import RouteTransitions from './components/RouteTransitions.jsx';
+import ImpersonateBanner from './components/ImpersonateBanner.jsx';
 
 import StudioLanding from './studio/pages/StudioLanding.jsx';
 import StudioCreate from './studio/pages/StudioCreate.jsx';
@@ -28,6 +29,7 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
+      <ImpersonateBanner />
       <RouteTransitions>
         <Route path="/studio" element={<StudioLanding />} />
         <Route path="/studio/new" element={<StudioCreate />} />

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import TopNav from '../components/TopNav.jsx';
-import { isAdmin, getAdminStats, listAllProfiles, toggleFeatured } from '../lib/admin.js';
+import { isAdmin, getAdminStats, listAllProfiles, toggleFeatured, impersonate } from '../lib/admin.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -136,8 +136,13 @@ export default function Admin() {
                   {p.is_premium && <span className="ml-2" style={{ color: ACCENT }}>★</span>}
                   {p.is_featured && <span className="ml-1" style={{ color: ACCENT }}>◆</span>}
                 </div>
-                <div className="text-[10px] tracking-[0.25em] uppercase opacity-60 mt-0.5" style={{ fontFamily: MONO, color: MUTED }}>
-                  /{p.handle}
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[10px] tracking-[0.25em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>
+                    {tab === 'artists' ? 'ARTIST' : (p.category || 'CREATOR').toUpperCase()}
+                  </span>
+                  <span className="text-[10px] tracking-[0.25em] uppercase opacity-60" style={{ fontFamily: MONO, color: MUTED }}>
+                    · /{p.handle}
+                  </span>
                 </div>
               </div>
               <Link
@@ -147,6 +152,19 @@ export default function Admin() {
               >
                 View
               </Link>
+              <button
+                onClick={() => {
+                  const type = tab === 'artists' ? 'artist' : 'creator';
+                  if (impersonate(p.handle, type)) {
+                    const editUrl = type === 'artist' ? `/studio/${p.handle}/edit` : `/${p.handle}/edit`;
+                    window.location.href = editUrl;
+                  }
+                }}
+                className="text-[9px] tracking-[0.3em] uppercase font-bold px-2 py-1 border hover:scale-[1.04] transition-transform shrink-0"
+                style={{ borderColor: ACCENT, fontFamily: MONO, color: ACCENT }}
+              >
+                ✎ Edit
+              </button>
               <button
                 onClick={() => toggle(p.handle, tab === 'artists' ? 'artist' : 'creator', p.is_featured)}
                 className="text-[9px] tracking-[0.3em] uppercase font-bold px-2 py-1 transition-transform shrink-0"
