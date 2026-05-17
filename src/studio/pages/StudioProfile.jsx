@@ -124,21 +124,27 @@ export default function StudioProfile() {
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20">
       <StudioNav minimal />
 
-      <div className="max-w-xl mx-auto px-6 pt-24 pb-12">
+      <div className={`max-w-xl mx-auto px-6 ${artist.releaseLayout === 'showcase' ? 'pt-20 pb-8' : 'pt-24 pb-12'}`}>
 
-        {/* Subtle vol/issue tag — flat, no rotation */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-[9px] tracking-[0.35em] uppercase font-bold mb-6"
-          style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-        >
-          VOL 01 · ISSUE 04 · {year}
-        </motion.div>
+        {/* HIDE everything above the release in SHOWCASE mode - lnk.to direct page style */}
+        {artist.releaseLayout !== 'showcase' && (
+          <>
+            {/* Subtle vol/issue tag — flat, no rotation */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-[9px] tracking-[0.35em] uppercase font-bold mb-6"
+              style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+            >
+              VOL 01 · ISSUE 04 · {year}
+            </motion.div>
+          </>
+        )}
 
-        {/* Profile photo + name */}
-        <motion.div
+        {/* Profile photo + name - only in compact mode */}
+        {artist.releaseLayout !== 'showcase' && (
+          <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15, ease: LUXURY_EASE }}
@@ -203,10 +209,11 @@ export default function StudioProfile() {
               ◉ {locDisplay} · EST {year}
             </div>
           )}
-        </motion.div>
+          </motion.div>
+        )}
 
-        {/* Bio pullquote */}
-        {artist.bio && (
+        {/* Bio pullquote - hide in showcase */}
+        {artist.releaseLayout !== 'showcase' && artist.bio && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -223,7 +230,8 @@ export default function StudioProfile() {
           </motion.div>
         )}
 
-        {/* Owner/Share button row */}
+        {/* Owner/Share button row - hidden in showcase */}
+        {artist.releaseLayout !== 'showcase' && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -281,14 +289,27 @@ export default function StudioProfile() {
             </>
           )}
         </motion.div>
+        )}
+
+        {/* In SHOWCASE mode, owner gets a tiny floating edit link only */}
+        {artist.releaseLayout === 'showcase' && isOwner && (
+          <div className="flex justify-end mb-2">
+            <Link
+              to={`/studio/${handle}/edit`}
+              className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
+              style={{ background: accentColor, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+            >
+              ✎ Edit
+            </Link>
+          </div>
+        )}
 
         {/* RELEASE - layout switches between compact and showcase */}
         {featuredRelease && artist.releaseLayout === 'showcase' ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.35, ease: LUXURY_EASE }}
-            className="mt-8"
+            transition={{ duration: 0.6, delay: 0.2, ease: LUXURY_EASE }}
           >
             <ShowcaseRelease
               release={featuredRelease}
@@ -341,8 +362,8 @@ export default function StudioProfile() {
           </div>
         )}
 
-        {/* Socials */}
-        {socialEntries.length > 0 && (
+        {/* Socials - hidden in showcase */}
+        {artist.releaseLayout !== 'showcase' && socialEntries.length > 0 && (
           <div>
             <SectionLabel number="03" label="Off the record" />
             <div className="flex flex-wrap gap-2">
@@ -363,8 +384,8 @@ export default function StudioProfile() {
           </div>
         )}
 
-        {/* Premium: Fan DM widget */}
-        {artist.isPremium && !isOwner && (
+        {/* Premium: Fan DM widget - hidden in showcase */}
+        {artist.releaseLayout !== 'showcase' && artist.isPremium && !isOwner && (
           <FanDMWidget handle={handle} accent={accentColor} />
         )}
 
