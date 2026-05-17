@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import StudioNav from '../components/StudioNav.jsx';
 import CompactPlayer from '../components/CompactPlayer.jsx';
 import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
+import MinimalRelease from '../components/MinimalRelease.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
 import SocialPill from '../../components/SocialPill.jsx';
 import FanDMWidget from '../../components/FanDMWidget.jsx';
@@ -124,10 +125,10 @@ export default function StudioProfile() {
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20">
       <StudioNav minimal />
 
-      <div className={`max-w-xl mx-auto px-6 ${artist.releaseLayout === 'showcase' ? 'pt-20 pb-8' : 'pt-24 pb-12'}`}>
+      <div className={`max-w-xl mx-auto px-6 ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-20 pb-8' : 'pt-24 pb-12'}`}>
 
         {/* HIDE everything above the release in SHOWCASE mode - lnk.to direct page style */}
-        {artist.releaseLayout !== 'showcase' && (
+        {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && (
           <>
             {/* Subtle vol/issue tag — flat, no rotation */}
             <motion.div
@@ -143,7 +144,7 @@ export default function StudioProfile() {
         )}
 
         {/* Profile photo + name - only in compact mode */}
-        {artist.releaseLayout !== 'showcase' && (
+        {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && (
           <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -157,6 +158,17 @@ export default function StudioProfile() {
               <img src={artist.photoUrl} alt={artist.artistName} className="w-full h-full object-cover" />
             </div>
           )}
+
+          {/* PLINKS PREMIUM tag - above name */}
+          {artist.isPremium && (
+            <div
+              className="text-[9px] tracking-[0.35em] uppercase font-bold mb-2"
+              style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}
+            >
+              ◆ PLINKS PREMIUM
+            </div>
+          )}
+
           <h1
             className="font-black leading-[0.9] tracking-tight break-words"
             style={{
@@ -183,37 +195,28 @@ export default function StudioProfile() {
             )}
           </h1>
 
-          {artist.isPremium && (
+          {/* Merged genres + location line */}
+          {(artist.genres?.length > 0 || locDisplay) && (
             <div
-              className="text-[9px] tracking-[0.35em] uppercase font-bold mt-1"
-              style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}
+              className="text-[10px] tracking-[0.3em] uppercase font-bold mt-3 flex flex-wrap items-center gap-x-2 gap-y-1"
+              style={{ fontFamily: STUDIO_FONTS.mono }}
             >
-              ◆ PLINKS PREMIUM
-            </div>
-          )}
-
-          {artist.genres && artist.genres.length > 0 && (
-            <div
-              className="text-[10px] tracking-[0.3em] uppercase font-bold mt-3"
-              style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}
-            >
-              {artist.genres.join(' · ')}
-            </div>
-          )}
-
-          {locDisplay && (
-            <div
-              className="text-[10px] tracking-[0.3em] uppercase mt-2 truncate"
-              style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-            >
-              ◉ {locDisplay} · EST {year}
+              {artist.genres?.length > 0 && (
+                <span style={{ color: accentColor }}>{artist.genres.join(' · ')}</span>
+              )}
+              {artist.genres?.length > 0 && locDisplay && (
+                <span style={{ color: STUDIO.muted }}>·</span>
+              )}
+              {locDisplay && (
+                <span style={{ color: STUDIO.muted }}>◉ {locDisplay}</span>
+              )}
             </div>
           )}
           </motion.div>
         )}
 
         {/* Bio pullquote - hide in showcase */}
-        {artist.releaseLayout !== 'showcase' && artist.bio && (
+        {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && artist.bio && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -231,7 +234,7 @@ export default function StudioProfile() {
         )}
 
         {/* Owner/Share button row - hidden in showcase */}
-        {artist.releaseLayout !== 'showcase' && (
+        {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -292,7 +295,7 @@ export default function StudioProfile() {
         )}
 
         {/* In SHOWCASE mode, owner gets a tiny floating edit link only */}
-        {artist.releaseLayout === 'showcase' && isOwner && (
+        {(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') && isOwner && (
           <div className="flex justify-end mb-2">
             <Link
               to={`/studio/${handle}/edit`}
@@ -304,7 +307,7 @@ export default function StudioProfile() {
           </div>
         )}
 
-        {/* RELEASE - layout switches between compact and showcase */}
+        {/* RELEASE - 3 layouts: showcase, minimal, compact */}
         {featuredRelease && artist.releaseLayout === 'showcase' ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -312,6 +315,24 @@ export default function StudioProfile() {
             transition={{ duration: 0.6, delay: 0.2, ease: LUXURY_EASE }}
           >
             <ShowcaseRelease
+              release={featuredRelease}
+              artistName={artist.artistName}
+              handle={handle}
+              musicLinks={artist.links || []}
+              isPremium={artist.isPremium}
+              accent={accentColor}
+              onPlay={() => trackEvent(handle, 'audio_play', { trackTitle: featuredRelease.trackTitle })}
+              onPresaveClick={() => trackEvent(handle, 'presave_click', { trackTitle: featuredRelease.trackTitle })}
+              onLinkClick={(l) => trackEvent(handle, 'link_click', { platform: l.label, url: l.url })}
+            />
+          </motion.div>
+        ) : featuredRelease && artist.releaseLayout === 'minimal' ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: LUXURY_EASE }}
+          >
+            <MinimalRelease
               release={featuredRelease}
               artistName={artist.artistName}
               handle={handle}
@@ -343,7 +364,7 @@ export default function StudioProfile() {
         ) : null}
 
         {/* Music links — only in compact layout (showcase has them built-in) */}
-        {artist.releaseLayout !== 'showcase' && artist.links && artist.links.length > 0 && (
+        {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && artist.links && artist.links.length > 0 && (
           <div>
             <SectionLabel number="02" label="Listen Everywhere" />
             <div className="space-y-2.5">
@@ -363,7 +384,7 @@ export default function StudioProfile() {
         )}
 
         {/* Socials - hidden in showcase */}
-        {artist.releaseLayout !== 'showcase' && socialEntries.length > 0 && (
+        {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && socialEntries.length > 0 && (
           <div>
             <SectionLabel number="03" label="Off the record" />
             <div className="flex flex-wrap gap-2">
@@ -385,7 +406,7 @@ export default function StudioProfile() {
         )}
 
         {/* Premium: Fan DM widget - hidden in showcase */}
-        {artist.releaseLayout !== 'showcase' && artist.isPremium && !isOwner && (
+        {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && artist.isPremium && !isOwner && (
           <FanDMWidget handle={handle} accent={accentColor} />
         )}
 

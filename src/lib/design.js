@@ -5,7 +5,6 @@ export const PAPER_DEEP = '#E6E2D5';
 
 export const CATEGORIES = [
   { id: 'streamer', label: 'STREAMER', icon: '◉', desc: 'Live channels, schedules, donations' },
-  { id: 'musician', label: 'MUSICIAN', icon: '♪', desc: 'Releases, tour dates, presaves' },
   { id: 'creator', label: 'CREATOR', icon: '✦', desc: 'Socials, sponsorships, merch' },
   { id: 'developer', label: 'DEVELOPER', icon: '▣', desc: 'Repos, demos, writing' },
 ];

@@ -144,6 +144,28 @@ export default function Create() {
               )}
             </div>
 
+            {/* Musician redirect banner */}
+            <Link
+              to="/studio/new"
+              className="block p-4 hover:scale-[1.005] transition-transform"
+              style={{ background: 'rgba(255,77,31,0.08)', border: `2px solid ${ACCENT}` }}
+            >
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-2xl">♪</span>
+                <div className="flex-1 min-w-[200px]">
+                  <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace', color: ACCENT }}>
+                    ARE YOU A MUSICIAN?
+                  </div>
+                  <div className="text-sm mt-1" style={{ fontFamily: '"Fraunces", serif' }}>
+                    Use Plinks Studio instead — built for artists with audio previews, presaves, analytics.
+                  </div>
+                </div>
+                <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace', color: ACCENT }}>
+                  Go to Studio →
+                </span>
+              </div>
+            </Link>
+
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={{ fontFamily: '"JetBrains Mono", monospace' }}>Display name</label>

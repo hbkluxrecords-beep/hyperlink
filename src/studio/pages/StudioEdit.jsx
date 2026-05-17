@@ -478,68 +478,88 @@ export default function StudioEdit() {
           {/* LAYOUT PICKER */}
           <CollapsibleSection
             label="Layout"
-            summary={releaseLayout === 'showcase' ? 'Showcase (big cover)' : 'Compact (mini player)'}
+            summary={
+              releaseLayout === 'showcase' ? 'Showcase (big cover)' :
+              releaseLayout === 'minimal' ? 'Minimal (lnk.to style)' :
+              'Compact (mini player)'
+            }
             theme="dark"
           >
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => setReleaseLayout('compact')}
-                className="p-3 transition-all text-left"
+                className="p-2 transition-all text-left"
                 style={{
                   background: releaseLayout === 'compact' ? STUDIO.surfaceHigh : 'transparent',
                   border: `2px solid ${releaseLayout === 'compact' ? STUDIO.accent : STUDIO.border}`,
                 }}
               >
-                {/* Mini preview */}
-                <div className="flex items-center gap-1 mb-3" style={{ background: '#0A0A0A', padding: 4 }}>
-                  <div className="w-6 h-6" style={{ background: STUDIO.muted }} />
+                <div className="flex items-center gap-1 mb-2" style={{ background: '#0A0A0A', padding: 3 }}>
+                  <div className="w-5 h-5" style={{ background: STUDIO.muted }} />
                   <div className="flex-1 space-y-1">
-                    <div className="h-1.5 w-3/4" style={{ background: STUDIO.muted }} />
+                    <div className="h-1 w-3/4" style={{ background: STUDIO.muted }} />
                     <div className="h-1 w-1/2" style={{ background: STUDIO.border }} />
                   </div>
-                  <div className="w-4 h-4 rounded-full" style={{ background: STUDIO.accent }} />
+                  <div className="w-3 h-3 rounded-full" style={{ background: STUDIO.accent }} />
                 </div>
                 <div className="space-y-1">
-                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
-                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
+                  <div className="h-1 w-full" style={{ background: STUDIO.border }} />
+                  <div className="h-1 w-full" style={{ background: STUDIO.border }} />
                 </div>
-                <div className="text-[10px] tracking-[0.25em] uppercase font-bold mt-3" style={{ fontFamily: STUDIO_FONTS.mono, color: releaseLayout === 'compact' ? STUDIO.accent : STUDIO.muted }}>
+                <div className="text-[9px] tracking-[0.2em] uppercase font-bold mt-2" style={{ fontFamily: STUDIO_FONTS.mono, color: releaseLayout === 'compact' ? STUDIO.accent : STUDIO.muted }}>
                   Compact
-                </div>
-                <div className="text-[9px] mt-1 opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
-                  Mini player + link cards
                 </div>
               </button>
 
               <button
                 onClick={() => setReleaseLayout('showcase')}
-                className="p-3 transition-all text-left"
+                className="p-2 transition-all text-left"
                 style={{
                   background: releaseLayout === 'showcase' ? STUDIO.surfaceHigh : 'transparent',
                   border: `2px solid ${releaseLayout === 'showcase' ? STUDIO.accent : STUDIO.border}`,
                 }}
               >
-                {/* Big cover preview */}
                 <div className="aspect-square mb-2 flex items-center justify-center" style={{ background: STUDIO.muted }}>
-                  <div className="w-6 h-6 rounded-full" style={{ background: STUDIO.accent }} />
+                  <div className="w-4 h-4 rounded-full" style={{ background: STUDIO.accent }} />
                 </div>
-                <div className="space-y-1 mb-2">
-                  <div className="h-1.5 w-2/3 mx-auto" style={{ background: STUDIO.ink }} />
+                <div className="space-y-1 mb-1">
+                  <div className="h-1 w-2/3 mx-auto" style={{ background: STUDIO.ink }} />
                 </div>
                 <div className="space-y-1">
-                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
-                  <div className="h-1.5 w-full" style={{ background: STUDIO.border }} />
+                  <div className="h-1 w-full" style={{ background: STUDIO.border }} />
                 </div>
-                <div className="text-[10px] tracking-[0.25em] uppercase font-bold mt-3" style={{ fontFamily: STUDIO_FONTS.mono, color: releaseLayout === 'showcase' ? STUDIO.accent : STUDIO.muted }}>
+                <div className="text-[9px] tracking-[0.2em] uppercase font-bold mt-2" style={{ fontFamily: STUDIO_FONTS.mono, color: releaseLayout === 'showcase' ? STUDIO.accent : STUDIO.muted }}>
                   Showcase
                 </div>
-                <div className="text-[9px] mt-1 opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
-                  Big cover, link rows below
+              </button>
+
+              <button
+                onClick={() => setReleaseLayout('minimal')}
+                className="p-2 transition-all text-left"
+                style={{
+                  background: releaseLayout === 'minimal' ? STUDIO.surfaceHigh : 'transparent',
+                  border: `2px solid ${releaseLayout === 'minimal' ? STUDIO.accent : STUDIO.border}`,
+                }}
+              >
+                <div className="flex items-center gap-1 mb-2">
+                  <div className="w-5 h-5" style={{ background: STUDIO.muted }} />
+                  <div className="flex-1 space-y-1">
+                    <div className="h-1 w-2/3" style={{ background: STUDIO.muted }} />
+                  </div>
+                </div>
+                <div className="h-1 w-full mb-2" style={{ background: STUDIO.accent }} />
+                <div className="space-y-1">
+                  <div className="h-2 w-full" style={{ background: STUDIO.surfaceHigh, border: `1px solid ${STUDIO.border}` }} />
+                  <div className="h-2 w-full" style={{ background: STUDIO.surfaceHigh, border: `1px solid ${STUDIO.border}` }} />
+                  <div className="h-2 w-full" style={{ background: STUDIO.surfaceHigh, border: `1px solid ${STUDIO.border}` }} />
+                </div>
+                <div className="text-[9px] tracking-[0.2em] uppercase font-bold mt-2" style={{ fontFamily: STUDIO_FONTS.mono, color: releaseLayout === 'minimal' ? STUDIO.accent : STUDIO.muted }}>
+                  Minimal
                 </div>
               </button>
             </div>
             <div className="mt-3 text-[10px] tracking-[0.25em] uppercase opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
-              Compact for everyday · Showcase for new drops
+              Compact · Showcase · Minimal (lnk.to)
             </div>
           </CollapsibleSection>
 
