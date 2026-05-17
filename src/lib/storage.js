@@ -160,6 +160,7 @@ function rowToProfile(row) {
     category: row.category,
     pinned: row.pinned,
     links: row.links || [],
+    isPremium: !!row.is_premium,
     createdAt: row.created_at,
   };
 }

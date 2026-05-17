@@ -5,6 +5,7 @@ import CollapsibleSection from '../components/CollapsibleSection.jsx';
 import { CATEGORIES } from '../lib/design.js';
 import { loadProfile, saveProfile } from '../lib/storage.js';
 import { isOwnerOf } from '../lib/auth.js';
+import { isPremium } from '../lib/premium.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -29,6 +30,7 @@ export default function Edit() {
   const [category, setCategory] = useState('creator');
   const [pinned, setPinned] = useState({ label: '', url: '' });
   const [links, setLinks] = useState([]);
+  const [premium, setPremium] = useState(false);
 
   useEffect(() => {
     if (!isOwnerOf(handle)) { navigate(`/${handle}`); return; }
@@ -41,6 +43,7 @@ export default function Edit() {
       setLinks(p.links || []);
       setLoading(false);
     });
+    isPremium(handle).then(setPremium);
   }, [handle, navigate]);
 
   const updateLink = (i, field, v) =>
@@ -116,25 +119,47 @@ export default function Edit() {
           </Link>
         </div>
 
-        {/* Premium upsell */}
-        <Link
-          to="/upgrade"
-          className="block mb-6 p-3 hover:scale-[1.005] transition-transform"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,77,31,0.12), rgba(255,77,31,0.04))',
-            border: `1px solid ${ACCENT}`,
-          }}
-        >
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-lg">★</span>
-            <span className="flex-1" style={{ fontFamily: DISPLAY, color: INK }}>
-              Unlock premium features
-            </span>
-            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>
-              $3/mo →
-            </span>
+        {/* Premium upsell - hide for premium users */}
+        {!premium && (
+          <Link
+            to="/upgrade"
+            className="block mb-6 p-3 hover:scale-[1.005] transition-transform"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,77,31,0.12), rgba(255,77,31,0.04))',
+              border: `1px solid ${ACCENT}`,
+            }}
+          >
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-lg">★</span>
+              <span className="flex-1" style={{ fontFamily: DISPLAY, color: INK }}>
+                Unlock premium features
+              </span>
+              <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>
+                $3/mo →
+              </span>
+            </div>
+          </Link>
+        )}
+
+        {premium && (
+          <div
+            className="mb-6 p-3"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,77,31,0.12), rgba(255,77,31,0.04))',
+              border: `1px solid ${ACCENT}`,
+            }}
+          >
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-lg">★</span>
+              <span className="flex-1" style={{ fontFamily: DISPLAY, color: INK }}>
+                You're a Plinks Premium member
+              </span>
+              <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>
+                ACTIVE
+              </span>
+            </div>
           </div>
-        </Link>
+        )}
 
         <div className="space-y-2">
           <CollapsibleSection

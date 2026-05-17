@@ -7,6 +7,7 @@ import { STUDIO, STUDIO_FONTS, GENRES, MUSIC_PLATFORMS, SOCIAL_PLATFORMS } from 
 import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRelease } from '../lib/studioStorage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { isOwnerOf } from '../../lib/auth.js';
+import { isPremium } from '../../lib/premium.js';
 
 export default function StudioEdit() {
   const { handle } = useParams();
@@ -39,6 +40,7 @@ export default function StudioEdit() {
   const [audioFile, setAudioFile] = useState(null);
   const [audioError, setAudioError] = useState('');
   const [platforms, setPlatforms] = useState([]);
+  const [premium, setPremium] = useState(false);
 
   useEffect(() => {
     if (!isOwnerOf(handle)) {
@@ -66,6 +68,7 @@ export default function StudioEdit() {
       }
       setLoading(false);
     });
+    isPremium(handle).then(setPremium);
   }, [handle, navigate]);
 
   const toggleGenre = (g) =>
@@ -224,25 +227,47 @@ export default function StudioEdit() {
           </Link>
         </div>
 
-        {/* Premium upsell */}
-        <Link
-          to="/upgrade"
-          className="block mb-6 p-3 hover:scale-[1.005] transition-transform"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,77,31,0.12), rgba(255,77,31,0.04))',
-            border: `1px solid ${STUDIO.accent}`,
-          }}
-        >
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-lg">★</span>
-            <span className="flex-1" style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}>
-              Unlock premium features
-            </span>
-            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
-              $3/mo →
-            </span>
+        {/* Premium upsell - hide for premium users */}
+        {!premium && (
+          <Link
+            to="/upgrade"
+            className="block mb-6 p-3 hover:scale-[1.005] transition-transform"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,77,31,0.12), rgba(255,77,31,0.04))',
+              border: `1px solid ${STUDIO.accent}`,
+            }}
+          >
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-lg">★</span>
+              <span className="flex-1" style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}>
+                Unlock premium features
+              </span>
+              <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
+                $3/mo →
+              </span>
+            </div>
+          </Link>
+        )}
+
+        {premium && (
+          <div
+            className="mb-6 p-3"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,77,31,0.12), rgba(255,77,31,0.04))',
+              border: `1px solid ${STUDIO.accent}`,
+            }}
+          >
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-lg">★</span>
+              <span className="flex-1" style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}>
+                You're a Plinks Premium member
+              </span>
+              <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
+                ACTIVE
+              </span>
+            </div>
           </div>
-        </Link>
+        )}
 
         <div className="space-y-2">
           {/* ARTIST NAME */}

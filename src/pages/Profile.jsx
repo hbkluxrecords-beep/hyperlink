@@ -134,7 +134,28 @@ export default function Profile() {
             style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.5rem, 9vw, 4.5rem)' }}
           >
             {profile.displayName}
+            {profile.isPremium && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.6, rotate: -180 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="inline-block ml-2 align-middle"
+                style={{
+                  fontSize: '0.45em',
+                  color: ACCENT,
+                  filter: `drop-shadow(0 0 8px ${ACCENT}80)`,
+                }}
+                title="Plinks Premium"
+              >
+                ★
+              </motion.span>
+            )}
           </h1>
+          {profile.isPremium && (
+            <div className="text-[9px] tracking-[0.35em] uppercase font-bold mt-1" style={{ fontFamily: MONO, color: ACCENT }}>
+              ◆ PLINKS PREMIUM
+            </div>
+          )}
           <div
             className="text-[10px] tracking-[0.3em] uppercase font-bold mt-3"
             style={{ fontFamily: MONO, color: ACCENT }}

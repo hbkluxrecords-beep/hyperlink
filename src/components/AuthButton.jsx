@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getSession } from '../lib/auth.js';
+import { isPremium } from '../lib/premium.js';
 
 export default function AuthButton({ theme = 'dark', variant = 'badge' }) {
   const [session, setSession] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [premium, setPremium] = useState(false);
 
   useEffect(() => {
-    setSession(getSession());
+    const s = getSession();
+    setSession(s);
+    if (s?.handle) isPremium(s.handle).then(setPremium);
   }, []);
 
   // Close menu on outside click
@@ -65,9 +69,9 @@ export default function AuthButton({ theme = 'dark', variant = 'badge' }) {
       <button
         onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
         className="px-3 py-1.5 text-[10px] tracking-[0.3em] uppercase font-bold border hover:scale-[1.02] transition-transform"
-        style={{ ...monoStyle, borderColor: border, color: ink }}
+        style={{ ...monoStyle, borderColor: premium ? accent : border, color: ink }}
       >
-        @{session.handle} ▾
+        {premium && <span style={{ color: accent }}>★ </span>}@{session.handle} ▾
       </button>
       {menuOpen && (
         <div
@@ -97,7 +101,7 @@ export default function AuthButton({ theme = 'dark', variant = 'badge' }) {
             style={{ ...monoStyle, color: accent, borderBottom: `1px solid ${border}` }}
             onClick={() => setMenuOpen(false)}
           >
-            ★ Upgrade to premium
+            {premium ? '★ Premium Active' : '★ Upgrade to premium'}
           </Link>
           <button
             onClick={() => {

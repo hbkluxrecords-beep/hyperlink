@@ -250,6 +250,7 @@ function rowToArtist(row, releases) {
       presaveUrl: r.presave_url,
       platforms: r.platforms || [],
     })),
+    isPremium: !!row.is_premium,
     createdAt: row.created_at,
   };
 }
