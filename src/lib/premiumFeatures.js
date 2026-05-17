@@ -125,3 +125,14 @@ export const PREMIUM_PALETTE = [
   { name: 'Crimson', value: '#FF0040' },
   { name: 'Mint', value: '#1FFFA8' },
 ];
+
+/**
+ * Toggle animated background on/off for a handle. Premium-only feature.
+ */
+export async function saveAnimatedBg(handle, type, enabled) {
+  if (!hasSupabase) return { ok: false };
+  const h = handle.toLowerCase().trim();
+  const table = type === 'artist' ? 'artist_profiles' : 'profiles';
+  const { error } = await supabase.from(table).update({ animated_bg: !!enabled }).eq('handle', h);
+  return { ok: !error, error: error?.message };
+}

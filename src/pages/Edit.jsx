@@ -6,6 +6,7 @@ import { CATEGORIES } from '../lib/design.js';
 import { loadProfile, saveProfile } from '../lib/storage.js';
 import { isOwnerOf } from '../lib/auth.js';
 import { isPremium } from '../lib/premium.js';
+import { convertToArtist } from '../lib/profileType.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -272,6 +273,31 @@ export default function Edit() {
                 style={{ borderColor: BORDER_STRONG, fontFamily: MONO, color: MUTED }}
               >
                 + Add link
+              </button>
+            </div>
+          </CollapsibleSection>
+
+          {/* Switch profile type */}
+          <CollapsibleSection label="Profile type" summary="Creator · Switch to Artist" theme="dark">
+            <div className="space-y-3">
+              <div className="text-xs leading-relaxed" style={{ color: '#8A8680', fontFamily: '"Fraunces", serif' }}>
+                Make music? Switch to an Artist profile to get audio previews, presaves, and the studio dashboard. Your handle, bio, and premium status stay the same.
+              </div>
+              <button
+                onClick={async () => {
+                  if (!confirm(`Switch /${handle} to an ARTIST profile? This converts your account from Creator → Artist. Your links will become socials.`)) return;
+                  const r = await convertToArtist(handle);
+                  if (r.ok) {
+                    alert('Switched to artist! Reloading your new studio edit page.');
+                    window.location.href = `/studio/${handle}/edit`;
+                  } else {
+                    alert('Switch failed: ' + r.error);
+                  }
+                }}
+                className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 transition-transform hover:scale-[1.01]"
+                style={{ background: '#FF4D1F', color: '#0A0A0A', fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                ♪ Switch to Artist →
               </button>
             </div>
           </CollapsibleSection>

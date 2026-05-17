@@ -5,6 +5,7 @@ import StudioNav from '../components/StudioNav.jsx';
 import CompactPlayer from '../components/CompactPlayer.jsx';
 import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
 import MinimalRelease from '../components/MinimalRelease.jsx';
+import AnimatedBackground from '../components/AnimatedBackground.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
 import SocialPill from '../../components/SocialPill.jsx';
 import FanDMWidget from '../../components/FanDMWidget.jsx';
@@ -122,10 +123,11 @@ export default function StudioProfile() {
   const locDisplay = compactLocation(artist.location);
 
   return (
-    <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20">
+    <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20 relative">
+      {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 
-      <div className={`max-w-xl mx-auto px-6 ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-20 pb-8' : 'pt-24 pb-12'}`}>
+      <div className={`max-w-xl mx-auto px-6 relative ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-20 pb-8' : 'pt-24 pb-12'}`} style={{ zIndex: 1 }}>
 
         {/* HIDE everything above the release in SHOWCASE mode - lnk.to direct page style */}
         {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && (
@@ -176,7 +178,7 @@ export default function StudioProfile() {
               fontSize: 'clamp(2.5rem, 9vw, 4.5rem)',
             }}
           >
-            {artist.artistName}
+            {artist.artistName || handle}
             {artist.isPremium && (
               <motion.span
                 initial={{ opacity: 0, scale: 0.6, rotate: -180 }}

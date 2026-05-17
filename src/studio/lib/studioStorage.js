@@ -232,7 +232,7 @@ export async function loadAnalytics(handle) {
 function rowToArtist(row, releases) {
   return {
     handle: row.handle,
-    artistName: row.artist_name,
+    artistName: row.artist_name || row.handle,
     bio: row.bio,
     genres: row.genre_tags || [],
     location: row.location,
@@ -254,6 +254,7 @@ function rowToArtist(row, releases) {
     accentColor: row.accent_color || null,
     releaseLayout: row.release_layout || 'compact',
     isFeatured: !!row.is_featured,
+    animatedBg: !!row.animated_bg,
     createdAt: row.created_at,
   };
 }

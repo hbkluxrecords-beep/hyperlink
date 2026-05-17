@@ -9,7 +9,8 @@ import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import AudioTrimmer from '../components/AudioTrimmer.jsx';
 import { isOwnerOf } from '../../lib/auth.js';
 import { isPremium } from '../../lib/premium.js';
-import { saveAccentColor, saveReleaseLayout, PREMIUM_PALETTE } from '../../lib/premiumFeatures.js';
+import { convertToCreator } from '../../lib/profileType.js';
+import { saveAccentColor, saveReleaseLayout, saveAnimatedBg, PREMIUM_PALETTE } from '../../lib/premiumFeatures.js';
 
 export default function StudioEdit() {
   const { handle } = useParams();
@@ -45,6 +46,7 @@ export default function StudioEdit() {
   const [platforms, setPlatforms] = useState([]);
   const [premium, setPremium] = useState(false);
   const [accentColor, setAccentColor] = useState(null);
+  const [animatedBg, setAnimatedBg] = useState(false);
   const [releaseLayout, setReleaseLayout] = useState('compact');
 
   useEffect(() => {
@@ -62,6 +64,7 @@ export default function StudioEdit() {
       setMusicLinks(a.links || []);
       setSocials(a.socials || {});
       setAccentColor(a.accentColor || null);
+      setAnimatedBg(!!a.animatedBg);
       setReleaseLayout(a.releaseLayout || 'compact');
       if (a.releases && a.releases.length > 0) {
         const r = a.releases[0];
@@ -202,6 +205,10 @@ export default function StudioEdit() {
       // Save premium-only accent color
       if (premium && accentColor) {
         await saveAccentColor(handle, accentColor, 'artist');
+      }
+      // Save premium animated background toggle
+      if (premium) {
+        await saveAnimatedBg(handle, 'artist', animatedBg);
       }
 
       // Save layout (free for all)
@@ -722,8 +729,64 @@ export default function StudioEdit() {
                   Changes your profile's accent color
                 </div>
               </CollapsibleSection>
+
+              {/* Animated background — premium toggle */}
+              <CollapsibleSection
+                label="Animated background"
+                summary={animatedBg ? '✓ ON · subtle drift' : 'OFF'}
+                theme="dark"
+              >
+                <div className="space-y-3">
+                  <div className="text-xs leading-relaxed" style={{ color: STUDIO.muted, fontFamily: STUDIO_FONTS.display }}>
+                    Adds a slow drifting accent-color glow behind your profile. Subtle motion — won't distract from the music.
+                  </div>
+                  <button
+                    onClick={() => setAnimatedBg((v) => !v)}
+                    className="w-full flex items-center justify-between px-4 py-3 transition-all"
+                    style={{
+                      background: animatedBg ? STUDIO.surfaceHigh : 'transparent',
+                      border: `2px solid ${animatedBg ? STUDIO.accent : STUDIO.border}`,
+                    }}
+                  >
+                    <span className="text-[11px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: animatedBg ? STUDIO.accent : STUDIO.ink }}>
+                      {animatedBg ? '✓ Enabled' : 'Tap to enable'}
+                    </span>
+                    <span className="w-10 h-5 rounded-full relative transition-colors" style={{ background: animatedBg ? STUDIO.accent : STUDIO.border }}>
+                      <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all" style={{
+                        background: animatedBg ? STUDIO.ink : STUDIO.muted,
+                        left: animatedBg ? '22px' : '2px',
+                      }} />
+                    </span>
+                  </button>
+                </div>
+              </CollapsibleSection>
             </>
           )}
+
+          {/* Profile type switch */}
+          <CollapsibleSection label="Profile type" summary="Artist · Switch to Creator" theme="dark">
+            <div className="space-y-3">
+              <div className="text-xs leading-relaxed" style={{ color: STUDIO.muted, fontFamily: STUDIO_FONTS.display }}>
+                Not making music anymore? Switch to a Creator profile (no audio player, just link cards). Your handle, bio, premium status stay.
+              </div>
+              <button
+                onClick={async () => {
+                  if (!confirm(`Switch /${handle} to a CREATOR profile? Audio previews and releases will be hidden.`)) return;
+                  const r = await convertToCreator(handle, 'creator');
+                  if (r.ok) {
+                    alert('Switched to creator! Reloading.');
+                    window.location.href = `/${handle}/edit`;
+                  } else {
+                    alert('Switch failed: ' + r.error);
+                  }
+                }}
+                className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 transition-transform hover:scale-[1.01]"
+                style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+              >
+                ✦ Switch to Creator →
+              </button>
+            </div>
+          </CollapsibleSection>
         </div>
       </div>
 

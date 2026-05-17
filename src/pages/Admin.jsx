@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import TopNav from '../components/TopNav.jsx';
 import { isAdmin, getAdminStats, listAllProfiles, toggleFeatured, impersonate } from '../lib/admin.js';
+import { convertToArtist, convertToCreator } from '../lib/profileType.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -164,6 +165,21 @@ export default function Admin() {
                 style={{ borderColor: ACCENT, fontFamily: MONO, color: ACCENT }}
               >
                 ✎ Edit
+              </button>
+              <button
+                onClick={async () => {
+                  const isArtist = tab === 'artists';
+                  const action = isArtist ? 'CREATOR' : 'ARTIST';
+                  if (!confirm(`Convert /${p.handle} to ${action} profile?`)) return;
+                  const r = isArtist ? await convertToCreator(p.handle) : await convertToArtist(p.handle);
+                  if (r.ok) { alert(`Converted to ${action}`); refresh(); }
+                  else alert('Failed: ' + r.error);
+                }}
+                className="text-[9px] tracking-[0.3em] uppercase font-bold px-2 py-1 border hover:scale-[1.04] transition-transform shrink-0"
+                style={{ borderColor: BORDER_STRONG, fontFamily: MONO, color: MUTED }}
+                title={`Switch to ${tab === 'artists' ? 'creator' : 'artist'}`}
+              >
+                ⇄
               </button>
               <button
                 onClick={() => toggle(p.handle, tab === 'artists' ? 'artist' : 'creator', p.is_featured)}
