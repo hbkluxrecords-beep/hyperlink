@@ -136,3 +136,38 @@ export async function saveAnimatedBg(handle, type, enabled) {
   const { error } = await supabase.from(table).update({ animated_bg: !!enabled }).eq('handle', h);
   return { ok: !error, error: error?.message };
 }
+
+export async function saveHideReleaseDate(handle, type, hide) {
+  if (!hasSupabase) return { ok: false };
+  const table = type === 'artist' ? 'artist_profiles' : 'profiles';
+  const { error } = await supabase.from(table).update({ hide_release_date: !!hide }).eq('handle', handle.toLowerCase());
+  return { ok: !error };
+}
+
+export async function saveTextEffect(handle, type, effect) {
+  if (!hasSupabase) return { ok: false };
+  const table = type === 'artist' ? 'artist_profiles' : 'profiles';
+  const { error } = await supabase.from(table).update({ text_effect: effect }).eq('handle', handle.toLowerCase());
+  return { ok: !error };
+}
+
+export async function saveGlowButtons(handle, type, glow) {
+  if (!hasSupabase) return { ok: false };
+  const table = type === 'artist' ? 'artist_profiles' : 'profiles';
+  const { error } = await supabase.from(table).update({ glow_buttons: !!glow }).eq('handle', handle.toLowerCase());
+  return { ok: !error };
+}
+
+export async function savePortfolioUrl(handle, url) {
+  if (!hasSupabase) return { ok: false };
+  const { error } = await supabase.from('profiles').update({ portfolio_url: url || null }).eq('handle', handle.toLowerCase());
+  return { ok: !error };
+}
+
+export const TEXT_EFFECTS = [
+  { id: 'none', name: 'None', preview: 'No effect' },
+  { id: 'glow', name: 'Glow', preview: 'Soft accent glow' },
+  { id: 'pulse', name: 'Pulse', preview: 'Slow pulse animation' },
+  { id: 'shimmer', name: 'Shimmer', preview: 'Sweeping shine' },
+  { id: 'glitch', name: 'Glitch', preview: 'Cyberpunk RGB split' },
+];

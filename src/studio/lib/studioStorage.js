@@ -255,6 +255,8 @@ function rowToArtist(row, releases) {
     releaseLayout: row.release_layout || 'compact',
     isFeatured: !!row.is_featured,
     animatedBg: !!row.animated_bg,
+    hideReleaseDate: !!row.hide_release_date,
+    textEffect: row.text_effect || 'none',
     createdAt: row.created_at,
   };
 }

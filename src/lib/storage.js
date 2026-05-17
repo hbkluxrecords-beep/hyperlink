@@ -163,6 +163,8 @@ function rowToProfile(row) {
     isPremium: !!row.is_premium,
     accentColor: row.accent_color || null,
     isFeatured: !!row.is_featured,
+    glowButtons: !!row.glow_buttons,
+    portfolioUrl: row.portfolio_url || null,
     createdAt: row.created_at,
   };
 }

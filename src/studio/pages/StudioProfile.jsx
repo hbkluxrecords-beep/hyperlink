@@ -323,6 +323,8 @@ export default function StudioProfile() {
               musicLinks={artist.links || []}
               isPremium={artist.isPremium}
               accent={accentColor}
+              hideReleaseDate={artist.hideReleaseDate}
+              textEffect={artist.textEffect}
               onPlay={() => trackEvent(handle, 'audio_play', { trackTitle: featuredRelease.trackTitle })}
               onPresaveClick={() => trackEvent(handle, 'presave_click', { trackTitle: featuredRelease.trackTitle })}
               onLinkClick={(l) => trackEvent(handle, 'link_click', { platform: l.label, url: l.url })}
@@ -341,6 +343,8 @@ export default function StudioProfile() {
               musicLinks={artist.links || []}
               isPremium={artist.isPremium}
               accent={accentColor}
+              hideReleaseDate={artist.hideReleaseDate}
+              textEffect={artist.textEffect}
               onPlay={() => trackEvent(handle, 'audio_play', { trackTitle: featuredRelease.trackTitle })}
               onPresaveClick={() => trackEvent(handle, 'presave_click', { trackTitle: featuredRelease.trackTitle })}
               onLinkClick={(l) => trackEvent(handle, 'link_click', { platform: l.label, url: l.url })}

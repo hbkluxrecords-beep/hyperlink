@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { platformColor } from '../../lib/platformColors.js';
 import PlatformIcon from '../../components/PlatformIcon.jsx';
+import TextEffect from '../../components/TextEffect.jsx';
 import DropAlertCapture from '../../components/DropAlertCapture.jsx';
 
 const ACCENT = '#FF4D1F';
@@ -33,6 +34,8 @@ export default function ShowcaseRelease({
   musicLinks = [],
   isPremium = false,
   accent = ACCENT,
+  hideReleaseDate = false,
+  textEffect = 'none',
   onPlay,
   onPresaveClick,
   onLinkClick,
@@ -107,13 +110,20 @@ export default function ShowcaseRelease({
             style={{ background: playing ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.3)' }}
           >
             <motion.div
-              animate={{ scale: playing ? 0.85 : 1 }}
-              transition={{ duration: 0.3 }}
+              animate={isPremium && (textEffect === 'pulse' || textEffect === 'glow') ? {
+                scale: playing ? 0.85 : 1,
+                boxShadow: [
+                  `0 0 16px ${accent}80, 0 0 32px ${accent}40`,
+                  `0 0 32px ${accent}cc, 0 0 64px ${accent}80`,
+                  `0 0 16px ${accent}80, 0 0 32px ${accent}40`,
+                ],
+              } : { scale: playing ? 0.85 : 1 }}
+              transition={isPremium && textEffect === 'pulse' ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 }}
               className="w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform"
               style={{
                 background: accent,
                 color: '#0A0A0A',
-                boxShadow: `0 0 16px ${accent}80`,
+                boxShadow: isPremium && textEffect === 'glow' ? `0 0 32px ${accent}cc, 0 0 64px ${accent}80` : `0 0 16px ${accent}80`,
               }}
             >
               {playing ? (
@@ -142,7 +152,9 @@ export default function ShowcaseRelease({
           className="text-2xl md:text-3xl font-black tracking-tight leading-tight"
           style={{ fontFamily: DISPLAY, color: INK }}
         >
-          {release.trackTitle}
+          <TextEffect effect={isPremium ? textEffect : 'none'} accent={accent} style={{ color: INK }}>
+            {release.trackTitle}
+          </TextEffect>
         </h2>
         <div
           className="text-[10px] tracking-[0.35em] uppercase font-bold mt-1"
@@ -153,7 +165,7 @@ export default function ShowcaseRelease({
       </motion.div>
 
       {/* Drop date label */}
-      {drop && (
+      {drop && !hideReleaseDate && (
         <div className="text-center mt-2">
           <span
             className="inline-flex items-center gap-2 text-[9px] tracking-[0.35em] uppercase font-bold px-2.5 py-1"

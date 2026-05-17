@@ -10,7 +10,7 @@ import AudioTrimmer from '../components/AudioTrimmer.jsx';
 import { isOwnerOf } from '../../lib/auth.js';
 import { isPremium } from '../../lib/premium.js';
 import { convertToCreator } from '../../lib/profileType.js';
-import { saveAccentColor, saveReleaseLayout, saveAnimatedBg, PREMIUM_PALETTE } from '../../lib/premiumFeatures.js';
+import { saveAccentColor, saveReleaseLayout, saveAnimatedBg, saveHideReleaseDate, saveTextEffect, PREMIUM_PALETTE, TEXT_EFFECTS } from '../../lib/premiumFeatures.js';
 
 export default function StudioEdit() {
   const { handle } = useParams();
@@ -47,6 +47,8 @@ export default function StudioEdit() {
   const [premium, setPremium] = useState(false);
   const [accentColor, setAccentColor] = useState(null);
   const [animatedBg, setAnimatedBg] = useState(false);
+  const [hideReleaseDate, setHideReleaseDate] = useState(false);
+  const [textEffect, setTextEffect] = useState('none');
   const [releaseLayout, setReleaseLayout] = useState('compact');
 
   useEffect(() => {
@@ -65,6 +67,8 @@ export default function StudioEdit() {
       setSocials(a.socials || {});
       setAccentColor(a.accentColor || null);
       setAnimatedBg(!!a.animatedBg);
+      setHideReleaseDate(!!a.hideReleaseDate);
+      setTextEffect(a.textEffect || 'none');
       setReleaseLayout(a.releaseLayout || 'compact');
       if (a.releases && a.releases.length > 0) {
         const r = a.releases[0];
@@ -209,7 +213,10 @@ export default function StudioEdit() {
       // Save premium animated background toggle
       if (premium) {
         await saveAnimatedBg(handle, 'artist', animatedBg);
+        await saveTextEffect(handle, 'artist', textEffect);
       }
+      // Hide release date is free
+      await saveHideReleaseDate(handle, 'artist', hideReleaseDate);
 
       // Save layout (free for all)
       await saveReleaseLayout(handle, releaseLayout, 'artist');
@@ -760,8 +767,68 @@ export default function StudioEdit() {
                   </button>
                 </div>
               </CollapsibleSection>
+
+              {/* Text effect picker */}
+              <CollapsibleSection
+                label="Text effect"
+                summary={TEXT_EFFECTS.find((e) => e.id === textEffect)?.name || 'None'}
+                theme="dark"
+              >
+                <div className="space-y-2">
+                  <div className="text-xs leading-relaxed mb-2" style={{ color: STUDIO.muted, fontFamily: STUDIO_FONTS.display }}>
+                    Animates your song title and play button.
+                  </div>
+                  {TEXT_EFFECTS.map((e) => (
+                    <button
+                      key={e.id}
+                      onClick={() => setTextEffect(e.id)}
+                      className="w-full flex items-center justify-between px-4 py-3 transition-all text-left"
+                      style={{
+                        background: textEffect === e.id ? STUDIO.surfaceHigh : 'transparent',
+                        border: `2px solid ${textEffect === e.id ? STUDIO.accent : STUDIO.border}`,
+                      }}
+                    >
+                      <div>
+                        <div className="text-[11px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: textEffect === e.id ? STUDIO.accent : STUDIO.ink }}>
+                          {e.name}
+                        </div>
+                        <div className="text-[10px] mt-0.5 opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
+                          {e.preview}
+                        </div>
+                      </div>
+                      {textEffect === e.id && <span style={{ color: STUDIO.accent }}>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              </CollapsibleSection>
             </>
           )}
+
+          {/* Hide release date - free for all */}
+          <CollapsibleSection
+            label="Release date"
+            summary={hideReleaseDate ? 'Hidden' : 'Visible'}
+            theme="dark"
+          >
+            <button
+              onClick={() => setHideReleaseDate((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 transition-all"
+              style={{
+                background: hideReleaseDate ? STUDIO.surfaceHigh : 'transparent',
+                border: `2px solid ${hideReleaseDate ? STUDIO.accent : STUDIO.border}`,
+              }}
+            >
+              <span className="text-[11px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: hideReleaseDate ? STUDIO.accent : STUDIO.ink }}>
+                {hideReleaseDate ? '✓ Hidden' : 'Tap to hide drop date'}
+              </span>
+              <span className="w-10 h-5 rounded-full relative transition-colors" style={{ background: hideReleaseDate ? STUDIO.accent : STUDIO.border }}>
+                <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all" style={{
+                  background: hideReleaseDate ? STUDIO.ink : STUDIO.muted,
+                  left: hideReleaseDate ? '22px' : '2px',
+                }} />
+              </span>
+            </button>
+          </CollapsibleSection>
 
           {/* Profile type switch */}
           <CollapsibleSection label="Profile type" summary="Artist · Switch to Creator" theme="dark">

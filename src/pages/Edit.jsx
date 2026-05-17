@@ -7,6 +7,7 @@ import { loadProfile, saveProfile } from '../lib/storage.js';
 import { isOwnerOf } from '../lib/auth.js';
 import { isPremium } from '../lib/premium.js';
 import { convertToArtist } from '../lib/profileType.js';
+import { saveGlowButtons, savePortfolioUrl } from '../lib/premiumFeatures.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -32,6 +33,8 @@ export default function Edit() {
   const [pinned, setPinned] = useState({ label: '', url: '' });
   const [links, setLinks] = useState([]);
   const [premium, setPremium] = useState(false);
+  const [glowButtons, setGlowButtons] = useState(false);
+  const [portfolioUrl, setPortfolioUrl] = useState('');
 
   useEffect(() => {
     if (!isOwnerOf(handle)) { navigate(`/${handle}`); return; }
@@ -40,6 +43,8 @@ export default function Edit() {
       setDisplayName(p.displayName || '');
       setBio(p.bio || '');
       setCategory(p.category || 'creator');
+      setGlowButtons(!!p.glowButtons);
+      setPortfolioUrl(p.portfolioUrl || '');
       setPinned(p.pinned || { label: '', url: '' });
       setLinks(p.links || []);
       setLoading(false);
@@ -68,6 +73,11 @@ export default function Edit() {
       };
       const result = await saveProfile(profile);
       if (!result.ok) { setErrorMsg(result.error || 'Save failed'); setSaving(false); return; }
+      // Premium glow + portfolio
+      if (premium) {
+        await saveGlowButtons(handle, 'creator', glowButtons);
+      }
+      await savePortfolioUrl(handle, portfolioUrl.trim() || null);
       setSavedMsg('Saved ✓');
       setTimeout(() => setSavedMsg(''), 2000);
     } catch (e) {
@@ -274,6 +284,76 @@ export default function Edit() {
               >
                 + Add link
               </button>
+            </div>
+          </CollapsibleSection>
+
+          {/* Premium glow buttons - same as artist profile vibe */}
+          {premium && (
+            <CollapsibleSection
+              label="Glow buttons"
+              summary={glowButtons ? '✓ ON · accent pulse' : 'OFF'}
+              theme="dark"
+            >
+              <div className="space-y-3">
+                <div className="text-xs leading-relaxed" style={{ color: MUTED, fontFamily: DISPLAY }}>
+                  Adds a pulsing accent-colored glow around all your link buttons. Same as the artist profile vibe.
+                </div>
+                <button
+                  onClick={() => setGlowButtons((v) => !v)}
+                  className="w-full flex items-center justify-between px-4 py-3 transition-all"
+                  style={{
+                    background: glowButtons ? 'rgba(255,77,31,0.1)' : 'transparent',
+                    border: `2px solid ${glowButtons ? '#FF4D1F' : BORDER_STRONG}`,
+                  }}
+                >
+                  <span className="text-[11px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: glowButtons ? '#FF4D1F' : INK }}>
+                    {glowButtons ? '✓ Enabled' : 'Tap to enable'}
+                  </span>
+                  <span className="w-10 h-5 rounded-full relative transition-colors" style={{ background: glowButtons ? '#FF4D1F' : BORDER_STRONG }}>
+                    <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all" style={{
+                      background: glowButtons ? INK : MUTED,
+                      left: glowButtons ? '22px' : '2px',
+                    }} />
+                  </span>
+                </button>
+              </div>
+            </CollapsibleSection>
+          )}
+
+          {/* Portfolio embed (developers/creators) */}
+          <CollapsibleSection
+            label="Live portfolio"
+            summary={portfolioUrl ? '✓ Embedded' : 'Add your site'}
+            theme="dark"
+          >
+            <div className="space-y-3">
+              <div className="text-xs leading-relaxed" style={{ color: MUTED, fontFamily: DISPLAY }}>
+                Embed your live portfolio, app, or website right on your profile. Visitors see your actual work — no extra click.
+              </div>
+              <div>
+                <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={{ fontFamily: MONO, color: MUTED }}>
+                  Portfolio URL
+                </label>
+                <input
+                  value={portfolioUrl}
+                  onChange={(e) => setPortfolioUrl(e.target.value)}
+                  placeholder="https://yoursite.com"
+                  className="w-full text-base bg-transparent border-b-2 pb-2 outline-none"
+                  style={{ borderColor: BORDER_STRONG, color: INK, fontFamily: MONO }}
+                />
+                <div className="text-[10px] mt-2 opacity-60" style={{ fontFamily: MONO, color: MUTED }}>
+                  Note: most sites refuse to be embedded. If yours won't load, set the right CSP headers or use a screenshot link instead.
+                </div>
+              </div>
+              {portfolioUrl && (
+                <button
+                  onClick={() => setPortfolioUrl('')}
+                  className="text-[10px] tracking-[0.3em] uppercase font-bold opacity-60 hover:opacity-100"
+                  style={{ fontFamily: MONO, color: MUTED }}
+                >
+                  ✕ Remove embed
+                </button>
+              )}
             </div>
           </CollapsibleSection>
 

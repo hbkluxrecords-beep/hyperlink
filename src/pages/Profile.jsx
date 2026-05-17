@@ -250,8 +250,38 @@ export default function Profile() {
                   url={l.url}
                   index={i}
                   theme="dark"
+                  glow={profile.isPremium && profile.glowButtons}
+                  accent={profile.accentColor || '#FF4D1F'}
                 />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Live portfolio embed (developers) */}
+        {profile.portfolioUrl && (
+          <div className="mt-12">
+            <SectionLabel number="03" label="Live Portfolio" />
+            <div
+              className="overflow-hidden"
+              style={{
+                background: '#141414',
+                border: `1px solid rgba(255,255,255,0.08)`,
+                aspectRatio: '16 / 10',
+              }}
+            >
+              <iframe
+                src={profile.portfolioUrl}
+                title="Live portfolio"
+                className="w-full h-full"
+                style={{ border: 'none', background: '#fff' }}
+                sandbox="allow-scripts allow-same-origin allow-popups"
+                loading="lazy"
+              />
+            </div>
+            <div className="mt-2 text-[10px] tracking-[0.3em] uppercase opacity-50 flex items-center justify-between" style={{ fontFamily: MONO, color: MUTED }}>
+              <span>{profile.portfolioUrl}</span>
+              <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="hover:opacity-100">Open ↗</a>
             </div>
           </div>
         )}

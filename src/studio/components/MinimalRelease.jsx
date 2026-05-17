@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { platformColor } from '../../lib/platformColors.js';
 import PlatformIcon from '../../components/PlatformIcon.jsx';
+import TextEffect from '../../components/TextEffect.jsx';
 import DropAlertCapture from '../../components/DropAlertCapture.jsx';
 
 const ACCENT = '#FF4D1F';
@@ -34,7 +35,8 @@ function formatDropDate(d) {
  */
 export default function MinimalRelease({
   release, artistName, handle, musicLinks = [],
-  isPremium = false, accent = ACCENT, onPlay, onPresaveClick, onLinkClick,
+  isPremium = false, accent = ACCENT, hideReleaseDate = false, textEffect = 'none',
+  onPlay, onPresaveClick, onLinkClick,
 }) {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
@@ -100,7 +102,9 @@ export default function MinimalRelease({
             className="text-xl md:text-2xl font-black leading-tight line-clamp-2"
             style={{ fontFamily: DISPLAY, color: INK }}
           >
-            {release.trackTitle}
+            <TextEffect effect={isPremium ? textEffect : 'none'} accent={accent} style={{ color: INK }}>
+              {release.trackTitle}
+            </TextEffect>
           </div>
           <div
             className="text-[10px] tracking-[0.3em] uppercase font-bold mt-1 truncate"
@@ -124,8 +128,20 @@ export default function MinimalRelease({
             onClick={toggle}
             whileTap={{ scale: 0.9 }}
             whileHover={{ scale: 1.06 }}
+            animate={isPremium && (textEffect === 'pulse' || textEffect === 'glow') ? {
+              boxShadow: [
+                `0 0 12px ${accent}80, 0 0 24px ${accent}40`,
+                `0 0 24px ${accent}cc, 0 0 48px ${accent}80`,
+                `0 0 12px ${accent}80, 0 0 24px ${accent}40`,
+              ],
+            } : {}}
+            transition={isPremium && textEffect === 'pulse' ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : {}}
             className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ background: accent, color: '#0A0A0A' }}
+            style={{
+              background: accent,
+              color: '#0A0A0A',
+              boxShadow: isPremium && textEffect === 'glow' ? `0 0 20px ${accent}aa, 0 0 40px ${accent}55` : undefined,
+            }}
           >
             {playing ? (
               <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
@@ -148,7 +164,7 @@ export default function MinimalRelease({
       )}
 
       {/* Drop date */}
-      {drop && (
+      {drop && !hideReleaseDate && (
         <div className="mt-3 flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO }}>
           <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: drop.isOut ? '#1DB954' : accent }} />
           <span style={{ color: drop.isOut ? '#1DB954' : accent }}>{drop.label}</span>

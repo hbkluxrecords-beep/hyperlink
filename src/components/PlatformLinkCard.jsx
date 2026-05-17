@@ -6,7 +6,7 @@ import PlatformIcon from './PlatformIcon.jsx';
  * Dark card link with platform-color dot on left, name center, arrow right.
  * The clean Spotify/Apple Music vibe from the user's reference screenshot.
  */
-export default function PlatformLinkCard({ label, url, color, index = 0, onClick, theme = 'dark' }) {
+export default function PlatformLinkCard({ label, url, color, index = 0, onClick, theme = 'dark', glow = false, accent = '#FF4D1F' }) {
   const isDark = theme === 'dark';
   const bg = isDark ? '#141414' : '#F2EFE6';
   const bgHover = isDark ? '#1F1F1F' : '#E6E2D5';
@@ -22,14 +22,25 @@ export default function PlatformLinkCard({ label, url, color, index = 0, onClick
       rel="noopener noreferrer"
       onClick={onClick}
       initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+      animate={glow ? {
+        opacity: 1, y: 0,
+        boxShadow: [
+          `0 0 12px ${accent}40, 0 0 24px ${accent}20`,
+          `0 0 24px ${accent}80, 0 0 48px ${accent}40`,
+          `0 0 12px ${accent}40, 0 0 24px ${accent}20`,
+        ],
+      } : { opacity: 1, y: 0 }}
+      transition={glow ? {
+        opacity: { duration: 0.4, delay: index * 0.04 },
+        y: { duration: 0.4, delay: index * 0.04 },
+        boxShadow: { duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: index * 0.2 },
+      } : { duration: 0.4, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
       whileHover={{ y: -2, background: bgHover }}
       whileTap={{ scale: 0.98 }}
       className="block w-full px-5 py-4 group transition-colors"
       style={{
         background: bg,
-        border: `1px solid ${border}`,
+        border: `1px solid ${glow ? accent + '60' : border}`,
         color: ink,
       }}
     >
