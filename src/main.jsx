@@ -19,6 +19,8 @@ import StudioProfile from './studio/pages/StudioProfile.jsx';
 import StudioEdit from './studio/pages/StudioEdit.jsx';
 import StudioAnalytics from './studio/pages/StudioAnalytics.jsx';
 import StudioExplore from './studio/pages/StudioExplore.jsx';
+import StudioInbox from './studio/pages/StudioInbox.jsx';
+import StudioSubscribers from './studio/pages/StudioSubscribers.jsx';
 
 import './index.css';
 
@@ -30,6 +32,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/studio/new" element={<StudioCreate />} />
         <Route path="/studio/explore" element={<StudioExplore />} />
         <Route path="/studio/:handle/edit" element={<StudioEdit />} />
+        <Route path="/studio/:handle/inbox" element={<StudioInbox />} />
+        <Route path="/studio/:handle/subscribers" element={<StudioSubscribers />} />
         <Route path="/studio/:handle" element={<StudioProfile />} />
         <Route path="/studio/:handle/analytics" element={<StudioAnalytics />} />
 

@@ -161,6 +161,7 @@ function rowToProfile(row) {
     pinned: row.pinned,
     links: row.links || [],
     isPremium: !!row.is_premium,
+    accentColor: row.accent_color || null,
     createdAt: row.created_at,
   };
 }

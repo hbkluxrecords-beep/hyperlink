@@ -5,6 +5,7 @@ import StudioNav from '../components/StudioNav.jsx';
 import CompactPlayer from '../components/CompactPlayer.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
 import SocialPill from '../../components/SocialPill.jsx';
+import FanDMWidget from '../../components/FanDMWidget.jsx';
 import { STUDIO, STUDIO_FONTS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
 import { LUXURY_EASE } from '../lib/animations.js';
 import { loadArtist, trackEvent } from '../lib/studioStorage.js';
@@ -64,6 +65,7 @@ export default function StudioProfile() {
   }, [handle]);
 
   const featuredRelease = artist?.releases?.[0];
+  const accentColor = (artist?.isPremium && artist?.accentColor) || STUDIO.accent;
 
   const share = async () => {
     const url = `${window.location.origin}/${handle}`;
@@ -164,8 +166,8 @@ export default function StudioProfile() {
                 className="inline-block ml-2 align-middle"
                 style={{
                   fontSize: '0.45em',
-                  color: STUDIO.accent,
-                  filter: `drop-shadow(0 0 8px ${STUDIO.accent}80)`,
+                  color: accentColor,
+                  filter: `drop-shadow(0 0 8px ${accentColor}80)`,
                 }}
                 title="Plinks Premium"
               >
@@ -177,7 +179,7 @@ export default function StudioProfile() {
           {artist.isPremium && (
             <div
               className="text-[9px] tracking-[0.35em] uppercase font-bold mt-1"
-              style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}
+              style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}
             >
               ◆ PLINKS PREMIUM
             </div>
@@ -186,7 +188,7 @@ export default function StudioProfile() {
           {artist.genres && artist.genres.length > 0 && (
             <div
               className="text-[10px] tracking-[0.3em] uppercase font-bold mt-3"
-              style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}
+              style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}
             >
               {artist.genres.join(' · ')}
             </div>
@@ -209,7 +211,7 @@ export default function StudioProfile() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.25 }}
             className="mt-6 pl-4"
-            style={{ borderLeft: `2px solid ${STUDIO.accent}` }}
+            style={{ borderLeft: `2px solid ${accentColor}` }}
           >
             <p
               className="text-base md:text-lg leading-snug"
@@ -243,10 +245,28 @@ export default function StudioProfile() {
               >
                 Analytics
               </Link>
+              {artist.isPremium && (
+                <>
+                  <Link
+                    to={`/studio/${handle}/inbox`}
+                    className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                    style={{ borderColor: accentColor, fontFamily: STUDIO_FONTS.mono, color: accentColor }}
+                  >
+                    ✉ Inbox
+                  </Link>
+                  <Link
+                    to={`/studio/${handle}/subscribers`}
+                    className="text-[10px] tracking-[0.3em] uppercase font-bold border px-3 py-1.5 hover:scale-[1.02] transition-all"
+                    style={{ borderColor: accentColor, fontFamily: STUDIO_FONTS.mono, color: accentColor }}
+                  >
+                    ★ Fans
+                  </Link>
+                </>
+              )}
               <Link
                 to={`/studio/${handle}/edit`}
                 className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-1.5 hover:scale-[1.02] transition-all"
-                style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+                style={{ background: accentColor, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
               >
                 ✎ Edit
               </Link>
@@ -272,6 +292,9 @@ export default function StudioProfile() {
             <CompactPlayer
               release={featuredRelease}
               artistName={artist.artistName}
+              handle={handle}
+              isPremium={artist.isPremium}
+              accent={artist.accentColor}
               onPlay={() => trackEvent(handle, 'audio_play', { trackTitle: featuredRelease.trackTitle })}
               onPresaveClick={() => trackEvent(handle, 'presave_click', { trackTitle: featuredRelease.trackTitle })}
             />
@@ -318,6 +341,11 @@ export default function StudioProfile() {
               })}
             </div>
           </div>
+        )}
+
+        {/* Premium: Fan DM widget */}
+        {artist.isPremium && !isOwner && (
+          <FanDMWidget handle={handle} accent={accentColor} />
         )}
 
         {/* Footer */}

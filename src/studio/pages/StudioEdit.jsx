@@ -8,6 +8,7 @@ import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRe
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { isOwnerOf } from '../../lib/auth.js';
 import { isPremium } from '../../lib/premium.js';
+import { saveAccentColor, PREMIUM_PALETTE } from '../../lib/premiumFeatures.js';
 
 export default function StudioEdit() {
   const { handle } = useParams();
@@ -41,6 +42,7 @@ export default function StudioEdit() {
   const [audioError, setAudioError] = useState('');
   const [platforms, setPlatforms] = useState([]);
   const [premium, setPremium] = useState(false);
+  const [accentColor, setAccentColor] = useState(null);
 
   useEffect(() => {
     if (!isOwnerOf(handle)) {
@@ -56,6 +58,7 @@ export default function StudioEdit() {
       setPhotoUrl(a.photoUrl || null);
       setMusicLinks(a.links || []);
       setSocials(a.socials || {});
+      setAccentColor(a.accentColor || null);
       if (a.releases && a.releases.length > 0) {
         const r = a.releases[0];
         setReleaseId(r.id);
@@ -173,6 +176,11 @@ export default function StudioEdit() {
           ? await updatePresaveRelease(handle, releaseId, releaseFields)
           : await savePresaveRelease(handle, releaseFields);
         if (!rr.ok) { setErrorMsg(rr.error || 'Release save failed'); setSaving(false); return; }
+      }
+
+      // Save premium-only accent color
+      if (premium && accentColor) {
+        await saveAccentColor(handle, accentColor, 'artist');
       }
 
       setSavedMsg('Saved ✓');
@@ -563,6 +571,47 @@ export default function StudioEdit() {
               })}
             </div>
           </CollapsibleSection>
+
+          {/* PREMIUM SECTION */}
+          {premium && (
+            <>
+              <div className="pt-4 pb-2">
+                <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
+                  ★ § PREMIUM
+                </div>
+              </div>
+
+              <CollapsibleSection
+                label="Accent Color"
+                summary={accentColor ? PREMIUM_PALETTE.find((p) => p.value === accentColor)?.name || 'Custom' : 'Plinks Orange (default)'}
+                theme="dark"
+              >
+                <div className="grid grid-cols-4 gap-2">
+                  {PREMIUM_PALETTE.map((c) => {
+                    const active = accentColor === c.value;
+                    return (
+                      <button
+                        key={c.value}
+                        onClick={() => setAccentColor(c.value)}
+                        className="aspect-square flex items-center justify-center transition-transform hover:scale-105"
+                        style={{
+                          background: c.value,
+                          border: active ? `2px solid ${STUDIO.ink}` : `1px solid ${STUDIO.border}`,
+                          boxShadow: active ? `0 0 12px ${c.value}` : 'none',
+                        }}
+                        title={c.name}
+                      >
+                        {active && <span style={{ color: '#0A0A0A', fontWeight: 'bold' }}>✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 text-[10px] tracking-[0.25em] uppercase opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
+                  Changes your profile's accent color
+                </div>
+              </CollapsibleSection>
+            </>
+          )}
         </div>
       </div>
 

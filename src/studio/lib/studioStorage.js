@@ -251,6 +251,7 @@ function rowToArtist(row, releases) {
       platforms: r.platforms || [],
     })),
     isPremium: !!row.is_premium,
+    accentColor: row.accent_color || null,
     createdAt: row.created_at,
   };
 }

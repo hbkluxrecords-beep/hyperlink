@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
+import DropAlertCapture from '../../components/DropAlertCapture.jsx';
 
 const ACCENT = '#FF4D1F';
 const INK = '#F2EFE6';
@@ -37,7 +38,7 @@ function formatDropDate(releaseDate) {
  *
  * Replaces ReleaseCover + AudioPlayer + PresaveBlock from v2.
  */
-export default function CompactPlayer({ release, artistName, onPlay, onPresaveClick }) {
+export default function CompactPlayer({ release, artistName, handle, isPremium = false, accent, onPlay, onPresaveClick }) {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -217,7 +218,7 @@ export default function CompactPlayer({ release, artistName, onPlay, onPresaveCl
           whileTap={{ scale: 0.98 }}
           className="block w-full text-center py-3.5 mt-3 relative overflow-hidden"
           style={{
-            background: ACCENT,
+            background: accent || ACCENT,
             color: '#0A0A0A',
             fontFamily: MONO,
             fontSize: 12,
@@ -239,7 +240,7 @@ export default function CompactPlayer({ release, artistName, onPlay, onPresaveCl
           whileTap={{ scale: 0.98 }}
           className="block w-full text-center py-3.5 mt-3"
           style={{
-            background: ACCENT,
+            background: accent || ACCENT,
             color: '#0A0A0A',
             fontFamily: MONO,
             fontSize: 12,
@@ -250,6 +251,11 @@ export default function CompactPlayer({ release, artistName, onPlay, onPresaveCl
         >
           Stream Now →
         </motion.a>
+      )}
+
+      {/* Premium feature: drop alerts email capture */}
+      {isPremium && drop && !drop.isOut && handle && (
+        <DropAlertCapture handle={handle} releaseId={release.id} accent={accent || ACCENT} />
       )}
     </div>
   );
