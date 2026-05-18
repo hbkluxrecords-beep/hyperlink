@@ -6,7 +6,7 @@ import CompactPlayer from '../components/CompactPlayer.jsx';
 import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
 import MinimalRelease from '../components/MinimalRelease.jsx';
 import AnimatedBackground from '../components/AnimatedBackground.jsx';
-import ArtistIntro from '../../components/ArtistIntro.jsx';
+import ProfileIntro from '../../components/ProfileIntro.jsx';
 import ProfileSkeleton from '../../components/ProfileSkeleton.jsx';
 import PlaylistPlayer from '../../components/PlaylistPlayer.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
@@ -58,7 +58,6 @@ export default function StudioProfile() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-  const [introDone, setIntroDone] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -93,21 +92,6 @@ export default function StudioProfile() {
     return <ProfileSkeleton variant="artist" />;
   }
 
-  // Run intro before showing the page. If already seen this session, intro auto-completes immediately.
-  if (artist && !introDone) {
-    return (
-      <>
-        <ProfileSkeleton variant="artist" />
-        <ArtistIntro
-          name={artist.artistName || handle}
-          handle={handle}
-          genres={artist.genres || []}
-          onComplete={() => setIntroDone(true)}
-        />
-      </>
-    );
-  }
-
   if (!artist) {
     return (
       <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="flex items-center justify-center px-6">
@@ -134,10 +118,16 @@ export default function StudioProfile() {
 
   return (
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20 relative">
+      <ProfileIntro
+        name={artist.artistName || handle}
+        handle={handle}
+        accent={accentColor}
+        category="ARTIST"
+      />
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 
-      <div className={`max-w-xl mx-auto px-6 relative ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-16 pb-6' : 'pt-24 pb-12'}`} style={{ zIndex: 1 }}>
+      <div className={`max-w-xl mx-auto px-6 relative ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-24 md:pt-28 pb-6' : 'pt-28 md:pt-32 pb-12'}`} style={{ zIndex: 1 }}>
 
         {/* HIDE everything above the release in SHOWCASE mode - lnk.to direct page style */}
         {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && (

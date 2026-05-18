@@ -17,10 +17,10 @@ export default function StudioNav({ minimal = false }) {
     <motion.nav
       className="fixed top-0 left-0 right-0 z-50"
       animate={{
-        backgroundColor: scrolled ? 'rgba(10, 10, 10, 0.85)' : 'rgba(10, 10, 10, 0.55)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottomColor: scrolled ? STUDIO.border : 'transparent',
+        backgroundColor: scrolled ? 'rgba(10, 10, 10, 0.96)' : 'rgba(10, 10, 10, 0.88)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderBottomColor: scrolled ? STUDIO.border : 'rgba(255,255,255,0.06)',
       }}
       style={{ borderBottom: '1px solid transparent', transition: 'all 0.3s ease' }}
     >
