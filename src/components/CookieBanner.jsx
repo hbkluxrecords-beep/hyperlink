@@ -24,31 +24,35 @@ export default function CookieBanner() {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ y: 100, opacity: 0 }}
+        initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed bottom-3 left-3 right-3 md:left-auto md:right-6 md:bottom-6 md:max-w-md z-[90]"
+        exit={{ y: 20, opacity: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed bottom-2 left-2 right-2 md:left-auto md:right-4 md:bottom-4 md:max-w-sm z-[90] flex items-center gap-2 px-3 py-2"
         style={{
-          background: '#141414',
-          border: '1px solid rgba(255,255,255,0.2)',
-          padding: 16,
+          background: 'rgba(20,20,20,0.95)',
+          border: '1px solid rgba(255,255,255,0.15)',
           backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
         }}
       >
-        <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-2" style={{ fontFamily: '"JetBrains Mono", monospace', color: '#FF4D1F' }}>
-          ◆ COOKIES
-        </div>
-        <p className="text-sm leading-relaxed mb-3" style={{ fontFamily: '"Fraunces", serif', color: '#F2EFE6' }}>
-          plinks.dev uses essential first-party cookies to keep you logged in. No tracking, no ads, no third-party cookies. By using the site you agree to our{' '}
-          <Link to="/privacy" style={{ color: '#FF4D1F', textDecoration: 'underline' }}>privacy policy</Link>.
-        </p>
+        <span className="flex-1 text-[10px] leading-snug" style={{ fontFamily: '"JetBrains Mono", monospace', color: '#D5D2C7' }}>
+          Essential cookies only. <Link to="/privacy" style={{ color: '#FF4D1F', textDecoration: 'underline' }}>Privacy</Link>
+        </span>
         <button
           onClick={accept}
-          className="w-full py-2.5 text-[10px] tracking-[0.3em] uppercase font-bold hover:scale-[1.01] transition-transform"
+          className="text-[9px] tracking-[0.25em] uppercase font-bold px-2.5 py-1.5 hover:scale-[1.04] transition-transform shrink-0"
           style={{ background: '#FF4D1F', color: '#0A0A0A', fontFamily: '"JetBrains Mono", monospace' }}
         >
-          Got it
+          OK
+        </button>
+        <button
+          onClick={accept}
+          aria-label="Dismiss"
+          className="text-xs opacity-50 hover:opacity-100 transition-opacity shrink-0 w-5 h-5 flex items-center justify-center"
+          style={{ color: '#8A8680' }}
+        >
+          ✕
         </button>
       </motion.div>
     </AnimatePresence>

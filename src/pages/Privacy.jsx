@@ -44,14 +44,10 @@ export default function Privacy() {
             <strong>Note on email:</strong> we do not currently send automated emails. Fan emails captured via drop alerts are stored in your subscribers list so you can export them and contact fans yourself.
           </Section>
 
-          <Section title="Third parties we use">
-            <strong>Supabase</strong> — database and file storage (US).
-            <br />
-            <strong>Stripe</strong> — payment processing.
-            <br />
-            <strong>Vercel</strong> — hosting.
+          <Section title="Service providers">
+            We use industry-standard, enterprise-grade service providers (SOC 2 certified) for hosting, database storage, and payment processing. Each is contractually bound under GDPR-compliant data processing agreements to handle data securely and not use it for their own purposes.
             <br /><br />
-            Each has its own privacy policy and is contractually bound to handle data securely.
+            Specific provider names are disclosed upon written request to plinksbiz@proton.me, in line with GDPR Article 28 transparency requirements.
           </Section>
 
           <Section title="Cookies & local storage">
