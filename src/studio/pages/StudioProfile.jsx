@@ -89,7 +89,7 @@ export default function StudioProfile() {
   };
 
   if (loading) {
-    return <ProfileSkeleton variant="artist" />;
+    return null;
   }
 
   if (!artist) {

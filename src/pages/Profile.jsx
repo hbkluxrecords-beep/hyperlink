@@ -68,7 +68,7 @@ export default function Profile() {
   };
 
   if (loading) {
-    return <ProfileSkeleton variant="creator" />;
+    return null;
   }
 
   if (!profile) {
