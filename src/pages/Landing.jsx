@@ -356,7 +356,7 @@ export default function Landing() {
             <Link to="/login" className="hover:opacity-100 hover:underline">Log in</Link>
             <Link to="/terms" className="hover:opacity-100 hover:underline">Terms</Link>
             <Link to="/privacy" className="hover:opacity-100 hover:underline">Privacy</Link>
-            <a href="mailto:support@plinks.dev" className="hover:opacity-100 hover:underline">Support</a>
+            <a href="mailto:plinksbiz@proton.me" className="hover:opacity-100 hover:underline">Support</a>
           </div>
         </div>
         <div className="text-[9px] leading-relaxed opacity-50 normal-case tracking-normal" style={{ fontFamily: MONO }}>

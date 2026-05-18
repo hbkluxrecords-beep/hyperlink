@@ -53,7 +53,7 @@ export default function Terms() {
             <br /><br />
             <strong>Cancellation:</strong> You can cancel anytime via the "Manage subscription" button on /upgrade. Cancellation takes effect at the end of the current billing period. No partial refunds for unused time, but you keep premium until the period ends.
             <br /><br />
-            <strong>Refunds:</strong> By default, no refunds. If you were charged in error or have a billing dispute, email support@plinks.dev within 14 days.
+            <strong>Refunds:</strong> By default, no refunds. If you were charged in error or have a billing dispute, email plinksbiz@proton.me within 14 days.
             <br /><br />
             <strong>Price changes:</strong> We may raise prices on future renewal periods with at least 30 days notice via email.
           </Section>
@@ -63,7 +63,7 @@ export default function Terms() {
           </Section>
 
           <Section title="7. Termination">
-            You can delete your account anytime via Edit → Delete account, or by emailing support@plinks.dev. We can suspend or terminate your account for violations of these terms.
+            You can delete your account anytime via Edit → Delete account, or by emailing plinksbiz@proton.me. We can suspend or terminate your account for violations of these terms.
           </Section>
 
           <Section title="8. Disclaimers & liability">
@@ -71,7 +71,7 @@ export default function Terms() {
           </Section>
 
           <Section title="9. DMCA & copyright">
-            If you believe content on plinks.dev infringes your copyright, send a notice to dmca@plinks.dev with: (a) your contact info, (b) the URL of the infringing content, (c) a description of the original work, (d) a statement under penalty of perjury that you own the rights, (e) your physical or electronic signature. We comply with the DMCA safe harbor process.
+            If you believe content on plinks.dev infringes your copyright, send a notice to plinksbiz@proton.me with: (a) your contact info, (b) the URL of the infringing content, (c) a description of the original work, (d) a statement under penalty of perjury that you own the rights, (e) your physical or electronic signature. We comply with the DMCA safe harbor process.
           </Section>
 
           <Section title="10. Changes">
@@ -81,7 +81,7 @@ export default function Terms() {
           <Section title="11. Law & contact">
             These terms are governed by the laws of the State of Ohio, USA, without regard to conflict of law principles.
             <br /><br />
-            Contact: <a href="mailto:support@plinks.dev" style={{ color: ACCENT }}>support@plinks.dev</a>
+            Contact: <a href="mailto:plinksbiz@proton.me" style={{ color: ACCENT }}>plinksbiz@proton.me</a>
           </Section>
         </div>
 

@@ -66,7 +66,7 @@ export async function startCheckout(tier) {
  */
 export async function openCustomerPortal(stripeCustomerId) {
   if (!stripeCustomerId) {
-    alert('No subscription found. If you think this is wrong, email support@plinks.dev');
+    alert('No subscription found. If you think this is wrong, email plinksbiz@proton.me');
     return;
   }
   try {
