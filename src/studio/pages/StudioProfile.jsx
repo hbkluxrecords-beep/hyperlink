@@ -7,6 +7,7 @@ import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
 import MinimalRelease from '../components/MinimalRelease.jsx';
 import AnimatedBackground from '../components/AnimatedBackground.jsx';
 import ProfileIntro from '../../components/ProfileIntro.jsx';
+import ProfileSkeleton from '../../components/ProfileSkeleton.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
 import SocialPill from '../../components/SocialPill.jsx';
 import FanDMWidget from '../../components/FanDMWidget.jsx';
@@ -85,18 +86,7 @@ export default function StudioProfile() {
   };
 
   if (loading) {
-    return (
-      <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="flex items-center justify-center">
-        <motion.div
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-xs tracking-[0.3em] uppercase font-bold"
-          style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
-        >
-          Loading /{handle}…
-        </motion.div>
-      </div>
-    );
+    return <ProfileSkeleton variant="artist" />;
   }
 
   if (!artist) {

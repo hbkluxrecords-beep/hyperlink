@@ -846,10 +846,10 @@ export default function StudioEdit() {
                   if (!confirm(`Switch /${handle} to a CREATOR profile? Audio previews and releases will be hidden.`)) return;
                   const r = await convertToCreator(handle, 'creator');
                   if (r.ok) {
-                    alert('Switched to creator! Reloading.');
-                    window.location.href = `/${handle}/edit`;
+                    toast.success('Switched to creator profile');
+                    setTimeout(() => { window.location.href = `/${handle}/edit`; }, 800);
                   } else {
-                    alert('Switch failed: ' + r.error);
+                    toast.error('Switch failed: ' + r.error);
                   }
                 }}
                 className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 transition-transform hover:scale-[1.01]"
@@ -868,11 +868,18 @@ export default function StudioEdit() {
               </div>
               <button
                 onClick={async () => {
-                  const t = prompt(`Type your handle "${handle}" to confirm deletion:`);
-                  if (t !== handle) { if (t !== null) alert('Handle did not match. Cancelled.'); return; }
+                  const confirmText = prompt(`Type your handle "${handle}" to confirm deletion:`);
+                  if (confirmText !== handle) {
+                    if (confirmText !== null) toast.error('Handle did not match');
+                    return;
+                  }
                   const r = await deleteAccount(handle, 'artist');
-                  if (r.ok) { alert('Account deleted.'); window.location.href = '/'; }
-                  else alert('Delete failed: ' + r.error);
+                  if (r.ok) {
+                    toast.success('Account deleted');
+                    setTimeout(() => { window.location.href = '/'; }, 800);
+                  } else {
+                    toast.error('Delete failed: ' + r.error);
+                  }
                 }}
                 className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 border-2 transition-all"
                 style={{ borderColor: '#FF0044', color: '#FF0044', fontFamily: STUDIO_FONTS.mono }}

@@ -124,6 +124,25 @@ export default function Create() {
               </h2>
             </div>
 
+            {/* Are you a musician? Route to Studio instead */}
+            <div className="p-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: 'rgba(0,0,0,0.04)', border: `1px solid ${INK}` }}>
+              <div>
+                <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace', color: ACCENT }}>
+                  ◆ ARE YOU A MUSICIAN?
+                </div>
+                <div className="text-sm mt-1" style={{ fontFamily: '"Fraunces", serif' }}>
+                  Get audio previews, presaves, and drop alerts. Use the Studio signup instead.
+                </div>
+              </div>
+              <Link
+                to="/studio/new"
+                className="text-[10px] tracking-[0.3em] uppercase font-bold px-3 py-2 shrink-0 hover:scale-[1.02] transition-transform"
+                style={{ background: INK, color: PAPER, fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                Studio signup →
+              </Link>
+            </div>
+
             <div>
               <label className="text-[10px] tracking-[0.3em] uppercase font-bold block mb-2" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
                 Your handle · hyperlink.to/

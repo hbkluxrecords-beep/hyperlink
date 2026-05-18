@@ -459,10 +459,10 @@ export default function Edit() {
                   if (!confirm(`Switch /${handle} to an ARTIST profile? This converts your account from Creator → Artist. Your links will become socials.`)) return;
                   const r = await convertToArtist(handle);
                   if (r.ok) {
-                    alert('Switched to artist! Reloading your new studio edit page.');
-                    window.location.href = `/studio/${handle}/edit`;
+                    toast.success('Switched to artist profile');
+                    setTimeout(() => { window.location.href = `/studio/${handle}/edit`; }, 800);
                   } else {
-                    alert('Switch failed: ' + r.error);
+                    toast.error('Switch failed: ' + r.error);
                   }
                 }}
                 className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 transition-transform hover:scale-[1.01]"
@@ -483,15 +483,15 @@ export default function Edit() {
                 onClick={async () => {
                   const confirmText = prompt(`Type your handle "${handle}" to confirm deletion:`);
                   if (confirmText !== handle) {
-                    if (confirmText !== null) alert('Handle did not match. Cancelled.');
+                    if (confirmText !== null) toast.error('Handle did not match');
                     return;
                   }
                   const r = await deleteAccount(handle, 'creator');
                   if (r.ok) {
-                    alert('Account deleted.');
-                    window.location.href = '/';
+                    toast.success('Account deleted');
+                    setTimeout(() => { window.location.href = '/'; }, 800);
                   } else {
-                    alert('Delete failed: ' + r.error);
+                    toast.error('Delete failed: ' + r.error);
                   }
                 }}
                 className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 border-2 transition-all hover:bg-red-500/10"

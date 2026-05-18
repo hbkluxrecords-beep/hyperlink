@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import TopNav from '../components/TopNav.jsx';
 import { isAdmin, getAdminStats, listAllProfiles, toggleFeatured, impersonate } from '../lib/admin.js';
 import { convertToArtist, convertToCreator } from '../lib/profileType.js';
+import { useToast } from '../components/Toast.jsx';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -17,6 +18,7 @@ const DISPLAY = '"Fraunces", serif';
 
 export default function Admin() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [artists, setArtists] = useState([]);
@@ -49,7 +51,7 @@ export default function Admin() {
         setCreators((prev) => prev.map((c) => c.handle === handle ? { ...c, is_featured: !current } : c));
       }
     } else {
-      alert('Toggle failed: ' + r.error);
+      toast.error('Toggle failed: ' + r.error);
     }
   };
 
@@ -172,8 +174,8 @@ export default function Admin() {
                   const action = isArtist ? 'CREATOR' : 'ARTIST';
                   if (!confirm(`Convert /${p.handle} to ${action} profile?`)) return;
                   const r = isArtist ? await convertToCreator(p.handle) : await convertToArtist(p.handle);
-                  if (r.ok) { alert(`Converted to ${action}`); refresh(); }
-                  else alert('Failed: ' + r.error);
+                  if (r.ok) { toast.success(`Converted to ${action}`); refresh(); }
+                  else toast.error('Failed: ' + r.error);
                 }}
                 className="text-[9px] tracking-[0.3em] uppercase font-bold px-2 py-1 border hover:scale-[1.04] transition-transform shrink-0"
                 style={{ borderColor: BORDER_STRONG, fontFamily: MONO, color: MUTED }}

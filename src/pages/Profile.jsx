@@ -6,6 +6,7 @@ import SocialPill from '../components/SocialPill.jsx';
 import { loadProfile } from '../lib/storage.js';
 import { isOwnerOf, logout } from '../lib/auth.js';
 import ProfileIntro from '../components/ProfileIntro.jsx';
+import ProfileSkeleton from '../components/ProfileSkeleton.jsx';
 
 const BG = '#0A0A0A';
 const INK = '#F2EFE6';
@@ -67,18 +68,7 @@ export default function Profile() {
   };
 
   if (loading) {
-    return (
-      <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="flex items-center justify-center">
-        <motion.div
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-xs tracking-[0.3em] uppercase font-bold"
-          style={{ fontFamily: MONO, color: MUTED }}
-        >
-          Loading /{handle}…
-        </motion.div>
-      </div>
-    );
+    return <ProfileSkeleton variant="creator" />;
   }
 
   if (!profile) {
