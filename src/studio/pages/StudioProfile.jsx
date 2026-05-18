@@ -118,12 +118,7 @@ export default function StudioProfile() {
 
   return (
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20 relative">
-      <ProfileIntro
-        name={artist.artistName || handle}
-        handle={handle}
-        accent={accentColor}
-        category="ARTIST"
-      />
+      <ProfileIntro handle={handle} />
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 

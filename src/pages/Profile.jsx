@@ -105,12 +105,7 @@ export default function Profile() {
 
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-12">
-      <ProfileIntro
-        name={profile.displayName}
-        handle={profile.handle}
-        accent={accentColor}
-        category={categoryLabel}
-      />
+      <ProfileIntro handle={profile.handle} />
       {/* EDITORIAL layout - HYPERLINK nav + VOL tag */}
       {isEditorial && (
         <nav className="px-6 py-5 flex items-center justify-between">

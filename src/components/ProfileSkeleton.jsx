@@ -1,18 +1,18 @@
 import { motion } from 'motion/react';
 
 const BG = '#0A0A0A';
-const SHIMMER = 'linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%)';
 
 function Bar({ width = '100%', height = 14, className = '', delay = 0 }) {
   return (
     <motion.div
-      animate={{ opacity: [0.4, 0.8, 0.4] }}
-      transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut', delay }}
+      animate={{ backgroundPosition: ['200% 0%', '-200% 0%'] }}
+      transition={{ duration: 2.8, repeat: Infinity, ease: 'linear', delay }}
       className={className}
       style={{
         width,
         height,
-        background: SHIMMER,
+        background:
+          'linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.03) 40%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.03) 100%)',
         backgroundSize: '200% 100%',
         borderRadius: 2,
       }}
