@@ -7,7 +7,7 @@ import { loadProfile, saveProfile } from '../lib/storage.js';
 import { isOwnerOf } from '../lib/auth.js';
 import { isPremium } from '../lib/premium.js';
 import { convertToArtist } from '../lib/profileType.js';
-import { saveGlowButtons, savePortfolioUrl, saveGlowSettings, GLOW_COLORS } from '../lib/premiumFeatures.js';
+import { saveGlowButtons, savePortfolioUrl, saveGlowSettings, saveProfileLayout, GLOW_COLORS } from '../lib/premiumFeatures.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -40,6 +40,7 @@ export default function Edit() {
   const [glowLinksColor, setGlowLinksColor] = useState('#FF4D1F');
   const [glowBioColor, setGlowBioColor] = useState('#FF4D1F');
   const [portfolioUrl, setPortfolioUrl] = useState('');
+  const [profileLayout, setProfileLayout] = useState('minimal');
 
   useEffect(() => {
     if (!isOwnerOf(handle)) { navigate(`/${handle}`); return; }
@@ -55,6 +56,7 @@ export default function Edit() {
       setGlowLinksColor(p.glowLinksColor || '#FF4D1F');
       setGlowBioColor(p.glowBioColor || '#FF4D1F');
       setPortfolioUrl(p.portfolioUrl || '');
+      setProfileLayout(p.profileLayout || 'minimal');
       setPinned(p.pinned || { label: '', url: '' });
       setLinks(p.links || []);
       setLoading(false);
@@ -91,6 +93,7 @@ export default function Edit() {
         });
       }
       await savePortfolioUrl(handle, portfolioUrl.trim() || null);
+      await saveProfileLayout(handle, profileLayout);
       setSavedMsg('Saved ✓');
       setTimeout(() => setSavedMsg(''), 2000);
     } catch (e) {
@@ -296,6 +299,63 @@ export default function Edit() {
                 style={{ borderColor: BORDER_STRONG, fontFamily: MONO, color: MUTED }}
               >
                 + Add link
+              </button>
+            </div>
+          </CollapsibleSection>
+
+          {/* Layout picker - free for all */}
+          <CollapsibleSection
+            label="Layout"
+            summary={profileLayout === 'editorial' ? 'Editorial (big aura)' : 'Minimal (tight)'}
+            theme="dark"
+          >
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setProfileLayout('minimal')}
+                className="p-3 transition-all text-left"
+                style={{
+                  background: profileLayout === 'minimal' ? 'rgba(255,77,31,0.1)' : 'transparent',
+                  border: `2px solid ${profileLayout === 'minimal' ? '#FF4D1F' : BORDER_STRONG}`,
+                }}
+              >
+                <div className="space-y-1 mb-2">
+                  <div className="h-2 w-2/3" style={{ background: INK }} />
+                  <div className="h-1 w-1/3" style={{ background: BORDER_STRONG }} />
+                </div>
+                <div className="h-1 w-full mb-1" style={{ background: BORDER_STRONG }} />
+                <div className="space-y-1 mt-2">
+                  <div className="h-2 w-full" style={{ background: '#1F1F1F' }} />
+                  <div className="h-2 w-full" style={{ background: '#1F1F1F' }} />
+                </div>
+                <div className="text-[10px] tracking-[0.25em] uppercase font-bold mt-2" style={{ fontFamily: MONO, color: profileLayout === 'minimal' ? '#FF4D1F' : MUTED }}>
+                  Minimal
+                </div>
+                <div className="text-[9px] mt-0.5 opacity-60" style={{ fontFamily: MONO, color: MUTED }}>
+                  Tight, fits one screen
+                </div>
+              </button>
+
+              <button
+                onClick={() => setProfileLayout('editorial')}
+                className="p-3 transition-all text-left"
+                style={{
+                  background: profileLayout === 'editorial' ? 'rgba(255,77,31,0.1)' : 'transparent',
+                  border: `2px solid ${profileLayout === 'editorial' ? '#FF4D1F' : BORDER_STRONG}`,
+                }}
+              >
+                <div className="h-1 w-1/3 mb-2" style={{ background: MUTED }} />
+                <div className="h-3 w-3/4 mb-1" style={{ background: INK }} />
+                <div className="h-1 w-1/4 mb-2" style={{ background: '#FF4D1F' }} />
+                <div className="space-y-1">
+                  <div className="h-2 w-full" style={{ background: '#1F1F1F' }} />
+                  <div className="h-2 w-full" style={{ background: '#1F1F1F' }} />
+                </div>
+                <div className="text-[10px] tracking-[0.25em] uppercase font-bold mt-2" style={{ fontFamily: MONO, color: profileLayout === 'editorial' ? '#FF4D1F' : MUTED }}>
+                  Editorial
+                </div>
+                <div className="text-[9px] mt-0.5 opacity-60" style={{ fontFamily: MONO, color: MUTED }}>
+                  Big aura, magazine vibe
+                </div>
               </button>
             </div>
           </CollapsibleSection>

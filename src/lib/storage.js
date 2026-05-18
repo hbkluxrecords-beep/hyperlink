@@ -171,6 +171,7 @@ function rowToProfile(row) {
     glowLinksColor: row.glow_links_color || null,
     glowBioColor: row.glow_bio_color || null,
     portfolioUrl: row.portfolio_url || null,
+    profileLayout: row.profile_layout || 'minimal',
     createdAt: row.created_at,
   };
 }

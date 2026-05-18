@@ -195,3 +195,9 @@ export const GLOW_COLORS = [
   { name: 'Crimson', value: '#FF0044' },
   { name: 'Mint', value: '#00FFA3' },
 ];
+
+export async function saveProfileLayout(handle, layout) {
+  if (!hasSupabase) return { ok: false };
+  const { error } = await supabase.from('profiles').update({ profile_layout: layout }).eq('handle', handle.toLowerCase());
+  return { ok: !error };
+}
