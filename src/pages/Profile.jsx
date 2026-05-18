@@ -24,7 +24,7 @@ const CAT_LABELS = {
 
 function SectionLabel({ number, label }) {
   return (
-    <div className="flex items-center gap-3 mb-4 mt-12">
+    <div className="flex items-center gap-3 mb-3 mt-6">
       <span className="text-[10px] tracking-[0.3em] uppercase font-bold shrink-0" style={{ fontFamily: MONO, color: ACCENT }}>
         § {number}
       </span>
@@ -111,35 +111,22 @@ export default function Profile() {
   const bioGlowColor = profile.glowBioColor || accentColor;
 
   return (
-    <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-20">
-      {/* Minimal nav */}
-      <nav className="px-6 py-5 flex items-center justify-between">
-        <Link to="/" className="text-[10px] tracking-[0.3em] uppercase font-bold hover:opacity-70" style={{ fontFamily: MONO, color: MUTED }}>
-          HYPERLINK
-        </Link>
-      </nav>
-
-      <div className="max-w-xl mx-auto px-6 pt-8 pb-12">
-        {/* Subtle vol/issue */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-[9px] tracking-[0.35em] uppercase font-bold mb-6"
-          style={{ fontFamily: MONO, color: MUTED }}
-        >
-          VOL 01 · ISSUE 04 · {year}
-        </motion.div>
-
-        {/* Display name + category */}
+    <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-12">
+      <div className="max-w-xl mx-auto px-6 pt-10 pb-8">
+        {/* Display name */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
         >
+          {profile.isPremium && (
+            <div className="text-[9px] tracking-[0.35em] uppercase font-bold mb-2" style={{ fontFamily: MONO, color: accentColor }}>
+              ◆ PLINKS PREMIUM
+            </div>
+          )}
           <h1
-            className="font-black leading-[0.9] tracking-tight break-words"
-            style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.5rem, 9vw, 4.5rem)' }}
+            className="font-black leading-[0.95] tracking-tight break-words"
+            style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 7vw, 3rem)' }}
           >
             {profile.displayName}
             {profile.isPremium && (
@@ -149,9 +136,9 @@ export default function Profile() {
                 transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 className="inline-block ml-2 align-middle"
                 style={{
-                  fontSize: '0.45em',
-                  color: ACCENT,
-                  filter: `drop-shadow(0 0 8px ${ACCENT}80)`,
+                  fontSize: '0.4em',
+                  color: accentColor,
+                  filter: `drop-shadow(0 0 8px ${accentColor}80)`,
                 }}
                 title="Plinks Premium"
               >
@@ -159,23 +146,13 @@ export default function Profile() {
               </motion.span>
             )}
           </h1>
-          {profile.isPremium && (
-            <div className="text-[9px] tracking-[0.35em] uppercase font-bold mt-1" style={{ fontFamily: MONO, color: ACCENT }}>
-              ◆ PLINKS PREMIUM
-            </div>
-          )}
-          <div
-            className="text-[10px] tracking-[0.3em] uppercase font-bold mt-3"
-            style={{ fontFamily: MONO, color: ACCENT }}
-          >
-            {categoryLabel}
-          </div>
-          <div className="text-[10px] tracking-[0.3em] uppercase mt-2" style={{ fontFamily: MONO, color: MUTED }}>
-            /{profile.handle}
+          <div className="text-[10px] tracking-[0.3em] uppercase font-bold mt-2 flex items-center gap-2 flex-wrap" style={{ fontFamily: MONO }}>
+            <span style={{ color: accentColor }}>{categoryLabel}</span>
+            <span style={{ color: MUTED }}>· /{profile.handle}</span>
           </div>
         </motion.div>
 
-        {/* Bio */}
+        {/* Bio - compact */}
         {profile.bio && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -188,17 +165,17 @@ export default function Profile() {
               ],
             } : { opacity: 1 }}
             transition={bioGlow ? {
-              opacity: { duration: 0.6, delay: 0.25 },
+              opacity: { duration: 0.6, delay: 0.2 },
               boxShadow: { duration: 2.6, repeat: Infinity, ease: 'easeInOut' },
-            } : { duration: 0.6, delay: 0.25 }}
-            className="mt-6 p-4"
+            } : { duration: 0.6, delay: 0.2 }}
+            className="mt-4 p-3"
             style={{
               borderLeft: `2px solid ${bioGlow ? bioGlowColor : accentColor}`,
               background: bioGlow ? `${bioGlowColor}08` : 'transparent',
             }}
           >
             <p
-              className="text-base md:text-lg leading-snug"
+              className="text-sm md:text-base leading-snug"
               style={{
                 fontFamily: DISPLAY,
                 color: INK,
@@ -215,7 +192,7 @@ export default function Profile() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex items-center gap-2 mt-6 flex-wrap"
+          className="flex items-center gap-2 mt-4 flex-wrap"
         >
           <button
             onClick={share}
@@ -250,7 +227,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="mt-8"
+            className="mt-5"
           >
             <div className="text-[9px] tracking-[0.35em] uppercase font-bold mb-2" style={{ fontFamily: MONO, color: pinnedGlow ? pinnedGlowColor : ACCENT }}>
               ★ PINNED
@@ -287,7 +264,7 @@ export default function Profile() {
 
         {/* Live portfolio embed (developers) */}
         {profile.portfolioUrl && (
-          <div className="mt-12">
+          <div className="mt-6">
             <SectionLabel number="03" label="Live Portfolio" />
             <div
               className="overflow-hidden"
@@ -315,7 +292,7 @@ export default function Profile() {
 
         {/* Footer */}
         <div
-          className="mt-20 pt-6 border-t flex items-center justify-between text-[9px] tracking-[0.35em] uppercase"
+          className="mt-10 pt-4 border-t flex items-center justify-between text-[9px] tracking-[0.35em] uppercase"
           style={{ borderColor: BORDER, fontFamily: MONO, color: MUTED }}
         >
           <span>/{profile.handle}</span>
