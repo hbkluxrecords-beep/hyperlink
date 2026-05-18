@@ -7,7 +7,7 @@ import { loadProfile, saveProfile } from '../lib/storage.js';
 import { isOwnerOf } from '../lib/auth.js';
 import { isPremium } from '../lib/premium.js';
 import { convertToArtist } from '../lib/profileType.js';
-import { saveGlowButtons, savePortfolioUrl } from '../lib/premiumFeatures.js';
+import { saveGlowButtons, savePortfolioUrl, saveGlowSettings, GLOW_COLORS } from '../lib/premiumFeatures.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -33,7 +33,12 @@ export default function Edit() {
   const [pinned, setPinned] = useState({ label: '', url: '' });
   const [links, setLinks] = useState([]);
   const [premium, setPremium] = useState(false);
-  const [glowButtons, setGlowButtons] = useState(false);
+  const [glowPinned, setGlowPinned] = useState(false);
+  const [glowLinks, setGlowLinks] = useState(false);
+  const [glowBio, setGlowBio] = useState(false);
+  const [glowPinnedColor, setGlowPinnedColor] = useState('#FF4D1F');
+  const [glowLinksColor, setGlowLinksColor] = useState('#FF4D1F');
+  const [glowBioColor, setGlowBioColor] = useState('#FF4D1F');
   const [portfolioUrl, setPortfolioUrl] = useState('');
 
   useEffect(() => {
@@ -43,7 +48,12 @@ export default function Edit() {
       setDisplayName(p.displayName || '');
       setBio(p.bio || '');
       setCategory(p.category || 'creator');
-      setGlowButtons(!!p.glowButtons);
+      setGlowPinned(!!p.glowPinned);
+      setGlowLinks(!!p.glowLinks);
+      setGlowBio(!!p.glowBio);
+      setGlowPinnedColor(p.glowPinnedColor || '#FF4D1F');
+      setGlowLinksColor(p.glowLinksColor || '#FF4D1F');
+      setGlowBioColor(p.glowBioColor || '#FF4D1F');
       setPortfolioUrl(p.portfolioUrl || '');
       setPinned(p.pinned || { label: '', url: '' });
       setLinks(p.links || []);
@@ -75,7 +85,10 @@ export default function Edit() {
       if (!result.ok) { setErrorMsg(result.error || 'Save failed'); setSaving(false); return; }
       // Premium glow + portfolio
       if (premium) {
-        await saveGlowButtons(handle, 'creator', glowButtons);
+        await saveGlowSettings(handle, {
+          glowPinned, glowLinks, glowBio,
+          glowPinnedColor, glowLinksColor, glowBioColor,
+        });
       }
       await savePortfolioUrl(handle, portfolioUrl.trim() || null);
       setSavedMsg('Saved ✓');
@@ -287,35 +300,48 @@ export default function Edit() {
             </div>
           </CollapsibleSection>
 
-          {/* Premium glow buttons - same as artist profile vibe */}
+          {/* Premium glow controls - per element + per color */}
           {premium && (
             <CollapsibleSection
-              label="Glow buttons"
-              summary={glowButtons ? '✓ ON · accent pulse' : 'OFF'}
+              label="Glow effects"
+              summary={
+                [glowPinned, glowLinks, glowBio].filter(Boolean).length === 0
+                  ? 'All off'
+                  : `${[glowPinned && 'Pinned', glowLinks && 'Links', glowBio && 'Bio'].filter(Boolean).join(' · ')}`
+              }
               theme="dark"
             >
-              <div className="space-y-3">
+              <div className="space-y-5">
                 <div className="text-xs leading-relaxed" style={{ color: MUTED, fontFamily: DISPLAY }}>
-                  Adds a pulsing accent-colored glow around all your link buttons. Same as the artist profile vibe.
+                  Turn on glow per element. Each can have its own color.
                 </div>
-                <button
-                  onClick={() => setGlowButtons((v) => !v)}
-                  className="w-full flex items-center justify-between px-4 py-3 transition-all"
-                  style={{
-                    background: glowButtons ? 'rgba(255,77,31,0.1)' : 'transparent',
-                    border: `2px solid ${glowButtons ? '#FF4D1F' : BORDER_STRONG}`,
-                  }}
-                >
-                  <span className="text-[11px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: glowButtons ? '#FF4D1F' : INK }}>
-                    {glowButtons ? '✓ Enabled' : 'Tap to enable'}
-                  </span>
-                  <span className="w-10 h-5 rounded-full relative transition-colors" style={{ background: glowButtons ? '#FF4D1F' : BORDER_STRONG }}>
-                    <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all" style={{
-                      background: glowButtons ? INK : MUTED,
-                      left: glowButtons ? '22px' : '2px',
-                    }} />
-                  </span>
-                </button>
+
+                {/* PINNED LINK */}
+                <GlowControl
+                  label="Pinned link"
+                  enabled={glowPinned}
+                  onToggle={() => setGlowPinned((v) => !v)}
+                  color={glowPinnedColor}
+                  onColor={setGlowPinnedColor}
+                />
+
+                {/* ALL LINKS */}
+                <GlowControl
+                  label="All other links"
+                  enabled={glowLinks}
+                  onToggle={() => setGlowLinks((v) => !v)}
+                  color={glowLinksColor}
+                  onColor={setGlowLinksColor}
+                />
+
+                {/* BIO */}
+                <GlowControl
+                  label="Bio"
+                  enabled={glowBio}
+                  onToggle={() => setGlowBio((v) => !v)}
+                  color={glowBioColor}
+                  onColor={setGlowBioColor}
+                />
               </div>
             </CollapsibleSection>
           )}
@@ -416,3 +442,62 @@ export default function Edit() {
     </div>
   );
 }
+
+function GlowControl({ label, enabled, onToggle, color, onColor }) {
+  const INK = '#F2EFE6';
+  const MUTED = '#8A8680';
+  const BORDER = 'rgba(255,255,255,0.18)';
+  const MONO = '"JetBrains Mono", monospace';
+
+  return (
+    <div className="space-y-2">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 transition-all"
+        style={{
+          background: enabled ? `${color}15` : 'transparent',
+          border: `2px solid ${enabled ? color : BORDER}`,
+        }}
+      >
+        <span className="text-[11px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: enabled ? color : INK }}>
+          {label}
+        </span>
+        <span className="w-10 h-5 rounded-full relative transition-colors" style={{ background: enabled ? color : BORDER }}>
+          <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all" style={{
+            background: enabled ? INK : MUTED,
+            left: enabled ? '22px' : '2px',
+          }} />
+        </span>
+      </button>
+      {enabled && (
+        <div className="flex flex-wrap gap-2 pl-2">
+          {GLOW_COLORS_LOCAL.map((c) => (
+            <button
+              key={c.value}
+              onClick={() => onColor(c.value)}
+              className="w-7 h-7 rounded-full transition-all"
+              style={{
+                background: c.value,
+                border: color === c.value ? `2px solid ${INK}` : `2px solid transparent`,
+                boxShadow: color === c.value ? `0 0 12px ${c.value}` : 'none',
+              }}
+              title={c.name}
+              aria-label={c.name}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const GLOW_COLORS_LOCAL = [
+  { name: 'Orange', value: '#FF4D1F' },
+  { name: 'Pink', value: '#FF3D8A' },
+  { name: 'Cyan', value: '#00E5FF' },
+  { name: 'Green', value: '#1DB954' },
+  { name: 'Purple', value: '#A238FF' },
+  { name: 'Gold', value: '#FFD700' },
+  { name: 'Crimson', value: '#FF0044' },
+  { name: 'Mint', value: '#00FFA3' },
+];

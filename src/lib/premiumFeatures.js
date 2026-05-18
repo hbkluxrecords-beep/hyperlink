@@ -171,3 +171,27 @@ export const TEXT_EFFECTS = [
   { id: 'shimmer', name: 'Shimmer', preview: 'Sweeping shine' },
   { id: 'glitch', name: 'Glitch', preview: 'Cyberpunk RGB split' },
 ];
+
+export async function saveGlowSettings(handle, settings) {
+  if (!hasSupabase) return { ok: false };
+  const payload = {};
+  if ('glowPinned' in settings) payload.glow_pinned = !!settings.glowPinned;
+  if ('glowLinks' in settings) payload.glow_links = !!settings.glowLinks;
+  if ('glowBio' in settings) payload.glow_bio = !!settings.glowBio;
+  if ('glowPinnedColor' in settings) payload.glow_pinned_color = settings.glowPinnedColor || null;
+  if ('glowLinksColor' in settings) payload.glow_links_color = settings.glowLinksColor || null;
+  if ('glowBioColor' in settings) payload.glow_bio_color = settings.glowBioColor || null;
+  const { error } = await supabase.from('profiles').update(payload).eq('handle', handle.toLowerCase());
+  return { ok: !error, error: error?.message };
+}
+
+export const GLOW_COLORS = [
+  { name: 'Orange', value: '#FF4D1F' },
+  { name: 'Pink', value: '#FF3D8A' },
+  { name: 'Cyan', value: '#00E5FF' },
+  { name: 'Green', value: '#1DB954' },
+  { name: 'Purple', value: '#A238FF' },
+  { name: 'Gold', value: '#FFD700' },
+  { name: 'Crimson', value: '#FF0044' },
+  { name: 'Mint', value: '#00FFA3' },
+];

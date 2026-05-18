@@ -101,6 +101,14 @@ export default function Profile() {
 
   const year = new Date(profile.createdAt || Date.now()).getFullYear();
   const categoryLabel = CAT_LABELS[profile.category] || 'CREATOR';
+  const accentColor = profile.accentColor || ACCENT;
+  const canGlow = profile.isPremium;
+  const pinnedGlow = canGlow && profile.glowPinned;
+  const linksGlow = canGlow && profile.glowLinks;
+  const bioGlow = canGlow && profile.glowBio;
+  const pinnedGlowColor = profile.glowPinnedColor || accentColor;
+  const linksGlowColor = profile.glowLinksColor || accentColor;
+  const bioGlowColor = profile.glowBioColor || accentColor;
 
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-20">
@@ -171,14 +179,31 @@ export default function Profile() {
         {profile.bio && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            className="mt-6 pl-4"
-            style={{ borderLeft: `2px solid ${ACCENT}` }}
+            animate={bioGlow ? {
+              opacity: 1,
+              boxShadow: [
+                `0 0 16px ${bioGlowColor}30, inset 0 0 8px ${bioGlowColor}15`,
+                `0 0 32px ${bioGlowColor}60, inset 0 0 12px ${bioGlowColor}25`,
+                `0 0 16px ${bioGlowColor}30, inset 0 0 8px ${bioGlowColor}15`,
+              ],
+            } : { opacity: 1 }}
+            transition={bioGlow ? {
+              opacity: { duration: 0.6, delay: 0.25 },
+              boxShadow: { duration: 2.6, repeat: Infinity, ease: 'easeInOut' },
+            } : { duration: 0.6, delay: 0.25 }}
+            className="mt-6 p-4"
+            style={{
+              borderLeft: `2px solid ${bioGlow ? bioGlowColor : accentColor}`,
+              background: bioGlow ? `${bioGlowColor}08` : 'transparent',
+            }}
           >
             <p
               className="text-base md:text-lg leading-snug"
-              style={{ fontFamily: DISPLAY, color: INK }}
+              style={{
+                fontFamily: DISPLAY,
+                color: INK,
+                textShadow: bioGlow ? `0 0 12px ${bioGlowColor}80` : 'none',
+              }}
             >
               {profile.bio}
             </p>
@@ -227,13 +252,15 @@ export default function Profile() {
             transition={{ duration: 0.6, delay: 0.35 }}
             className="mt-8"
           >
-            <div className="text-[9px] tracking-[0.35em] uppercase font-bold mb-2" style={{ fontFamily: MONO, color: ACCENT }}>
+            <div className="text-[9px] tracking-[0.35em] uppercase font-bold mb-2" style={{ fontFamily: MONO, color: pinnedGlow ? pinnedGlowColor : ACCENT }}>
               ★ PINNED
             </div>
             <PlatformLinkCard
               label={profile.pinned.label}
               url={profile.pinned.url}
               theme="dark"
+              glow={pinnedGlow}
+              accent={pinnedGlowColor}
             />
           </motion.div>
         )}
@@ -250,8 +277,8 @@ export default function Profile() {
                   url={l.url}
                   index={i}
                   theme="dark"
-                  glow={profile.isPremium && profile.glowButtons}
-                  accent={profile.accentColor || '#FF4D1F'}
+                  glow={linksGlow}
+                  accent={linksGlowColor}
                 />
               ))}
             </div>
