@@ -5,7 +5,7 @@ import PlatformLinkCard from '../components/PlatformLinkCard.jsx';
 import SocialPill from '../components/SocialPill.jsx';
 import { loadProfile } from '../lib/storage.js';
 import { isOwnerOf, logout } from '../lib/auth.js';
-import ProfileIntro from '../components/ProfileIntro.jsx';
+import ArtistIntro from '../components/ArtistIntro.jsx';
 import ProfileSkeleton from '../components/ProfileSkeleton.jsx';
 
 const BG = '#0A0A0A';
@@ -44,6 +44,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -69,6 +70,21 @@ export default function Profile() {
 
   if (loading) {
     return <ProfileSkeleton variant="creator" />;
+  }
+
+  // Block render until intro plays
+  if (profile && !introDone) {
+    return (
+      <>
+        <ProfileSkeleton variant="creator" />
+        <ArtistIntro
+          name={profile.displayName || handle}
+          handle={handle}
+          genres={[]}
+          onComplete={() => setIntroDone(true)}
+        />
+      </>
+    );
   }
 
   if (!profile) {
@@ -105,12 +121,6 @@ export default function Profile() {
 
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-12">
-      <ProfileIntro
-        name={profile.displayName}
-        handle={profile.handle}
-        accent={accentColor}
-        category={categoryLabel}
-      />
       {/* EDITORIAL layout - HYPERLINK nav + VOL tag */}
       {isEditorial && (
         <nav className="px-6 py-5 flex items-center justify-between">

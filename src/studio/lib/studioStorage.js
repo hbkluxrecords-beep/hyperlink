@@ -264,3 +264,64 @@ function rowToArtist(row, releases) {
 }
 
 export const usingSupabase = hasSupabase;
+
+/**
+ * Track playlist functions
+ */
+export async function loadTracks(handle) {
+  if (!hasSupabase) return [];
+  const { data, error } = await supabase
+    .from('artist_tracks')
+    .select('*')
+    .eq('artist_handle', handle.toLowerCase())
+    .order('position', { ascending: true });
+  if (error) {
+    console.warn('loadTracks', error.message);
+    return [];
+  }
+  return (data || []).map((r) => ({
+    id: r.id,
+    title: r.title || '',
+    audioUrl: r.audio_url || null,
+    coverUrl: r.cover_url || null,
+    releaseDate: r.release_date || null,
+    presaveUrl: r.presave_url || null,
+    platforms: Array.isArray(r.platforms) ? r.platforms : [],
+    position: r.position || 0,
+  }));
+}
+
+export async function saveTrack(handle, track) {
+  if (!hasSupabase) return { ok: false };
+  const payload = {
+    artist_handle: handle.toLowerCase(),
+    position: track.position ?? 0,
+    title: track.title || '',
+    audio_url: track.audioUrl || null,
+    cover_url: track.coverUrl || null,
+    release_date: track.releaseDate || null,
+    presave_url: track.presaveUrl || null,
+    platforms: track.platforms || [],
+  };
+  if (track.id) {
+    const { error } = await supabase.from('artist_tracks').update(payload).eq('id', track.id);
+    return { ok: !error, error: error?.message };
+  }
+  const { data, error } = await supabase.from('artist_tracks').insert(payload).select().single();
+  return { ok: !error, id: data?.id, error: error?.message };
+}
+
+export async function deleteTrack(trackId) {
+  if (!hasSupabase) return { ok: false };
+  const { error } = await supabase.from('artist_tracks').delete().eq('id', trackId);
+  return { ok: !error, error: error?.message };
+}
+
+export async function reorderTracks(handle, orderedIds) {
+  if (!hasSupabase) return { ok: false };
+  // Update each track position sequentially
+  for (let i = 0; i < orderedIds.length; i++) {
+    await supabase.from('artist_tracks').update({ position: i }).eq('id', orderedIds[i]);
+  }
+  return { ok: true };
+}

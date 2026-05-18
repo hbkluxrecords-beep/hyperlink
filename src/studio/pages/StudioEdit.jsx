@@ -6,7 +6,7 @@ import CollapsibleSection from '../../components/CollapsibleSection.jsx';
 import OnboardingBanner from '../../components/OnboardingBanner.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { STUDIO, STUDIO_FONTS, GENRES, MUSIC_PLATFORMS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
-import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRelease } from '../lib/studioStorage.js';
+import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRelease, loadTracks, saveTrack, deleteTrack, reorderTracks } from '../lib/studioStorage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import AudioTrimmer from '../components/AudioTrimmer.jsx';
 import { isOwnerOf, deleteAccount } from '../../lib/auth.js';
@@ -48,6 +48,9 @@ export default function StudioEdit() {
   const [trimmerFile, setTrimmerFile] = useState(null);
   const [platforms, setPlatforms] = useState([]);
   const [premium, setPremium] = useState(false);
+
+  // Discography tracks (multi-track playlist)
+  const [tracks, setTracks] = useState([]);
   const [accentColor, setAccentColor] = useState(null);
   const [animatedBg, setAnimatedBg] = useState(false);
   const [hideReleaseDate, setHideReleaseDate] = useState(false);
@@ -85,6 +88,7 @@ export default function StudioEdit() {
       }
       setLoading(false);
     });
+    loadTracks(handle).then(setTracks);
     isPremium(handle).then(setPremium);
   }, [handle, navigate]);
 
@@ -833,6 +837,93 @@ export default function StudioEdit() {
                 }} />
               </span>
             </button>
+          </CollapsibleSection>
+
+          {/* Discography — multi-track playlist */}
+          <CollapsibleSection label="Discography" summary={`${tracks.length} ${tracks.length === 1 ? 'track' : 'tracks'}`} theme="dark">
+            <div className="space-y-3">
+              <div className="text-xs leading-relaxed" style={{ color: STUDIO.muted, fontFamily: STUDIO_FONTS.display }}>
+                Add multiple tracks fans can skip through right on your profile. Tracks here appear below your featured release in a playlist with prev/next/play controls.
+              </div>
+
+              {tracks.length > 0 && (
+                <div className="space-y-2">
+                  {tracks.map((t, i) => (
+                    <div key={t.id} className="p-3 flex items-center gap-2" style={{ background: STUDIO.surface, border: `1px solid ${STUDIO.border}` }}>
+                      <span className="text-[10px] tracking-[0.25em] opacity-60 w-5 shrink-0" style={{ fontFamily: STUDIO_FONTS.mono }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <input
+                        value={t.title}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setTracks((prev) => prev.map((x, idx) => idx === i ? { ...x, title: v } : x));
+                        }}
+                        onBlur={() => saveTrack(handle, { ...tracks[i], position: i })}
+                        placeholder="Track title"
+                        className="flex-1 bg-transparent outline-none text-sm font-bold min-w-0"
+                        style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}
+                      />
+                      <input
+                        type="file"
+                        accept="audio/*,.wav,.mp3,.m4a"
+                        id={`track-audio-${i}`}
+                        className="hidden"
+                        onChange={async (e) => {
+                          const f = e.target.files?.[0];
+                          if (!f) return;
+                          const path = `${handle}/track-${t.id}-${Date.now()}.${f.name.split('.').pop()}`;
+                          const r = await uploadFile('audio-previews', f, path);
+                          if (r.url) {
+                            await saveTrack(handle, { ...t, audioUrl: r.url, position: i });
+                            const fresh = await loadTracks(handle);
+                            setTracks(fresh);
+                            toast.success('Audio uploaded');
+                          } else toast.error('Upload failed');
+                        }}
+                      />
+                      <label
+                        htmlFor={`track-audio-${i}`}
+                        className="text-[9px] tracking-[0.2em] uppercase font-bold px-2 py-1 cursor-pointer hover:scale-[1.04] transition-transform shrink-0"
+                        style={{ border: `1px solid ${t.audioUrl ? STUDIO.accent : STUDIO.border}`, color: t.audioUrl ? STUDIO.accent : STUDIO.muted, fontFamily: STUDIO_FONTS.mono }}
+                      >
+                        {t.audioUrl ? '✓ Audio' : '+ Audio'}
+                      </label>
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`Delete "${t.title || 'this track'}"?`)) return;
+                          const r = await deleteTrack(t.id);
+                          if (r.ok) {
+                            setTracks((prev) => prev.filter((x) => x.id !== t.id));
+                            toast.success('Track removed');
+                          } else toast.error('Delete failed');
+                        }}
+                        className="text-sm opacity-50 hover:opacity-100 shrink-0"
+                        style={{ color: STUDIO.muted }}
+                        aria-label="Remove"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={async () => {
+                  const r = await saveTrack(handle, { title: 'New track', position: tracks.length });
+                  if (r.ok) {
+                    const fresh = await loadTracks(handle);
+                    setTracks(fresh);
+                    toast.success('Track added');
+                  } else toast.error('Add failed');
+                }}
+                className="w-full py-3 text-[10px] tracking-[0.3em] uppercase font-bold border border-dashed hover:bg-white/5 transition-colors"
+                style={{ borderColor: STUDIO.border, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
+              >
+                + Add track
+              </button>
+            </div>
           </CollapsibleSection>
 
           {/* Profile type switch */}

@@ -6,14 +6,15 @@ import CompactPlayer from '../components/CompactPlayer.jsx';
 import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
 import MinimalRelease from '../components/MinimalRelease.jsx';
 import AnimatedBackground from '../components/AnimatedBackground.jsx';
-import ProfileIntro from '../../components/ProfileIntro.jsx';
+import ArtistIntro from '../../components/ArtistIntro.jsx';
 import ProfileSkeleton from '../../components/ProfileSkeleton.jsx';
+import PlaylistPlayer from '../../components/PlaylistPlayer.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
 import SocialPill from '../../components/SocialPill.jsx';
 import FanDMWidget from '../../components/FanDMWidget.jsx';
 import { STUDIO, STUDIO_FONTS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
 import { LUXURY_EASE } from '../lib/animations.js';
-import { loadArtist, trackEvent } from '../lib/studioStorage.js';
+import { loadArtist, loadTracks, trackEvent } from '../lib/studioStorage.js';
 import { isOwnerOf, logout } from '../../lib/auth.js';
 
 function compactLocation(loc) {
@@ -53,14 +54,17 @@ export default function StudioProfile() {
   const { handle } = useParams();
   const navigate = useNavigate();
   const [artist, setArtist] = useState(null);
+  const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    loadArtist(handle).then((a) => {
+    Promise.all([loadArtist(handle), loadTracks(handle)]).then(([a, ts]) => {
       setArtist(a);
+      setTracks(ts || []);
       setLoading(false);
       if (a) {
         trackEvent(handle, 'view');
@@ -89,6 +93,21 @@ export default function StudioProfile() {
     return <ProfileSkeleton variant="artist" />;
   }
 
+  // Run intro before showing the page. If already seen this session, intro auto-completes immediately.
+  if (artist && !introDone) {
+    return (
+      <>
+        <ProfileSkeleton variant="artist" />
+        <ArtistIntro
+          name={artist.artistName || handle}
+          handle={handle}
+          genres={artist.genres || []}
+          onComplete={() => setIntroDone(true)}
+        />
+      </>
+    );
+  }
+
   if (!artist) {
     return (
       <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="flex items-center justify-center px-6">
@@ -115,12 +134,6 @@ export default function StudioProfile() {
 
   return (
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20 relative">
-      <ProfileIntro
-        name={artist.artistName || handle}
-        handle={handle}
-        accent={accentColor}
-        category="ARTIST"
-      />
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 
@@ -365,6 +378,19 @@ export default function StudioProfile() {
             />
           </motion.div>
         ) : null}
+
+        {/* Track playlist — skip between tracks */}
+        {tracks.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.45, ease: LUXURY_EASE }}
+            className="mt-8"
+          >
+            <SectionLabel number="◆" label={`Discography · ${tracks.length} tracks`} />
+            <PlaylistPlayer tracks={tracks} accent={accentColor} />
+          </motion.div>
+        )}
 
         {/* Music links — only in compact layout (showcase has them built-in) */}
         {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && artist.links && artist.links.length > 0 && (
