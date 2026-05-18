@@ -8,6 +8,8 @@ import { isOwnerOf, deleteAccount } from '../lib/auth.js';
 import { isPremium } from '../lib/premium.js';
 import { convertToArtist } from '../lib/profileType.js';
 import { saveGlowButtons, savePortfolioUrl, saveGlowSettings, saveProfileLayout, GLOW_COLORS } from '../lib/premiumFeatures.js';
+import OnboardingBanner from '../components/OnboardingBanner.jsx';
+import { useToast } from '../components/Toast.jsx';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -22,6 +24,7 @@ const MONO = '"JetBrains Mono", monospace';
 export default function Edit() {
   const { handle } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -95,6 +98,7 @@ export default function Edit() {
       await savePortfolioUrl(handle, portfolioUrl.trim() || null);
       await saveProfileLayout(handle, profileLayout);
       setSavedMsg('Saved ✓');
+      toast.success('Profile saved');
       setTimeout(() => setSavedMsg(''), 2000);
     } catch (e) {
       setErrorMsg(e.message || 'Something went wrong');
@@ -132,6 +136,7 @@ export default function Edit() {
       </nav>
 
       <div className="max-w-lg mx-auto px-5 pt-6 pb-32">
+        <OnboardingBanner handle={handle} type="creator" />
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>

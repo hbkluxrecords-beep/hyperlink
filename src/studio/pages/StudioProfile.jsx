@@ -6,6 +6,7 @@ import CompactPlayer from '../components/CompactPlayer.jsx';
 import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
 import MinimalRelease from '../components/MinimalRelease.jsx';
 import AnimatedBackground from '../components/AnimatedBackground.jsx';
+import ProfileIntro from '../../components/ProfileIntro.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
 import SocialPill from '../../components/SocialPill.jsx';
 import FanDMWidget from '../../components/FanDMWidget.jsx';
@@ -124,6 +125,12 @@ export default function StudioProfile() {
 
   return (
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20 relative">
+      <ProfileIntro
+        name={artist.artistName || handle}
+        handle={handle}
+        accent={accentColor}
+        category="ARTIST"
+      />
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 

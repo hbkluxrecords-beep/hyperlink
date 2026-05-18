@@ -5,6 +5,7 @@ import PlatformLinkCard from '../components/PlatformLinkCard.jsx';
 import SocialPill from '../components/SocialPill.jsx';
 import { loadProfile } from '../lib/storage.js';
 import { isOwnerOf, logout } from '../lib/auth.js';
+import ProfileIntro from '../components/ProfileIntro.jsx';
 
 const BG = '#0A0A0A';
 const INK = '#F2EFE6';
@@ -114,6 +115,12 @@ export default function Profile() {
 
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-12">
+      <ProfileIntro
+        name={profile.displayName}
+        handle={profile.handle}
+        accent={accentColor}
+        category={categoryLabel}
+      />
       {/* EDITORIAL layout - HYPERLINK nav + VOL tag */}
       {isEditorial && (
         <nav className="px-6 py-5 flex items-center justify-between">
@@ -302,6 +309,22 @@ export default function Profile() {
                   accent={linksGlowColor}
                 />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state - no pinned, no links, no portfolio */}
+        {(!profile.pinned || !profile.pinned.url) && (!profile.links || profile.links.length === 0) && !profile.portfolioUrl && (
+          <div className={`text-center ${isEditorial ? 'mt-12 p-8' : 'mt-6 p-6'}`} style={{ border: `1px dashed ${BORDER}` }}>
+            <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-2" style={{ fontFamily: MONO, color: MUTED }}>
+              ◆ NO LINKS YET
+            </div>
+            <div className="text-sm opacity-70" style={{ fontFamily: DISPLAY }}>
+              {isOwner ? (
+                <>This page is empty. <Link to={`/${profile.handle}/edit`} style={{ color: accentColor, textDecoration: 'underline' }}>Add your first link →</Link></>
+              ) : (
+                `${profile.displayName} hasn't added any links yet.`
+              )}
             </div>
           </div>
         )}

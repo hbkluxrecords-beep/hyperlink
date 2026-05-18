@@ -7,6 +7,7 @@ import MiniPreviewPlayer from '../components/MiniPreviewPlayer.jsx';
 import { loadRecentProfiles } from '../lib/storage.js';
 import { loadRecentArtists } from '../studio/lib/studioStorage.js';
 import { listFeatured } from '../lib/admin.js';
+import BrandIntro from '../components/BrandIntro.jsx';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -91,6 +92,7 @@ export default function Landing() {
 
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }}>
+      <BrandIntro />
       <TopNav />
 
       {/* FEATURED ARTISTS - moved to TOP */}
@@ -352,6 +354,7 @@ export default function Landing() {
           <span>© 2026 plinks.dev · built in 2026</span>
           <div className="flex items-center gap-5 flex-wrap">
             <Link to="/upgrade" className="hover:opacity-100 hover:underline">Pricing</Link>
+            <Link to="/help" className="hover:opacity-100 hover:underline">Help</Link>
             <Link to="/explore" className="hover:opacity-100 hover:underline">Directory</Link>
             <Link to="/login" className="hover:opacity-100 hover:underline">Log in</Link>
             <Link to="/terms" className="hover:opacity-100 hover:underline">Terms</Link>

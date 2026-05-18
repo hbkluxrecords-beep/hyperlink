@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import StudioNav from '../components/StudioNav.jsx';
 import CollapsibleSection from '../../components/CollapsibleSection.jsx';
+import OnboardingBanner from '../../components/OnboardingBanner.jsx';
+import { useToast } from '../../components/Toast.jsx';
 import { STUDIO, STUDIO_FONTS, GENRES, MUSIC_PLATFORMS, SOCIAL_PLATFORMS } from '../lib/studioDesign.js';
 import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRelease } from '../lib/studioStorage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
@@ -15,6 +17,7 @@ import { saveAccentColor, saveReleaseLayout, saveAnimatedBg, saveHideReleaseDate
 export default function StudioEdit() {
   const { handle } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -222,6 +225,7 @@ export default function StudioEdit() {
       await saveReleaseLayout(handle, releaseLayout, 'artist');
 
       setSavedMsg('Saved ✓');
+      toast.success('Profile saved');
       setTimeout(() => setSavedMsg(''), 2000);
     } catch (e) {
       setErrorMsg(e.message || 'Something went wrong');
@@ -254,6 +258,7 @@ export default function StudioEdit() {
       <StudioNav minimal />
 
       <div className="max-w-lg mx-auto px-5 pt-24 pb-32">
+        <OnboardingBanner handle={handle} type="artist" />
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>

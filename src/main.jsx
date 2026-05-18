@@ -12,11 +12,13 @@ import Upgrade from './pages/Upgrade.jsx';
 import Admin from './pages/Admin.jsx';
 import Terms from './pages/Terms.jsx';
 import Privacy from './pages/Privacy.jsx';
+import Help from './pages/Help.jsx';
 import NotFound from './pages/NotFound.jsx';
 import SmartProfileResolver from './components/SmartProfileResolver.jsx';
 import RouteTransitions from './components/RouteTransitions.jsx';
 import ImpersonateBanner from './components/ImpersonateBanner.jsx';
 import CookieBanner from './components/CookieBanner.jsx';
+import { ToastProvider } from './components/Toast.jsx';
 
 import StudioLanding from './studio/pages/StudioLanding.jsx';
 import StudioCreate from './studio/pages/StudioCreate.jsx';
@@ -32,31 +34,34 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ImpersonateBanner />
-      <CookieBanner />
-      <RouteTransitions>
-        <Route path="/studio" element={<StudioLanding />} />
-        <Route path="/studio/new" element={<StudioCreate />} />
-        <Route path="/studio/explore" element={<StudioExplore />} />
-        <Route path="/studio/:handle/edit" element={<StudioEdit />} />
-        <Route path="/studio/:handle/inbox" element={<StudioInbox />} />
-        <Route path="/studio/:handle/subscribers" element={<StudioSubscribers />} />
-        <Route path="/studio/:handle" element={<StudioProfile />} />
-        <Route path="/studio/:handle/analytics" element={<StudioAnalytics />} />
+      <ToastProvider>
+        <ImpersonateBanner />
+        <CookieBanner />
+        <RouteTransitions>
+          <Route path="/studio" element={<StudioLanding />} />
+          <Route path="/studio/new" element={<StudioCreate />} />
+          <Route path="/studio/explore" element={<StudioExplore />} />
+          <Route path="/studio/:handle/edit" element={<StudioEdit />} />
+          <Route path="/studio/:handle/inbox" element={<StudioInbox />} />
+          <Route path="/studio/:handle/subscribers" element={<StudioSubscribers />} />
+          <Route path="/studio/:handle" element={<StudioProfile />} />
+          <Route path="/studio/:handle/analytics" element={<StudioAnalytics />} />
 
-        <Route path="/" element={<Landing />} />
-        <Route path="/new" element={<Create />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/upgrade" element={<Upgrade />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/find" element={<Lookup />} />
-        <Route path="/:handle/edit" element={<Edit />} />
-        <Route path="/:handle" element={<SmartProfileResolver />} />
-        <Route path="*" element={<NotFound />} />
-      </RouteTransitions>
+          <Route path="/" element={<Landing />} />
+          <Route path="/new" element={<Create />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/upgrade" element={<Upgrade />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/find" element={<Lookup />} />
+          <Route path="/:handle/edit" element={<Edit />} />
+          <Route path="/:handle" element={<SmartProfileResolver />} />
+          <Route path="*" element={<NotFound />} />
+        </RouteTransitions>
+      </ToastProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
