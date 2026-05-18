@@ -122,41 +122,6 @@ export default function StudioProfile() {
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 
-      {/* Page indicator pill - only show if there are tracks */}
-      {tracks.length > 0 && (
-        <div
-          className="fixed top-[68px] left-1/2 z-30 flex items-center gap-2 px-3 py-1.5"
-          style={{
-            transform: 'translateX(-50%)',
-            background: 'rgba(10,10,10,0.85)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 999,
-            fontFamily: STUDIO_FONTS.mono,
-          }}
-        >
-          <button
-            onClick={() => document.querySelector('[data-pager-scroll]')?.scrollTo({ left: 0, behavior: 'smooth' })}
-            className="text-[9px] tracking-[0.3em] uppercase font-bold transition-opacity"
-            style={{ color: STUDIO.ink }}
-          >
-            PROFILE
-          </button>
-          <span style={{ color: '#3A3A3A' }}>·</span>
-          <button
-            onClick={() => {
-              const el = document.querySelector('[data-pager-scroll]');
-              if (el) el.scrollTo({ left: el.clientWidth, behavior: 'smooth' });
-            }}
-            className="text-[9px] tracking-[0.3em] uppercase font-bold transition-opacity"
-            style={{ color: accentColor }}
-          >
-            MUSIC
-          </button>
-        </div>
-      )}
-
       {/* Pager: slide 1 = full profile, slide 2 = discography */}
       <div
         data-pager-scroll

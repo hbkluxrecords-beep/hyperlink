@@ -46,6 +46,8 @@ export default function StudioEdit() {
   const [audioFile, setAudioFile] = useState(null);
   const [audioError, setAudioError] = useState('');
   const [trimmerFile, setTrimmerFile] = useState(null);
+  // Track-specific trimmer (no length cap, separate from main release trimmer)
+  const [trackTrimmer, setTrackTrimmer] = useState(null); // { file, trackIndex }
   const [platforms, setPlatforms] = useState([]);
   const [premium, setPremium] = useState(false);
 
@@ -891,17 +893,17 @@ export default function StudioEdit() {
                         accept="audio/*,.wav,.mp3,.m4a"
                         id={`track-audio-${i}`}
                         className="hidden"
-                        onChange={async (e) => {
+                        onChange={(e) => {
                           const f = e.target.files?.[0];
                           if (!f) return;
-                          const path = `${handle}/track-${t.id}-${Date.now()}.${f.name.split('.').pop()}`;
-                          const r = await uploadFile('audio-previews', f, path);
-                          if (r.url) {
-                            await saveTrack(handle, { ...t, audioUrl: r.url, position: i });
-                            const fresh = await loadTracks(handle);
-                            setTracks(fresh);
-                            toast.success('Audio uploaded');
-                          } else toast.error('Upload failed');
+                          if (f.size > 50 * 1024 * 1024) {
+                            toast.error('File must be under 50MB');
+                            return;
+                          }
+                          // Open trimmer for this specific track — no length cap
+                          setTrackTrimmer({ file: f, trackIndex: i });
+                          // Clear the input so re-selecting the same file fires onChange again
+                          e.target.value = '';
                         }}
                       />
                       <label
@@ -1004,12 +1006,38 @@ export default function StudioEdit() {
         </div>
       </div>
 
-      {/* Audio trimmer modal */}
+      {/* Audio trimmer modal — main release (30s cap) */}
       {trimmerFile && (
         <AudioTrimmer
           file={trimmerFile}
           onClose={() => setTrimmerFile(null)}
           onTrim={onTrimComplete}
+        />
+      )}
+
+      {/* Audio trimmer modal — discography tracks (any length) */}
+      {trackTrimmer && (
+        <AudioTrimmer
+          file={trackTrimmer.file}
+          maxDuration={null}
+          onClose={() => setTrackTrimmer(null)}
+          onTrim={async (blob) => {
+            const i = trackTrimmer.trackIndex;
+            const t = tracks[i];
+            if (!t) { setTrackTrimmer(null); return; }
+            const trimmedFile = new File([blob], `track-${t.id}-${Date.now()}.wav`, { type: 'audio/wav' });
+            const path = `${handle}/${trimmedFile.name}`;
+            const r = await uploadFile('audio-previews', trimmedFile, path);
+            if (r.url) {
+              await saveTrack(handle, { ...t, audioUrl: r.url, position: i });
+              const fresh = await loadTracks(handle);
+              setTracks(fresh);
+              toast.success('Track audio saved');
+            } else {
+              toast.error('Upload failed');
+            }
+            setTrackTrimmer(null);
+          }}
         />
       )}
 

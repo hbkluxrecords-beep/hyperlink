@@ -11,24 +11,26 @@ const BORDER = 'rgba(255,255,255,0.18)';
 const MONO = '"JetBrains Mono", monospace';
 const DISPLAY = '"Fraunces", serif';
 
-const MAX_DURATION = 30; // seconds
+const DEFAULT_MAX_DURATION = 30; // seconds — overrideable via prop
 
 /**
- * Modal that lets the user pick a 30s window out of any-length audio file.
+ * Modal that lets the user pick a clip out of any-length audio file.
  *
  * Props:
  *   file - the File from the input
  *   onClose - cancel/X
  *   onTrim(blob, duration) - called with trimmed WAV blob + duration in seconds
+ *   maxDuration - optional max clip length (defaults to 30s); pass null/0 to allow full length
  */
-export default function AudioTrimmer({ file, onClose, onTrim }) {
+export default function AudioTrimmer({ file, onClose, onTrim, maxDuration = DEFAULT_MAX_DURATION }) {
+  const MAX_DURATION = maxDuration && maxDuration > 0 ? maxDuration : Infinity;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [buffer, setBuffer] = useState(null);
   const [waveform, setWaveform] = useState([]);
   const [duration, setDuration] = useState(0);
   const [startSec, setStartSec] = useState(0);
-  const [endSec, setEndSec] = useState(MAX_DURATION);
+  const [endSec, setEndSec] = useState(MAX_DURATION === Infinity ? 0 : MAX_DURATION);
   const [playing, setPlaying] = useState(false);
   const [trimming, setTrimming] = useState(false);
 
@@ -47,7 +49,7 @@ export default function AudioTrimmer({ file, onClose, onTrim }) {
         setBuffer(buf);
         setWaveform(bufferToWaveform(buf, 200));
         setDuration(dur);
-        // Default: first 30s, or full if shorter
+        // Default: first MAX_DURATION secs, or full file if max is unlimited/file is shorter
         setStartSec(0);
         setEndSec(Math.min(MAX_DURATION, dur));
         setLoading(false);
@@ -164,7 +166,7 @@ export default function AudioTrimmer({ file, onClose, onTrim }) {
                 ◆ TRIM PREVIEW
               </div>
               <div className="text-lg font-black tracking-tight mt-1" style={{ fontFamily: DISPLAY, color: INK }}>
-                Pick your 30s
+                {MAX_DURATION === Infinity ? 'Pick your clip' : `Pick your ${MAX_DURATION}s`}
               </div>
             </div>
             <button onClick={onClose} className="text-xl opacity-60 hover:opacity-100" style={{ color: MUTED }}>✕</button>
@@ -262,7 +264,7 @@ export default function AudioTrimmer({ file, onClose, onTrim }) {
               </button>
 
               <div className="mt-4 text-[10px] tracking-[0.25em] uppercase opacity-50 text-center" style={{ fontFamily: MONO, color: MUTED }}>
-                Drag the orange handles · Max 30s
+                {MAX_DURATION === Infinity ? 'Drag the orange handles · Any length' : `Drag the orange handles · Max ${MAX_DURATION}s`}
               </div>
             </>
           )}
