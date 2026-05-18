@@ -251,6 +251,8 @@ function rowToArtist(row, releases) {
       platforms: r.platforms || [],
     })),
     isPremium: !!row.is_premium,
+    stripeCustomerId: row.stripe_customer_id || null,
+    subscriptionStatus: row.subscription_status || null,
     accentColor: row.accent_color || null,
     releaseLayout: row.release_layout || 'compact',
     isFeatured: !!row.is_featured,

@@ -110,6 +110,9 @@ export default function FanDMWidget({ handle, accent }) {
               {status === 'error' && (
                 <div className="text-xs text-center" style={{ color: accent, fontFamily: MONO }}>⚠ Failed to send</div>
               )}
+              <div className="text-[9px] tracking-[0.15em] opacity-50 text-center" style={{ fontFamily: MONO, color: MUTED }}>
+                Be respectful. Messages are anonymous unless you share your handle. See <a href="/privacy" target="_blank" style={{ textDecoration: 'underline' }}>privacy</a>.
+              </div>
             </motion.form>
           )}
         </AnimatePresence>

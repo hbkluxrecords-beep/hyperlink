@@ -182,3 +182,27 @@ export async function setPasswordForHandle(handle, password, type) {
 export function logout() {
   clearSession();
 }
+
+/**
+ * GDPR right to erasure - delete the user's profile data.
+ * Note: doesn't cancel Stripe subscription — user must cancel separately first.
+ */
+export async function deleteAccount(handle, type) {
+  if (!supabase) return { ok: false, error: 'No DB' };
+  const h = handle.toLowerCase().trim();
+  const table = type === 'artist' ? 'artist_profiles' : 'profiles';
+
+  // Delete dependent data first
+  if (type === 'artist') {
+    await supabase.from('presave_releases').delete().eq('artist_handle', h);
+    await supabase.from('drop_alerts').delete().eq('artist_handle', h);
+    await supabase.from('fan_messages').delete().eq('artist_handle', h);
+  }
+  // Delete profile row
+  const { error } = await supabase.from(table).delete().eq('handle', h);
+  if (error) return { ok: false, error: error.message };
+
+  // Clear session
+  try { localStorage.removeItem('plinks-session'); } catch {}
+  return { ok: true };
+}

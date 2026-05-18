@@ -345,14 +345,22 @@ export default function Landing() {
 
       {/* Footer */}
       <footer
-        className="px-6 md:px-12 py-8 border-t flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.3em] uppercase"
+        className="px-6 md:px-12 py-10 border-t"
         style={{ borderColor: BORDER, fontFamily: MONO, color: MUTED }}
       >
-        <span>© 2026 plinks.dev</span>
-        <div className="flex items-center gap-5">
-          <Link to="/upgrade" className="hover:opacity-100 hover:underline">Pricing</Link>
-          <Link to="/explore" className="hover:opacity-100 hover:underline">Directory</Link>
-          <Link to="/login" className="hover:opacity-100 hover:underline">Log in</Link>
+        <div className="flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.3em] uppercase mb-6">
+          <span>© 2026 plinks.dev · built in 2026</span>
+          <div className="flex items-center gap-5 flex-wrap">
+            <Link to="/upgrade" className="hover:opacity-100 hover:underline">Pricing</Link>
+            <Link to="/explore" className="hover:opacity-100 hover:underline">Directory</Link>
+            <Link to="/login" className="hover:opacity-100 hover:underline">Log in</Link>
+            <Link to="/terms" className="hover:opacity-100 hover:underline">Terms</Link>
+            <Link to="/privacy" className="hover:opacity-100 hover:underline">Privacy</Link>
+            <a href="mailto:support@plinks.dev" className="hover:opacity-100 hover:underline">Support</a>
+          </div>
+        </div>
+        <div className="text-[9px] leading-relaxed opacity-50 normal-case tracking-normal" style={{ fontFamily: MONO }}>
+          Spotify, Apple Music, YouTube, SoundCloud, Tidal, Amazon Music, Deezer, Bandcamp, Instagram, TikTok, X, Facebook, Twitch, Discord, and other third-party names and logos are trademarks of their respective owners. plinks.dev is not affiliated with, sponsored by, or endorsed by any third-party service. References are made under nominative fair use to help users identify destination links.
         </div>
       </footer>
     </div>

@@ -60,3 +60,28 @@ export async function startCheckout(tier) {
     alert('Could not start checkout. Try again.');
   }
 }
+
+/**
+ * Open the Stripe customer portal so the user can cancel, update card, view invoices.
+ */
+export async function openCustomerPortal(stripeCustomerId) {
+  if (!stripeCustomerId) {
+    alert('No subscription found. If you think this is wrong, email support@plinks.dev');
+    return;
+  }
+  try {
+    const res = await fetch('https://xbzmjmddmhhuhsocrwli.supabase.co/functions/v1/stripe-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerId: stripeCustomerId,
+        returnUrl: window.location.origin + '/upgrade',
+      }),
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert('Could not open subscription portal: ' + (data.error || 'unknown'));
+  } catch (e) {
+    alert('Portal error: ' + e.message);
+  }
+}

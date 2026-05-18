@@ -7,7 +7,7 @@ import { STUDIO, STUDIO_FONTS, GENRES, MUSIC_PLATFORMS, SOCIAL_PLATFORMS } from 
 import { loadArtist, saveArtist, uploadFile, updatePresaveRelease, savePresaveRelease } from '../lib/studioStorage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import AudioTrimmer from '../components/AudioTrimmer.jsx';
-import { isOwnerOf } from '../../lib/auth.js';
+import { isOwnerOf, deleteAccount } from '../../lib/auth.js';
 import { isPremium } from '../../lib/premium.js';
 import { convertToCreator } from '../../lib/profileType.js';
 import { saveAccentColor, saveReleaseLayout, saveAnimatedBg, saveHideReleaseDate, saveTextEffect, PREMIUM_PALETTE, TEXT_EFFECTS } from '../../lib/premiumFeatures.js';
@@ -494,7 +494,7 @@ export default function StudioEdit() {
             label="Layout"
             summary={
               releaseLayout === 'showcase' ? 'Showcase (big cover)' :
-              releaseLayout === 'minimal' ? 'Minimal (lnk.to style)' :
+              releaseLayout === 'minimal' ? 'Minimal (direct landing)' :
               'Compact (mini player)'
             }
             theme="dark"
@@ -573,7 +573,7 @@ export default function StudioEdit() {
               </button>
             </div>
             <div className="mt-3 text-[10px] tracking-[0.25em] uppercase opacity-60" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
-              Compact · Showcase · Minimal (lnk.to)
+              Compact · Showcase · Minimal
             </div>
           </CollapsibleSection>
 
@@ -851,6 +851,28 @@ export default function StudioEdit() {
                 style={{ background: STUDIO.accent, color: STUDIO.ink, fontFamily: STUDIO_FONTS.mono }}
               >
                 ✦ Switch to Creator →
+              </button>
+            </div>
+          </CollapsibleSection>
+
+          {/* Danger zone */}
+          <CollapsibleSection label="Danger zone" summary="Delete account" theme="dark">
+            <div className="space-y-3">
+              <div className="text-xs leading-relaxed" style={{ color: STUDIO.muted, fontFamily: STUDIO_FONTS.display }}>
+                Permanently delete your artist profile, releases, audio files, fan messages, and all data. Cannot be undone. Cancel any active subscription first via /upgrade.
+              </div>
+              <button
+                onClick={async () => {
+                  const t = prompt(`Type your handle "${handle}" to confirm deletion:`);
+                  if (t !== handle) { if (t !== null) alert('Handle did not match. Cancelled.'); return; }
+                  const r = await deleteAccount(handle, 'artist');
+                  if (r.ok) { alert('Account deleted.'); window.location.href = '/'; }
+                  else alert('Delete failed: ' + r.error);
+                }}
+                className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 border-2 transition-all"
+                style={{ borderColor: '#FF0044', color: '#FF0044', fontFamily: STUDIO_FONTS.mono }}
+              >
+                ✕ Permanently delete account
               </button>
             </div>
           </CollapsibleSection>

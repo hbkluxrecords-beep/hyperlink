@@ -71,6 +71,12 @@ export default function DropAlertCapture({ handle, releaseId, accent = ACCENT })
       {status === 'error' && (
         <div className="mt-2 text-xs" style={{ color: accent, fontFamily: MONO }}>⚠ {errorMsg}</div>
       )}
+      {status === 'idle' && (
+        <div className="mt-2 text-[9px] tracking-[0.15em] opacity-50" style={{ fontFamily: MONO, color: MUTED }}>
+          By subscribing, you agree to receive drop alerts for this release. Unsubscribe anytime. See our{' '}
+          <a href="/privacy" target="_blank" style={{ textDecoration: 'underline' }}>privacy policy</a>.
+        </div>
+      )}
     </div>
   );
 }

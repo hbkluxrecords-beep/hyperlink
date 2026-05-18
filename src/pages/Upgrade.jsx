@@ -1,8 +1,12 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import AuthButton from '../components/AuthButton.jsx';
 import TopNav from '../components/TopNav.jsx';
-import { startCheckout } from '../lib/premium.js';
+import { startCheckout, openCustomerPortal } from '../lib/premium.js';
+import { getSession } from '../lib/auth.js';
+import { loadProfile } from '../lib/storage.js';
+import { loadArtist } from '../studio/lib/studioStorage.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -110,11 +114,46 @@ function Tier({ name, price, period, sub, features, cta, highlighted, savings })
 }
 
 export default function Upgrade() {
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const s = getSession();
+    setSession(s);
+    if (s?.handle) {
+      const loader = s.type === 'artist' ? loadArtist : loadProfile;
+      loader(s.handle).then(setProfile).catch(() => {});
+    }
+  }, []);
+
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }}>
       <TopNav />
 
       <div className="max-w-5xl mx-auto px-6 md:px-12 pt-24 md:pt-32 pb-20">
+
+        {/* Manage subscription banner - shown if user has active subscription */}
+        {profile?.isPremium && profile?.stripeCustomerId && (
+          <div className="mb-10 p-5" style={{ background: 'rgba(255,77,31,0.1)', border: `2px solid ${ACCENT}` }}>
+            <div className="flex items-start gap-3 flex-wrap">
+              <div className="flex-1 min-w-[200px]">
+                <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-1" style={{ fontFamily: MONO, color: ACCENT }}>
+                  ★ PREMIUM ACTIVE
+                </div>
+                <div className="text-sm" style={{ fontFamily: DISPLAY, color: INK }}>
+                  Manage your subscription, update payment method, or cancel anytime.
+                </div>
+              </div>
+              <button
+                onClick={() => openCustomerPortal(profile.stripeCustomerId)}
+                className="text-[10px] tracking-[0.3em] uppercase font-bold px-4 py-2.5 hover:scale-[1.02] transition-transform"
+                style={{ background: ACCENT, color: BG, fontFamily: MONO }}
+              >
+                Manage subscription →
+              </button>
+            </div>
+          </div>
+        )}
         <div className="text-center mb-16">
           <div className="text-[10px] tracking-[0.35em] uppercase font-bold mb-4" style={{ fontFamily: MONO, color: ACCENT }}>
             PRICING · 2026
@@ -184,7 +223,21 @@ export default function Upgrade() {
           </div>
         </div>
 
-        <div className="mt-20 text-center text-[10px] tracking-[0.3em] uppercase opacity-60" style={{ fontFamily: MONO }}>
+        {/* Billing disclosure - required for legal compliance */}
+        <div className="mt-16 p-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-3" style={{ fontFamily: MONO, color: MUTED }}>
+            ◆ BILLING DETAILS
+          </div>
+          <ul className="text-xs leading-relaxed space-y-1.5 opacity-80" style={{ fontFamily: DISPLAY, color: INK }}>
+            <li>· $3 first-month rate auto-renews at $7/month after the first 30 days unless cancelled.</li>
+            <li>· $7/month plan billed every 30 days. $60/year plan billed once per year.</li>
+            <li>· Cancel anytime from the "Manage subscription" button. Cancellation takes effect at the end of the current billing period.</li>
+            <li>· Payments processed by Stripe. plinks.dev never sees your full card number.</li>
+            <li>· See full <Link to="/terms" style={{ color: ACCENT, textDecoration: 'underline' }}>Terms</Link> and <Link to="/privacy" style={{ color: ACCENT, textDecoration: 'underline' }}>Privacy Policy</Link>.</li>
+          </ul>
+        </div>
+
+        <div className="mt-12 text-center text-[10px] tracking-[0.3em] uppercase opacity-60" style={{ fontFamily: MONO }}>
           plinks.dev · built independent in 2026
         </div>
       </div>

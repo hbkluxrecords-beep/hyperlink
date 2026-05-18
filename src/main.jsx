@@ -10,10 +10,13 @@ import Lookup from './pages/Lookup.jsx';
 import Login from './pages/Login.jsx';
 import Upgrade from './pages/Upgrade.jsx';
 import Admin from './pages/Admin.jsx';
+import Terms from './pages/Terms.jsx';
+import Privacy from './pages/Privacy.jsx';
 import NotFound from './pages/NotFound.jsx';
 import SmartProfileResolver from './components/SmartProfileResolver.jsx';
 import RouteTransitions from './components/RouteTransitions.jsx';
 import ImpersonateBanner from './components/ImpersonateBanner.jsx';
+import CookieBanner from './components/CookieBanner.jsx';
 
 import StudioLanding from './studio/pages/StudioLanding.jsx';
 import StudioCreate from './studio/pages/StudioCreate.jsx';
@@ -30,6 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <ImpersonateBanner />
+      <CookieBanner />
       <RouteTransitions>
         <Route path="/studio" element={<StudioLanding />} />
         <Route path="/studio/new" element={<StudioCreate />} />
@@ -45,6 +49,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<Login />} />
         <Route path="/upgrade" element={<Upgrade />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/find" element={<Lookup />} />
         <Route path="/:handle/edit" element={<Edit />} />

@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import CollapsibleSection from '../components/CollapsibleSection.jsx';
 import { CATEGORIES } from '../lib/design.js';
 import { loadProfile, saveProfile } from '../lib/storage.js';
-import { isOwnerOf } from '../lib/auth.js';
+import { isOwnerOf, deleteAccount } from '../lib/auth.js';
 import { isPremium } from '../lib/premium.js';
 import { convertToArtist } from '../lib/profileType.js';
 import { saveGlowButtons, savePortfolioUrl, saveGlowSettings, saveProfileLayout, GLOW_COLORS } from '../lib/premiumFeatures.js';
@@ -464,6 +464,35 @@ export default function Edit() {
                 style={{ background: '#FF4D1F', color: '#0A0A0A', fontFamily: '"JetBrains Mono", monospace' }}
               >
                 ♪ Switch to Artist →
+              </button>
+            </div>
+          </CollapsibleSection>
+
+          {/* Danger zone - GDPR right to erasure */}
+          <CollapsibleSection label="Danger zone" summary="Delete account" theme="dark">
+            <div className="space-y-3">
+              <div className="text-xs leading-relaxed" style={{ color: MUTED, fontFamily: '"Fraunces", serif' }}>
+                Permanently delete your profile, links, and all associated data. This cannot be undone. If you have an active subscription, cancel it first via /upgrade.
+              </div>
+              <button
+                onClick={async () => {
+                  const confirmText = prompt(`Type your handle "${handle}" to confirm deletion:`);
+                  if (confirmText !== handle) {
+                    if (confirmText !== null) alert('Handle did not match. Cancelled.');
+                    return;
+                  }
+                  const r = await deleteAccount(handle, 'creator');
+                  if (r.ok) {
+                    alert('Account deleted.');
+                    window.location.href = '/';
+                  } else {
+                    alert('Delete failed: ' + r.error);
+                  }
+                }}
+                className="w-full text-[11px] tracking-[0.3em] uppercase font-bold py-3 border-2 transition-all hover:bg-red-500/10"
+                style={{ borderColor: '#FF0044', color: '#FF0044', fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                ✕ Permanently delete account
               </button>
             </div>
           </CollapsibleSection>

@@ -161,6 +161,8 @@ function rowToProfile(row) {
     pinned: row.pinned,
     links: row.links || [],
     isPremium: !!row.is_premium,
+    stripeCustomerId: row.stripe_customer_id || null,
+    subscriptionStatus: row.subscription_status || null,
     accentColor: row.accent_color || null,
     isFeatured: !!row.is_featured,
     glowButtons: !!row.glow_buttons,
