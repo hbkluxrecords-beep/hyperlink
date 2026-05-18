@@ -117,12 +117,55 @@ export default function StudioProfile() {
   const locDisplay = compactLocation(artist.location);
 
   return (
-    <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="pb-20 relative">
+    <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="relative overflow-x-hidden">
       <ProfileIntro handle={handle} />
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 
-      <div className={`max-w-xl mx-auto px-6 relative ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-24 md:pt-28 pb-6' : 'pt-28 md:pt-32 pb-12'}`} style={{ zIndex: 1 }}>
+      {/* Page indicator pill - only show if there are tracks */}
+      {tracks.length > 0 && (
+        <div
+          className="fixed top-[68px] left-1/2 z-30 flex items-center gap-2 px-3 py-1.5"
+          style={{
+            transform: 'translateX(-50%)',
+            background: 'rgba(10,10,10,0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: 999,
+            fontFamily: STUDIO_FONTS.mono,
+          }}
+        >
+          <button
+            onClick={() => document.querySelector('[data-pager-scroll]')?.scrollTo({ left: 0, behavior: 'smooth' })}
+            className="text-[9px] tracking-[0.3em] uppercase font-bold transition-opacity"
+            style={{ color: STUDIO.ink }}
+          >
+            PROFILE
+          </button>
+          <span style={{ color: '#3A3A3A' }}>·</span>
+          <button
+            onClick={() => {
+              const el = document.querySelector('[data-pager-scroll]');
+              if (el) el.scrollTo({ left: el.clientWidth, behavior: 'smooth' });
+            }}
+            className="text-[9px] tracking-[0.3em] uppercase font-bold transition-opacity"
+            style={{ color: accentColor }}
+          >
+            MUSIC
+          </button>
+        </div>
+      )}
+
+      {/* Pager: slide 1 = full profile, slide 2 = discography */}
+      <div
+        data-pager-scroll
+        className="flex w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+        style={{ scrollSnapType: 'x mandatory' }}
+      >
+        {/* SLIDE 1 - main profile */}
+        <div className="min-w-full snap-start snap-always pb-20">
+          <div className={`max-w-xl mx-auto px-6 relative ${(artist.releaseLayout === 'showcase' || artist.releaseLayout === 'minimal') ? 'pt-24 md:pt-28 pb-6' : 'pt-28 md:pt-32 pb-12'}`} style={{ zIndex: 1 }}>
 
         {/* HIDE everything above the release in SHOWCASE mode - lnk.to direct page style */}
         {artist.releaseLayout !== 'showcase' && artist.releaseLayout !== 'minimal' && (
@@ -364,17 +407,43 @@ export default function StudioProfile() {
           </motion.div>
         ) : null}
 
-        {/* Track playlist — skip between tracks */}
+        {/* Swipe hint - points to discography screen */}
         {tracks.length > 0 && (
-          <motion.div
+          <motion.button
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.45, ease: LUXURY_EASE }}
-            className="mt-8"
+            onClick={() => {
+              // Scroll the pager to slide 2
+              const pager = document.querySelector('[data-pager-scroll]');
+              if (pager) pager.scrollTo({ left: pager.clientWidth, behavior: 'smooth' });
+            }}
+            className="mt-6 w-full flex items-center justify-between gap-3 px-4 py-3 group"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}
           >
-            <SectionLabel number="◆" label={`Discography · ${tracks.length} tracks`} />
-            <PlaylistPlayer tracks={tracks} accent={accentColor} />
-          </motion.div>
+            <div className="flex items-center gap-3 text-left">
+              <span className="text-2xl" style={{ color: accentColor }}>♪</span>
+              <div>
+                <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}>
+                  DISCOGRAPHY · {tracks.length} {tracks.length === 1 ? 'TRACK' : 'TRACKS'}
+                </div>
+                <div className="text-xs opacity-70 mt-0.5" style={{ fontFamily: STUDIO_FONTS.display }}>
+                  Swipe → for the full catalog
+                </div>
+              </div>
+            </div>
+            <motion.span
+              animate={{ x: [0, 6, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+              className="text-xl shrink-0"
+              style={{ color: accentColor }}
+            >
+              →
+            </motion.span>
+          </motion.button>
         )}
 
         {/* Music links — only in compact layout (showcase has them built-in) */}
@@ -434,6 +503,47 @@ export default function StudioProfile() {
             <Link to={`/studio/${handle}/edit`} className="hover:opacity-100 hover:underline">Edit →</Link>
           )}
         </div>
+          </div>
+        </div>
+
+        {/* SLIDE 2 - DISCOGRAPHY */}
+        {tracks.length > 0 && (
+          <div className="min-w-full snap-start snap-always pb-20">
+            <div className="max-w-xl mx-auto px-6 pt-28 md:pt-32 pb-12">
+              {/* Back hint */}
+              <button
+                onClick={() => document.querySelector('[data-pager-scroll]')?.scrollTo({ left: 0, behavior: 'smooth' })}
+                className="text-[10px] tracking-[0.3em] uppercase font-bold opacity-60 hover:opacity-100 transition-opacity mb-6 flex items-center gap-2"
+                style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+              >
+                ← Swipe back to profile
+              </button>
+
+              <div className="text-[10px] tracking-[0.35em] uppercase font-bold mb-3" style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}>
+                ◆ DISCOGRAPHY
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-[0.95] mb-2" style={{ fontFamily: STUDIO_FONTS.display }}>
+                {artist.artistName || handle}
+              </h2>
+              <div className="text-[10px] tracking-[0.3em] uppercase opacity-60 mb-8" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>
+                {tracks.length} {tracks.length === 1 ? 'track' : 'tracks'} · Tap any to skip
+              </div>
+
+              <PlaylistPlayer tracks={tracks} accent={accentColor} />
+
+              {/* Footer */}
+              <div
+                className="mt-20 pt-6 border-t flex items-center justify-between text-[9px] tracking-[0.35em] uppercase"
+                style={{ borderColor: STUDIO.border, fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}
+              >
+                <span>/{handle}</span>
+                {isOwner && (
+                  <Link to={`/studio/${handle}/edit`} className="hover:opacity-100 hover:underline">Edit tracks →</Link>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
