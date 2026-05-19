@@ -17,9 +17,8 @@ const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://plinks.dev';
 
 const PRICE_IDS = {
-  '3':  'price_1TXkisL84FmP5exbseEtC1gV',   // $3 intro
-  '7':  'price_1TXkjwL84FmP5exbLHLlpBK0',   // $7/mo
-  '60': 'price_1TXkkxL84FmP5exbDVoGGUwW',   // $60/yr
+  'monthly': 'price_1TYouXPpn4P4gnxwpY5F2EU8',   // $7/mo
+  'yearly':  'price_1TYoyKPpn4P4gnxwAKkcB00p',   // $30/yr
 };
 
 const CORS = {

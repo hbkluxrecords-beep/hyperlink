@@ -162,7 +162,7 @@ export default function Upgrade() {
             Free, <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>forever.</span>
           </h1>
           <p className="text-base md:text-lg opacity-75 max-w-xl mx-auto" style={{ fontFamily: DISPLAY }}>
-            Linktree charges $35/mo and takes 9% of every sale. Plinks is free, 0% fees — premium adds detail no other link site has.
+            Linktree charges $35/mo and takes 9% of every sale. Plinks is free, 0% fees — premium is $7/mo or $30/year.
           </p>
         </div>
 
@@ -177,21 +177,21 @@ export default function Upgrade() {
           />
           <Tier
             name="Premium Monthly"
-            price="$3"
-            period="first month"
-            sub="$7/mo after"
+            price="$7"
+            period="/month"
+            sub="Cancel anytime"
             features={PREMIUM}
-            cta={{ label: 'Start for $3 →', disabled: false, tier: '3' }}
+            cta={{ label: 'Start for $7 →', disabled: false, tier: 'monthly' }}
           />
           <Tier
             name="Premium Yearly"
-            price="$60"
-            period="per year"
-            sub="$5/mo · best value"
+            price="$30"
+            period="/year"
+            sub="$2.50/mo · best value"
             features={PREMIUM}
-            cta={{ label: 'Lock in $60 →', disabled: false, tier: '60' }}
+            cta={{ label: 'Lock in $30 →', disabled: false, tier: 'yearly' }}
             highlighted
-            savings="Save $24"
+            savings="Save $54"
           />
         </div>
 
