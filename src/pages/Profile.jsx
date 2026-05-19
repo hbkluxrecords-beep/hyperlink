@@ -5,7 +5,6 @@ import PlatformLinkCard from '../components/PlatformLinkCard.jsx';
 import SocialPill from '../components/SocialPill.jsx';
 import { loadProfile } from '../lib/storage.js';
 import { isOwnerOf, logout } from '../lib/auth.js';
-import ProfileIntro from '../components/ProfileIntro.jsx';
 import ProfileSkeleton from '../components/ProfileSkeleton.jsx';
 
 const BG = '#0A0A0A';
@@ -105,7 +104,6 @@ export default function Profile() {
 
   return (
     <div style={{ background: BG, color: INK, minHeight: '100vh' }} className="pb-12">
-      <ProfileIntro handle={profile.handle} />
       {/* EDITORIAL layout - HYPERLINK nav + VOL tag */}
       {isEditorial && (
         <nav className="px-6 py-5 flex items-center justify-between">

@@ -6,7 +6,6 @@ import CompactPlayer from '../components/CompactPlayer.jsx';
 import ShowcaseRelease from '../components/ShowcaseRelease.jsx';
 import MinimalRelease from '../components/MinimalRelease.jsx';
 import AnimatedBackground from '../components/AnimatedBackground.jsx';
-import ProfileIntro from '../../components/ProfileIntro.jsx';
 import ProfileSkeleton from '../../components/ProfileSkeleton.jsx';
 import PlaylistPlayer from '../../components/PlaylistPlayer.jsx';
 import PlatformLinkCard from '../../components/PlatformLinkCard.jsx';
@@ -118,7 +117,6 @@ export default function StudioProfile() {
 
   return (
     <div style={{ background: STUDIO.bg, color: STUDIO.ink, minHeight: '100vh' }} className="relative overflow-x-hidden">
-      <ProfileIntro handle={handle} />
       {artist.isPremium && artist.animatedBg && <AnimatedBackground accent={accentColor} />}
       <StudioNav minimal />
 
@@ -372,43 +370,40 @@ export default function StudioProfile() {
           </motion.div>
         ) : null}
 
-        {/* Swipe hint - points to discography screen */}
+        {/* Swipe hint pill - small, centered, overlapping bottom of player */}
         {tracks.length > 0 && (
-          <motion.button
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45, ease: LUXURY_EASE }}
-            onClick={() => {
-              // Scroll the pager to slide 2
-              const pager = document.querySelector('[data-pager-scroll]');
-              if (pager) pager.scrollTo({ left: pager.clientWidth, behavior: 'smooth' });
-            }}
-            className="mt-6 w-full flex items-center justify-between gap-3 px-4 py-3 group"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.1)',
-            }}
-          >
-            <div className="flex items-center gap-3 text-left">
-              <span className="text-2xl" style={{ color: accentColor }}>♪</span>
-              <div>
-                <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}>
-                  DISCOGRAPHY · {tracks.length} {tracks.length === 1 ? 'TRACK' : 'TRACKS'}
-                </div>
-                <div className="text-xs opacity-70 mt-0.5" style={{ fontFamily: STUDIO_FONTS.display }}>
-                  Swipe → for the full catalog
-                </div>
-              </div>
-            </div>
-            <motion.span
-              animate={{ x: [0, 6, 0] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-xl shrink-0"
-              style={{ color: accentColor }}
+          <div className="relative flex justify-center" style={{ marginTop: -18, zIndex: 5 }}>
+            <motion.button
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6, ease: LUXURY_EASE }}
+              onClick={() => {
+                const pager = document.querySelector('[data-pager-scroll]');
+                if (pager) pager.scrollTo({ left: pager.clientWidth, behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2 px-3.5 py-2"
+              style={{
+                background: 'rgba(10,10,10,0.95)',
+                border: `1px solid ${accentColor}`,
+                borderRadius: 999,
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: `0 4px 16px rgba(0,0,0,0.5), 0 0 12px ${accentColor}40`,
+              }}
             >
-              →
-            </motion.span>
-          </motion.button>
+              <span className="text-[9px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: accentColor }}>
+                ♪ {tracks.length} {tracks.length === 1 ? 'TRACK' : 'TRACKS'} · SWIPE
+              </span>
+              <motion.span
+                animate={{ x: [0, 4, 0] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                className="text-sm"
+                style={{ color: accentColor }}
+              >
+                →
+              </motion.span>
+            </motion.button>
+          </div>
         )}
 
         {/* Music links — only in compact layout (showcase has them built-in) */}
