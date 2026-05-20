@@ -20,23 +20,22 @@ const MONO = '"JetBrains Mono", monospace';
 
 const FREE = [
   'Unlimited links',
-  'Audio previews on releases',
+  'Audio previews + 30s trimmer',
   'Presave countdowns',
+  'Drop-alert email capture',
+  'Fan DM inbox',
   'Basic analytics',
-  'No Plinks branding on your page',
-  '0% transaction fees',
+  'No ads, no Plinks branding',
 ];
 
 const PREMIUM = [
   'Everything in Free',
-  'Cinematic page transitions',
-  'Custom font + accent color',
-  'Hover-preview audio on links',
-  'Live presence indicator',
-  'Unlimited fan DMs',
-  'Drop-alert email capture',
-  'CSV subscriber export',
+  'Custom accent color',
+  'Animated backgrounds',
+  'Glowing buttons (pick what glows)',
+  'Text effects on titles',
   'Premium badge on profile',
+  'Promo Lab idea generator',
 ];
 
 function Tier({ name, price, period, sub, features, cta, highlighted, savings }) {
@@ -162,7 +161,7 @@ export default function Upgrade() {
             Free, <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>forever.</span>
           </h1>
           <p className="text-base md:text-lg opacity-75 max-w-xl mx-auto" style={{ fontFamily: DISPLAY }}>
-            Linktree charges $35/mo and takes 9% of every sale. Plinks is free, 0% fees — premium is $7/mo or $30/year.
+            Most link-in-bio platforms charge monthly fees and take a cut of every sale. Plinks is free, takes 0% of your sales — premium is $7/mo or $30/year.
           </p>
         </div>
 
@@ -202,12 +201,12 @@ export default function Upgrade() {
           <div className="grid md:grid-cols-2 gap-8 max-w-3xl">
             <div>
               <div className="text-[10px] tracking-[0.3em] uppercase font-bold mb-2" style={{ fontFamily: MONO, color: ACCENT }}>
-                THE COMPETITION
+                TYPICAL LINK-IN-BIO PLATFORMS
               </div>
               <ul className="space-y-2 text-base opacity-80" style={{ fontFamily: DISPLAY }}>
-                <li>· Linktree: $8–$35/mo + 9–12% per sale</li>
-                <li>· Beacons: $10–$90/mo + 9% per sale</li>
-                <li>· Their branding on YOUR profile</li>
+                <li>· Monthly fees that scale up by tier</li>
+                <li>· A percentage cut of each sale on most plans</li>
+                <li>· Their branding on your profile unless you pay</li>
               </ul>
             </div>
             <div>
@@ -215,8 +214,8 @@ export default function Upgrade() {
                 PLINKS
               </div>
               <ul className="space-y-2 text-base opacity-80" style={{ fontFamily: DISPLAY }}>
-                <li>· $0 forever, $7/mo premium tops</li>
-                <li>· 0% transaction fees, ever</li>
+                <li>· $0 forever · $7/mo premium tops out the cost</li>
+                <li>· We never take a cut — we don't touch your sales</li>
                 <li>· Your name, your URL, no branding</li>
               </ul>
             </div>

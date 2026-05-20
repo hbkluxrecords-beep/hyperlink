@@ -231,14 +231,14 @@ export default function Landing() {
             className="font-black leading-[0.9] tracking-tight mb-12"
             style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 6vw, 3.5rem)', color: INK }}
           >
-            Linktree charges $35/mo.<br />
+            Most platforms charge monthly.<br />
             <span style={{ fontStyle: 'italic', fontWeight: 300, color: ACCENT }}>We don't.</span>
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { label: 'FREE FOREVER', detail: 'Every feature on the free tier. No trial. No watermark. No catch.' },
-              { label: 'ZERO FEES', detail: 'Linktree takes 9–12% per sale. We take 0%, ever.' },
+              { label: 'ZERO FEES', detail: 'Most platforms take a cut of every sale. We take 0%, ever.' },
               { label: 'YOUR NAME', detail: 'plinks.dev/yourname — no branding, no ads, no algorithm.' },
             ].map((item, i) => (
               <motion.div

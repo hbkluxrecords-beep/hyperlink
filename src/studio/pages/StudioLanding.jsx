@@ -196,13 +196,13 @@ export default function StudioLanding() {
       <section className="px-6 md:px-12 py-24 relative" style={{ background: STUDIO.surface }}>
         <motion.div {...fadeUp} className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-12">
-            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>§ 02 / VS LINKTREE</span>
+            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>§ 02 / BUILT FOR MUSIC</span>
             <div className="flex-1 h-px" style={{ background: STUDIO.border }} />
           </div>
 
           <h2 className="text-4xl md:text-6xl font-black leading-[0.95] tracking-tight mb-12" style={{ fontFamily: STUDIO_FONTS.display }}>
-            Linktree is for influencers.<br />
-            <span style={{ color: STUDIO.accent, fontStyle: 'italic', fontWeight: 300 }}>This is for you.</span>
+            Generic link tools aren't built for music.<br />
+            <span style={{ color: STUDIO.accent, fontStyle: 'italic', fontWeight: 300 }}>This is.</span>
           </h2>
 
           <div className="grid grid-cols-3 gap-px" style={{ background: STUDIO.border }}>
@@ -210,7 +210,7 @@ export default function StudioLanding() {
               <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>Feature</span>
             </div>
             <div className="p-5" style={{ background: STUDIO.surface }}>
-              <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>Linktree</span>
+              <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.muted }}>Generic tools</span>
             </div>
             <div className="p-5" style={{ background: STUDIO.surface }}>
               <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>Plinks Studio</span>
@@ -218,9 +218,9 @@ export default function StudioLanding() {
             {[
               ['Inline audio preview', '✕', '✓'],
               ['Release countdown', '✕', '✓'],
-              ['Real artist analytics', 'Basic', 'Full'],
+              ['Artist analytics', 'Basic', 'Full'],
               ['Editorial design', '✕', '✓'],
-              ['Custom domain', 'Paid', 'Free'],
+              ['Discography swipe', '✕', '✓'],
               ['Built for the drop', '✕', '✓'],
             ].map(([feature, lt, ps], i) => (
               <div key={i} style={{ display: 'contents' }}>
