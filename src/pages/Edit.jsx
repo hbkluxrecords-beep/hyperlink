@@ -137,6 +137,28 @@ export default function Edit() {
 
       <div className="max-w-lg mx-auto px-5 pt-6 pb-32">
         <OnboardingBanner handle={handle} type="creator" />
+
+        {/* Referral earnings CTA */}
+        <Link
+          to={`/referrals/${handle}`}
+          className="block mb-6 p-4 hover:scale-[1.005] transition-transform"
+          style={{ background: '#141414', border: '2px solid #FF4D1F' }}
+        >
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-2xl" style={{ color: '#FF4D1F' }}>$</span>
+            <div className="flex-1 min-w-[180px]">
+              <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace', color: '#FF4D1F' }}>
+                EARN MONEY · REFERRALS
+              </div>
+              <div className="text-sm mt-1" style={{ fontFamily: '"Fraunces", serif', color: '#F2EFE6' }}>
+                Get $1 for every person you bring who goes Premium
+              </div>
+            </div>
+            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: '"JetBrains Mono", monospace', color: '#FF4D1F' }}>
+              Open →
+            </span>
+          </div>
+        </Link>
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: MONO, color: ACCENT }}>

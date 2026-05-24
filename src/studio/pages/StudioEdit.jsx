@@ -287,6 +287,28 @@ export default function StudioEdit() {
             </span>
           </div>
         </Link>
+
+        {/* Referral earnings CTA */}
+        <Link
+          to={`/referrals/${handle}`}
+          className="block mb-6 p-4 hover:scale-[1.005] transition-transform"
+          style={{ background: STUDIO.surface, border: `2px solid ${STUDIO.accent}` }}
+        >
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-2xl" style={{ color: STUDIO.accent }}>$</span>
+            <div className="flex-1 min-w-[180px]">
+              <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
+                EARN MONEY · REFERRALS
+              </div>
+              <div className="text-sm mt-1" style={{ fontFamily: STUDIO_FONTS.display, color: STUDIO.ink }}>
+                Get $1 for every artist you bring who goes Premium
+              </div>
+            </div>
+            <span className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ fontFamily: STUDIO_FONTS.mono, color: STUDIO.accent }}>
+              Open →
+            </span>
+          </div>
+        </Link>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>

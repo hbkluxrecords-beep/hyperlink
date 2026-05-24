@@ -63,9 +63,28 @@ async function setPremium(handle: string, isPremium: boolean, customerId?: strin
     .maybeSingle();
   if (artist) {
     await supabase.from('artist_profiles').update(update).eq('handle', h);
-    return;
+  } else {
+    await supabase.from('profiles').update(update).eq('handle', h);
   }
-  await supabase.from('profiles').update(update).eq('handle', h);
+
+  // If they just went premium and were referred, accrue the referrer's reward
+  if (isPremium) {
+    const { data: ref } = await supabase
+      .from('referrals')
+      .select('id, status')
+      .eq('referred_handle', h)
+      .maybeSingle();
+    if (ref && ref.status !== 'converted') {
+      await supabase
+        .from('referrals')
+        .update({
+          status: 'converted',
+          reward_cents: 100,
+          converted_at: new Date().toISOString(),
+        })
+        .eq('id', ref.id);
+    }
+  }
 }
 
 Deno.serve(async (req) => {

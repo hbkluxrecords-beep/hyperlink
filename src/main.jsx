@@ -15,6 +15,8 @@ import Privacy from './pages/Privacy.jsx';
 import Help from './pages/Help.jsx';
 import NotFound from './pages/NotFound.jsx';
 import SmartProfileResolver from './components/SmartProfileResolver.jsx';
+import ReferralCapture from './pages/ReferralCapture.jsx';
+import ReferralDashboard from './pages/ReferralDashboard.jsx';
 import RouteTransitions from './components/RouteTransitions.jsx';
 import ImpersonateBanner from './components/ImpersonateBanner.jsx';
 import CookieBanner from './components/CookieBanner.jsx';
@@ -59,6 +61,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/help" element={<Help />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/find" element={<Lookup />} />
+          <Route path="/r/:handle" element={<ReferralCapture />} />
+          <Route path="/referrals/:handle" element={<ReferralDashboard />} />
           <Route path="/:handle/edit" element={<Edit />} />
           <Route path="/:handle" element={<SmartProfileResolver />} />
           <Route path="*" element={<NotFound />} />

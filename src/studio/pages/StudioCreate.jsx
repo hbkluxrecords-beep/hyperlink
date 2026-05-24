@@ -13,6 +13,7 @@ import {
 import { isHandleTakenAnywhere } from '../../lib/storage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { setPasswordForHandle, validatePassword } from '../../lib/auth.js';
+import { recordReferral } from '../../lib/referrals.js';
 
 const RESERVED = ['new', 'explore', 'analytics', 'studio', 'admin', 'api', 'edit', 'login', 'signup', 'upgrade'];
 
@@ -213,6 +214,7 @@ export default function StudioCreate() {
         console.warn('Password not set:', pwResult.error);
       }
 
+      await recordReferral(h, 'artist');
       navigate(`/studio/${h}`);
     } catch (e) {
       setErrorMsg(e.message || 'Something went wrong');

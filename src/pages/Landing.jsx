@@ -8,6 +8,7 @@ import { loadRecentProfiles } from '../lib/storage.js';
 import { loadRecentArtists } from '../studio/lib/studioStorage.js';
 import { listFeatured } from '../lib/admin.js';
 import BrandIntro from '../components/BrandIntro.jsx';
+import { captureReferrer } from '../lib/referrals.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -88,6 +89,12 @@ export default function Landing() {
     loadRecentProfiles(6).then(setRecent);
     loadRecentArtists(6).then(setRecentArtists);
     listFeatured().then(setFeatured);
+    // Capture ?ref=handle referral param
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (ref) captureReferrer(ref);
+    } catch {}
   }, []);
 
   return (

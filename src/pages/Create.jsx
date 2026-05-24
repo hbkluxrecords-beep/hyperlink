@@ -5,6 +5,7 @@ import TopNav from '../components/TopNav.jsx';
 import { CATEGORIES, LINK_PRESETS } from '../lib/design.js';
 import { isHandleTakenAnywhere, saveProfile } from '../lib/storage.js';
 import { setPasswordForHandle, validatePassword } from '../lib/auth.js';
+import { recordReferral } from '../lib/referrals.js';
 
 const BG = '#0A0A0A';
 const SURFACE = '#141414';
@@ -93,6 +94,8 @@ export default function Create() {
         }
         const pwResult = await setPasswordForHandle(profile.handle, password, 'creator');
         if (!pwResult.ok) console.warn('Password not set:', pwResult.error);
+        // Attribute referral if one was captured
+        await recordReferral(profile.handle, 'creator');
         navigate(`/${profile.handle}`);
       } catch (e) {
         setErrorMsg(e.message || 'Something went wrong publishing.');
