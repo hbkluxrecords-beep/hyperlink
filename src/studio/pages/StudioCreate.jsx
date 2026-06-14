@@ -14,6 +14,7 @@ import { isHandleTakenAnywhere } from '../../lib/storage.js';
 import { getAudioDuration, generateWaveformData } from '../lib/audioUtils.js';
 import { setPasswordForHandle, validatePassword } from '../../lib/auth.js';
 import { recordReferral } from '../../lib/referrals.js';
+import { recordPartnerSignup, getStoredPartner, capturePartner } from '../../lib/partners.js';
 
 const RESERVED = ['new', 'explore', 'analytics', 'studio', 'admin', 'api', 'edit', 'login', 'signup', 'upgrade'];
 
@@ -51,6 +52,14 @@ export default function StudioCreate() {
   // Step 4: Password
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+
+  // Capture ?partner=loveit on direct hits to /studio/new (landing page also captures it)
+  useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search).get('partner');
+      if (p) capturePartner(p);
+    } catch {}
+  }, []);
 
   const toggleGenre = (g) => {
     setGenres((prev) =>
@@ -215,6 +224,11 @@ export default function StudioCreate() {
       }
 
       await recordReferral(h, 'artist');
+      // If they came through a brand partner deal (e.g. Love It Digital), log it.
+      if (getStoredPartner()) {
+        const launch = new URLSearchParams(window.location.search).get('tier') === 'launch';
+        await recordPartnerSignup(h, artistName.trim() || h, launch ? 'launch' : 'paid');
+      }
       navigate(`/studio/${h}`);
     } catch (e) {
       setErrorMsg(e.message || 'Something went wrong');
