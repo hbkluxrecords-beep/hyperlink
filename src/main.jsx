@@ -17,7 +17,7 @@ import NotFound from './pages/NotFound.jsx';
 import SmartProfileResolver from './components/SmartProfileResolver.jsx';
 import ReferralCapture from './pages/ReferralCapture.jsx';
 import ReferralDashboard from './pages/ReferralDashboard.jsx';
-import LoveItDigital from './pages/LoveItDigital.jsx';
+import LID from './pages/LID.jsx';
 import PartnerDashboard from './pages/PartnerDashboard.jsx';
 import RouteTransitions from './components/RouteTransitions.jsx';
 import ImpersonateBanner from './components/ImpersonateBanner.jsx';
@@ -65,7 +65,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/find" element={<Lookup />} />
           <Route path="/r/:handle" element={<ReferralCapture />} />
           <Route path="/referrals/:handle" element={<ReferralDashboard />} />
-          <Route path="/love-it-digital" element={<LoveItDigital />} />
+          <Route path="/lid" element={<LID />} />
+          <Route path="/love-it-digital" element={<LID />} />
           <Route path="/partners/:code" element={<PartnerDashboard />} />
           <Route path="/:handle/edit" element={<Edit />} />
           <Route path="/:handle" element={<SmartProfileResolver />} />

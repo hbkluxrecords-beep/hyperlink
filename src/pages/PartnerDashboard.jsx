@@ -192,7 +192,7 @@ export default function PartnerDashboard() {
           <div className="p-8 text-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
             <p style={{ color: MUTED }}>No artists onboarded yet.</p>
             <p className="text-xs mt-2" style={{ color: MUTED }}>
-              Share <span style={{ color: ACCENT }}>plinks.dev/love-it-digital</span> to start.
+              Share <span style={{ color: ACCENT }}>plinks.dev/lid</span> to start.
             </p>
           </div>
         ) : (
