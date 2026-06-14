@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { capturePartner, getPartnerDeal, formatMoney } from '../lib/partners.js';
+import { getPartnerDeal, formatMoney } from '../lib/partners.js';
 
 const PARTNER_CODE = 'loveit';
+const CONTACT_URL = 'https://loveitdigital.com/contact';
 
-// Co-brand palette: warm cream base (friendly, Love It energy) +
-// plinks ember accent + editorial serif. Its OWN look, not a copy of either site.
+// Co-brand palette: warm cream base + plinks ember + editorial serif.
+// Its OWN look — a partnership showcase, not a clone of either site.
 const C = {
   cream: '#FBF7F0',
   card: '#FFFFFF',
@@ -22,17 +22,19 @@ const MONO = '"JetBrains Mono", ui-monospace, monospace';
 export default function LID() {
   const deal = getPartnerDeal(PARTNER_CODE);
 
-  useEffect(() => {
-    capturePartner(PARTNER_CODE);
-  }, []);
+  // Smooth-scroll any in-page anchors; nothing to capture here (no self-serve signup).
+  useEffect(() => {}, []);
 
-  const Btn = ({ to, children, big = false }) => (
-    <Link
-      to={to}
+  const Btn = ({ children, big = false, outline = false }) => (
+    <a
+      href={CONTACT_URL}
+      target="_blank"
+      rel="noopener noreferrer"
       className="inline-flex items-center justify-center transition-all hover:opacity-90"
       style={{
-        background: C.ink,
-        color: C.cream,
+        background: outline ? 'transparent' : C.ink,
+        color: outline ? C.ink : C.cream,
+        border: outline ? `1px solid ${C.ink}` : 'none',
         fontFamily: MONO,
         fontWeight: 700,
         fontSize: big ? 14 : 12,
@@ -44,7 +46,7 @@ export default function LID() {
       }}
     >
       {children}
-    </Link>
+    </a>
   );
 
   return (
@@ -58,6 +60,8 @@ export default function LID() {
         </div>
         <a
           href="https://loveitdigital.com"
+          target="_blank"
+          rel="noopener noreferrer"
           style={{ fontFamily: MONO, fontSize: 11, color: C.muted, textDecoration: 'none', letterSpacing: '0.1em' }}
           className="uppercase hover:opacity-70"
         >
@@ -94,22 +98,23 @@ export default function LID() {
             maxWidth: 900,
           }}
         >
-          Your own artist site, <span style={{ fontStyle: 'italic', fontWeight: 300, color: C.ember }}>done for you.</span>
+          Artist pages on your <span style={{ fontStyle: 'italic', fontWeight: 300, color: C.ember }}>own domain.</span>
         </h1>
 
-        <p style={{ maxWidth: 580, fontSize: 'clamp(1.05rem,2.4vw,1.3rem)', color: C.muted, lineHeight: 1.6, marginBottom: 36 }}>
-          A pro music page on your <strong style={{ color: C.ink }}>own custom domain</strong> &mdash; drops, presaves,
-          a fan inbox, the works. plinks builds the page, Love It Digital registers your domain and launches it.
+        <p style={{ maxWidth: 600, fontSize: 'clamp(1.05rem,2.4vw,1.3rem)', color: C.muted, lineHeight: 1.6, marginBottom: 36 }}>
+          Love It Digital builds you a professional music page &mdash; powered by plinks &mdash; and puts it on
+          your <strong style={{ color: C.ink }}>own custom domain</strong>. Like <em>yourname.com</em>, fully built for you.
+          Drops, presaves, a fan inbox, the works.
         </p>
 
         <div className="flex flex-wrap items-center gap-6">
-          <Btn to="/studio/new?partner=loveit" big>Claim your page &rarr;</Btn>
+          <Btn big>Get yours built &rarr;</Btn>
           <div style={{ borderLeft: `1px solid ${C.line}`, paddingLeft: 20 }}>
             <div style={{ fontFamily: SERIF, fontWeight: 900, fontSize: 30, lineHeight: 1 }}>
-              {formatMoney(deal.listPriceCents)}
+              from {formatMoney(deal.listPriceCents)}
             </div>
             <div style={{ fontFamily: MONO, fontSize: 11, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>
-              one-time &middot; domain included
+              per artist page &middot; domain included
             </div>
           </div>
         </div>
@@ -119,14 +124,14 @@ export default function LID() {
       <section className="px-6 md:px-12 py-16 max-w-5xl mx-auto" style={{ borderTop: `1px solid ${C.line}` }}>
         <div className="grid md:grid-cols-[200px_1fr] gap-8 md:gap-16">
           <h2 style={{ fontFamily: SERIF, fontWeight: 900, fontSize: 'clamp(1.6rem,4vw,2.4rem)', letterSpacing: '-0.02em' }}>
-            What you get
+            What&rsquo;s included
           </h2>
           <div className="grid sm:grid-cols-2 gap-x-12 gap-y-7">
             {[
               ['Music, front & center', '30-second previews, your discography, and release pages built for artists.'],
               ['Drops & presaves', 'Countdown timers and drop-alert email capture so fans never miss a release.'],
               ['Fan inbox', 'A built-in DM inbox so listeners can reach you straight from your page.'],
-              ['Your own domain', 'Love It Digital registers yourname.com and wires it to your page — truly yours.'],
+              ['Your own domain', 'Love It Digital registers yourname.com and wires it up — truly yours.'],
             ].map(([t, b]) => (
               <div key={t}>
                 <div className="flex items-center gap-2 mb-2">
@@ -140,7 +145,7 @@ export default function LID() {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How it works — he builds it */}
       <section className="px-6 md:px-12 py-16" style={{ background: C.card, borderTop: `1px solid ${C.line}` }}>
         <div className="max-w-5xl mx-auto">
           <h2 className="mb-12" style={{ fontFamily: SERIF, fontWeight: 900, fontSize: 'clamp(1.6rem,4vw,2.4rem)', letterSpacing: '-0.02em' }}>
@@ -148,9 +153,9 @@ export default function LID() {
           </h2>
           <div className="grid md:grid-cols-3 gap-10">
             {[
-              ['01', 'You claim your page', 'Set up your artist page on plinks — music, links, drops, all of it.', C.ember],
-              ['02', 'Love It wires the domain', 'Love It Digital registers your custom domain and connects it.', C.pink],
-              ['03', 'You go live', 'Your site launches on your domain. Share it everywhere — it looks pro.', C.ember],
+              ['01', 'Reach out', 'Tell Love It Digital about you and your music through their contact form.', C.pink],
+              ['02', 'We build it', 'Love It Digital designs your plinks artist page and registers your custom domain.', C.ember],
+              ['03', 'You go live', 'Your site launches on your own domain — share it everywhere, it looks pro.', C.ember],
             ].map(([n, t, b, col]) => (
               <div key={n} style={{ borderTop: `2px solid ${col}`, paddingTop: 18 }}>
                 <div style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700, color: col, letterSpacing: '0.2em', marginBottom: 12 }}>
@@ -164,15 +169,29 @@ export default function LID() {
         </div>
       </section>
 
+      {/* Need more than a page? */}
+      <section className="px-6 md:px-12 py-16 max-w-5xl mx-auto" style={{ borderTop: `1px solid ${C.line}` }}>
+        <div style={{ background: C.card, border: `1px solid ${C.line}`, borderRadius: 12, padding: 'clamp(24px,5vw,44px)' }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 900, fontSize: 'clamp(1.5rem,4vw,2.2rem)', letterSpacing: '-0.02em', marginBottom: 12 }}>
+            Need more than an artist page?
+          </h2>
+          <p style={{ color: C.muted, fontSize: 16, lineHeight: 1.6, marginBottom: 24, maxWidth: 640 }}>
+            Love It Digital builds full websites, landing pages, online stores, and handles maintenance and
+            marketing too. Whatever you need built, they&rsquo;ve got it &mdash; just ask.
+          </p>
+          <Btn outline>Talk to Love It Digital &rarr;</Btn>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="px-6 md:px-12 py-24 text-center" style={{ borderTop: `1px solid ${C.line}` }}>
         <h2 style={{ fontFamily: SERIF, fontWeight: 900, fontSize: 'clamp(2rem,6vw,3.6rem)', letterSpacing: '-0.02em', marginBottom: 16 }}>
           Ready to drop?
         </h2>
         <p style={{ color: C.muted, fontSize: 18, maxWidth: 480, margin: '0 auto 32px' }}>
-          Claim your page now — we'll take care of the rest.
+          Reach out to Love It Digital and they&rsquo;ll build your page from scratch.
         </p>
-        <Btn to="/studio/new?partner=loveit" big>Claim your page &rarr;</Btn>
+        <Btn big>Get yours built &rarr;</Btn>
       </section>
 
       {/* Footer */}
@@ -186,7 +205,7 @@ export default function LID() {
           <span style={{ color: C.ink }}>plinks<span style={{ color: C.ember }}>.</span>dev</span>
         </div>
         <div className="uppercase tracking-wider" style={{ fontSize: 11 }}>
-          Pages by plinks &middot; Domains by Love It &middot; Midland, TX
+          Built by Love It &middot; Powered by plinks &middot; Midland, TX
         </div>
       </footer>
     </div>
